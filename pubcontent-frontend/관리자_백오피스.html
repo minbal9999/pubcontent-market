@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 백오피스 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1e2535;--surface3:#242d42;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+  --accent:#1dd9a0;--accent2:#0fb87f;--accent-dim:rgba(29,217,160,0.12);
+  --amber:#f5c842;--amber-dim:rgba(245,200,66,0.12);
+  --red:#ff4d6a;--red-dim:rgba(255,77,106,0.12);
+  --blue:#4f7cff;--blue-dim:rgba(79,124,255,0.12);
+  --purple:#a07cfc;--purple-dim:rgba(160,124,252,0.12);
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:rgba(13,17,23,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#0d1117;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.admin-badge{font-size:10px;background:var(--red-dim);color:var(--red);border:1px solid rgba(255,77,106,.25);border-radius:6px;padding:2px 8px;font-weight:600;margin-left:8px;}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
+.btn-accent{background:var(--accent);color:#0d1117;font-weight:700;}
+.btn-accent:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(255,77,106,.2);}
+.btn-approve{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(29,217,160,.2);}
+.btn-sm{padding:4px 10px;font-size:11px;}
+
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 58px);}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;position:sticky;top:58px;height:calc(100vh - 58px);display:flex;flex-direction:column;}
+.menu-section{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 6px;padding:0 8px;}
+.menu-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .13s;margin-bottom:1px;}
+.menu-item:hover{background:var(--surface2);color:var(--text);}
+.menu-item.active{background:var(--accent-dim);color:var(--accent);font-weight:500;}
+.mi-icon{font-size:14px;width:18px;text-align:center;}
+.mi-badge{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;}
+.mb-red{background:var(--red-dim);color:var(--red);}
+.mb-amber{background:var(--amber-dim);color:var(--amber);}
+.mb-accent{background:var(--accent-dim);color:var(--accent);}
+
+.main{padding:24px;}
+.section-title{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--text2);margin-bottom:20px;font-weight:300;}
+
+/* STAT */
+.stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.sc-icon{font-size:20px;margin-bottom:6px;}
+.sc-val{font-family:var(--mono);font-size:22px;font-weight:700;margin-bottom:2px;}
+.sc-label{font-size:10px;color:var(--text3);}
+.sc-trend{font-size:10px;margin-top:3px;}
+.trend-up{color:var(--accent);}
+.trend-down{color:var(--red);}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.data-table th{padding:10px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);background:var(--surface2);}
+.data-table td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--surface2);}
+
+.status-chip{font-size:10px;padding:3px 9px;border-radius:8px;font-weight:600;white-space:nowrap;}
+.chip-pending{background:var(--amber-dim);color:var(--amber);}
+.chip-active{background:var(--accent-dim);color:var(--accent);}
+.chip-reject{background:var(--red-dim);color:var(--red);}
+.chip-dispute{background:var(--red-dim);color:var(--red);}
+.chip-settle{background:var(--blue-dim);color:var(--blue);}
+.chip-done{background:var(--accent-dim);color:var(--accent);}
+
+.user-cell{display:flex;align-items:center;gap:8px;}
+.user-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--surface2);}
+.user-name{font-size:13px;font-weight:500;}
+.user-sub{font-size:11px;color:var(--text3);}
+
+/* FILTER ROW */
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.filter-input{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--sans);font-size:12px;padding:7px 12px;outline:none;width:200px;}
+.filter-input:focus{border-color:var(--accent);}
+.filter-select{background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--sans);font-size:12px;padding:7px 12px;outline:none;cursor:pointer;}
+
+/* CHART MINI */
+.mini-chart{display:flex;align-items:flex-end;gap:3px;height:40px;}
+.mc-bar{background:var(--accent-dim);border-radius:3px 3px 0 0;flex:1;min-width:6px;transition:background .13s;cursor:pointer;}
+.mc-bar:hover{background:var(--accent);}
+
+/* DISPUTE CARD */
+.dispute-card{background:var(--surface);border:1px solid rgba(255,77,106,.2);border-radius:10px;padding:16px;margin-bottom:10px;}
+.dc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.dc-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.dc-meta{font-size:11px;color:var(--text3);}
+.dc-body{font-size:12px;color:var(--text2);background:var(--surface2);border-radius:6px;padding:10px;margin-bottom:10px;line-height:1.6;}
+.dc-actions{display:flex;gap:6px;}
+
+/* ESCROW TABLE */
+.escrow-row-highlight{background:rgba(245,200,66,.04);}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="logo" onclick="nav('랜딩페이지.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+    </div>
+    <span class="admin-badge">🔐 관리자</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div style="font-size:12px;color:var(--text3);">admin@pubcontent.kr</div>
+    <button class="btn btn-ghost" onclick="PCM.logout()">로그아웃</button>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="menu-section">대시보드</div>
+    <div class="menu-item active" id="m-overview" onclick="show('overview')"><span class="mi-icon">📊</span>전체 현황</div>
+
+    <div class="menu-section">회원 관리</div>
+    <div class="menu-item" id="m-approve" onclick="show('approve')"><span class="mi-icon">✅</span>가입 승인<span class="mi-badge mb-red">4</span></div>
+    <div class="menu-item" id="m-members" onclick="show('members')"><span class="mi-icon">👥</span>전체 회원</div>
+
+    <div class="menu-section">거래 관리</div>
+    <div class="menu-item" id="m-escrow" onclick="show('escrow')"><span class="mi-icon">🔒</span>에스크로 현황<span class="mi-badge mb-amber">7</span></div>
+    <div class="menu-item" id="m-dispute" onclick="show('dispute')"><span class="mi-icon">⚠️</span>분쟁 처리<span class="mi-badge mb-red">2</span></div>
+    <div class="menu-item" id="m-settle" onclick="show('settle')"><span class="mi-icon">💰</span>정산 관리</div>
+
+    <div class="menu-section">플랫폼</div>
+    <div class="menu-item" id="m-price" onclick="show('price')"><span class="mi-icon">📈</span>표준단가 관리</div>
+    <div class="menu-item" id="m-log" onclick="show('log')"><span class="mi-icon">📋</span>감사 로그</div>
+
+    <div style="margin-top:auto;padding-top:14px;border-top:1px solid var(--border);">
+      <div style="font-size:10px;color:var(--text3);padding:0 8px;">v1.0.0 · 공공콘텐츠마켓</div>
+    </div>
+  </div>
+
+  <div class="main" id="main-area"></div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+let current='overview';
+
+function show(s){
+  current=s;
+  document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));
+  document.getElementById('m-'+s).classList.add('active');
+  render();
+}
+
+const PENDING_MEMBERS=[
+  {id:1,emoji:'🎬',name:'㈜ 모션픽스',type:'콘텐츠사',email:'motion@fixstudio.com',date:'2025.05.01',ceo:'박지훈',bizNum:'234-56-78901',docs:['사업자등록증','통장사본'],woman:true},
+  {id:2,emoji:'👩',name:'이수정',type:'콘텐츠 전문가',email:'sujung@gmail.com',date:'2025.05.02',verify:'건강보험자격득실확인서',fields:['시각디자인','모션그래픽'],career:7},
+  {id:3,emoji:'🏛',name:'산업부 홍보담당',type:'공공기관',email:'pr@motie.go.kr',date:'2025.05.03',org:'산업통상자원부',dept:'홍보기획팀'},
+  {id:4,emoji:'🎨',name:'㈜ 디자인팩토리',type:'콘텐츠사',email:'df@design.kr',date:'2025.05.04',ceo:'최지훈',bizNum:'345-67-89012',docs:['사업자등록증'],woman:false},
+];
+const ALL_MEMBERS=[
+  {emoji:'🎬',name:'㈜ 그린스튜디오',type:'콘텐츠사',status:'active',joinDate:'2024.01.10',txCount:67,totalVAT:42000},
+  {emoji:'🏛',name:'환경부 홍보기획과',type:'공공기관',status:'active',joinDate:'2024.02.15',txCount:12,totalVAT:18000},
+  {emoji:'👩',name:'김민정',type:'콘텐츠 전문가',status:'active',joinDate:'2024.03.01',txCount:89,totalVAT:0},
+  {emoji:'📊',name:'비주얼팩토리',type:'콘텐츠사',status:'active',joinDate:'2024.01.20',txCount:54,totalVAT:28000},
+  {emoji:'🏛',name:'국토부 소통협력관',type:'공공기관',status:'active',joinDate:'2024.04.05',txCount:8,totalVAT:12000},
+];
+const ESCROWS=[
+  {id:'ESC-001',task:'탄소중립 SNS 카드뉴스',buyer:'환경부',seller:'㈜ 그린스튜디오',amount:1800,status:'보관 중',days:5},
+  {id:'ESC-002',task:'서울시 SNS 채널 운영',buyer:'서울시',seller:'소셜미디어웍스',amount:2100,status:'보관 중',days:12},
+  {id:'ESC-003',task:'국토부 홍보영상',buyer:'국토부',seller:'퍼블릭크리에이티브',amount:5500,status:'정산 대기',days:1},
+  {id:'ESC-004',task:'환경 정책 인포그래픽',buyer:'환경부',seller:'비주얼팩토리',amount:700,status:'정산 완료',days:0},
+];
+const DISPUTES=[
+  {id:'DIS-001',task:'행안부 홍보영상 수정',buyer:'행안부 홍보담당관',seller:'퍼블릭크리에이티브',amount:3200,
+   issue:'3차 수정 요청 후 추가 수정 요구, 범위 과도 논란',buyerSide:'계약서 내 수정 범위 해석 차이',sellerSide:'2회 수정 완료, 추가 요청은 과업 외 사항',date:'2025.04.28'},
+  {id:'DIS-002',task:'SNS 카드뉴스 납기 지연',buyer:'복지부 정책홍보담당관',seller:'모션랩',amount:1200,
+   issue:'납기일 2일 초과, 발주처 최종 승인 거부 중',buyerSide:'납기 지연으로 캠페인 일정 차질',sellerSide:'추가 수정 요청이 납기 지연 원인',date:'2025.05.01'},
+];
+
+function render(){
+  const el=document.getElementById('main-area');
+  if(current==='overview') el.innerHTML=renderOverview();
+  else if(current==='approve') el.innerHTML=renderApprove();
+  else if(current==='members') el.innerHTML=renderMembers();
+  else if(current==='escrow') el.innerHTML=renderEscrow();
+  else if(current==='dispute') el.innerHTML=renderDispute();
+  else if(current==='settle') el.innerHTML=renderSettle();
+  else if(current==='price') el.innerHTML=renderPrice();
+  else el.innerHTML=renderLog();
+}
+
+function renderOverview(){
+  const bars=[45,62,78,91,55,83,97,74,88,62,75,92];
+  return`
+    <div class="section-title">전체 현황</div>
+    <div class="section-sub">오늘: ${new Date().toLocaleDateString('ko-KR')}</div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="sc-icon">👥</div><div class="sc-val" style="color:var(--blue);">127</div><div class="sc-label">전체 회원</div><div class="sc-trend trend-up">▲ 12 이번 달</div></div>
+      <div class="stat-card"><div class="sc-icon">📋</div><div class="sc-val" style="color:var(--accent);">34</div><div class="sc-label">진행 중 거래</div><div class="sc-trend trend-up">▲ 8 이번 달</div></div>
+      <div class="stat-card"><div class="sc-icon">🔒</div><div class="sc-val" style="color:var(--amber);">8,050<span style="font-size:13px;">만</span></div><div class="sc-label">에스크로 보관</div><div class="sc-trend trend-up">▲ 1,200만</div></div>
+      <div class="stat-card"><div class="sc-icon">💰</div><div class="sc-val" style="color:var(--accent);">732<span style="font-size:13px;">만</span></div><div class="sc-label">이번 달 수수료</div><div class="sc-trend trend-up">▲ 18%</div></div>
+      <div class="stat-card"><div class="sc-icon">⚠️</div><div class="sc-val" style="color:var(--red);">2</div><div class="sc-label">분쟁 처리 중</div><div class="sc-trend trend-down">미해결</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:.07em;">최근 12일 거래 건수</div>
+        <div class="mini-chart">
+          ${bars.map(h=>`<div class="mc-bar" style="height:${h}%;"></div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px;"><span>5/1</span><span>5/12</span></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:.07em;">회원 유형 분포</div>
+        ${[{label:'콘텐츠사',val:54,color:'var(--accent)'},{label:'공공기관',val:38,color:'var(--blue)'},{label:'콘텐츠 전문가',val:35,color:'var(--purple)'}].map(d=>`
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>${d.label}</span><span style="font-family:var(--mono);font-weight:600;">${d.val}명</span></div>
+            <div style="height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;"><div style="height:100%;background:${d.color};width:${d.val/127*100}%;border-radius:3px;"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid rgba(255,77,106,.2);border-radius:10px;padding:14px;">
+      <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:10px;">🚨 즉시 처리 필요</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:8px 12px;background:var(--surface2);border-radius:6px;">
+          <span>가입 승인 대기 <strong style="color:var(--amber);">4건</strong></span>
+          <button class="btn btn-amber btn-sm" style="background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,200,66,.2);" onclick="show('approve')">처리하기 →</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:8px 12px;background:var(--surface2);border-radius:6px;">
+          <span>분쟁 처리 중 <strong style="color:var(--red);">2건</strong></span>
+          <button class="btn btn-danger btn-sm" onclick="show('dispute')">처리하기 →</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:8px 12px;background:var(--surface2);border-radius:6px;">
+          <span>정산 대기 <strong style="color:var(--blue);">1건</strong></span>
+          <button class="btn btn-ghost btn-sm" onclick="show('settle')">처리하기 →</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderApprove(){
+  return`
+    <div class="section-title">가입 승인 대기</div>
+    <div class="section-sub">가입 신청 서류를 검토하고 승인 또는 반려해주세요</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${PENDING_MEMBERS.map(m=>`
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+            <div style="font-size:28px;">${m.emoji}</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+                <span style="font-size:14px;font-weight:700;">${m.name}</span>
+                <span class="status-chip chip-pending">${m.type}</span>
+                ${m.woman?'<span style="font-size:10px;background:rgba(180,80,180,.15);color:#c87cd0;border-radius:6px;padding:2px 7px;">여성기업</span>':''}
+              </div>
+              <div style="font-size:12px;color:var(--text3);">${m.email} · 신청일 ${m.date}</div>
+              <div style="font-size:12px;color:var(--text2);margin-top:4px;">
+                ${m.type==='콘텐츠사'?`대표자: ${m.ceo} · 사업자번호: ${m.bizNum} · 서류: ${m.docs.join(', ')}`:''}
+                ${m.type==='콘텐츠 전문가'?`인증: ${m.verify} · 분야: ${m.fields.join(', ')} · 경력 ${m.career}년`:''}
+                ${m.type==='공공기관'?`기관: ${m.org} · 부서: ${m.dept}`:''}
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-approve btn-sm" onclick="approveMember(${m.id})">✓ 승인</button>
+              <button class="btn btn-danger btn-sm" onclick="rejectMember(${m.id})">✕ 반려</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="openDocViewer(1)">📄 서류 보기</button>
+            <button class="btn btn-ghost btn-sm" style="font-size:11px;">💬 추가 서류 요청</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderMembers(){
+  return`
+    <div class="section-title">전체 회원</div>
+    <div class="section-sub">총 127명</div>
+    <div class="filter-row">
+      <input type="text" class="filter-input" placeholder="🔍  이름, 이메일 검색">
+      <select class="filter-select"><option>전체 유형</option><option>공공기관</option><option>콘텐츠사</option><option>콘텐츠 전문가</option></select>
+      <select class="filter-select"><option>전체 상태</option><option>활성</option><option>정지</option></select>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>회원</th><th>유형</th><th>거래 건수</th><th>총 발주금액</th><th>상태</th><th>가입일</th><th>관리</th>
+      </tr></thead>
+      <tbody>
+        ${ALL_MEMBERS.map(m=>`
+          <tr>
+            <td><div class="user-cell"><div class="user-avatar">${m.emoji}</div><div><div class="user-name">${m.name}</div></div></div></td>
+            <td><span class="status-chip ${m.type==='공공기관'?'chip-settle':m.type==='콘텐츠사'?'chip-active':'chip-pending'}">${m.type}</span></td>
+            <td style="font-family:var(--mono);">${m.txCount}건</td>
+            <td style="font-family:var(--mono);color:var(--accent);">${m.totalVAT?m.totalVAT.toLocaleString()+'만원':'—'}</td>
+            <td><span class="status-chip chip-active">활성</span></td>
+            <td style="color:var(--text3);font-size:12px;">${m.joinDate}</td>
+            <td><div style="display:flex;gap:4px;"><button class="btn btn-ghost btn-sm">상세</button><button class="btn btn-danger btn-sm">정지</button></div></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderEscrow(){
+  const total=ESCROWS.filter(e=>e.status==='보관 중'||e.status==='정산 대기').reduce((s,e)=>s+e.amount,0);
+  return`
+    <div class="section-title">에스크로 현황</div>
+    <div class="section-sub">보관 중 총액: <strong style="color:var(--amber);font-family:var(--mono);">${total.toLocaleString()}만원</strong></div>
+    <table class="data-table">
+      <thead><tr>
+        <th>에스크로 ID</th><th>과업명</th><th>발주처</th><th>제작사</th><th style="text-align:right;">금액 (VAT포함)</th><th>상태</th><th>보관일수</th><th>관리</th>
+      </tr></thead>
+      <tbody>
+        ${ESCROWS.map(e=>`
+          <tr class="${e.status==='정산 대기'?'escrow-row-highlight':''}">
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${e.id}</td>
+            <td style="font-weight:500;">${e.task}</td>
+            <td style="font-size:12px;color:var(--text2);">${e.buyer}</td>
+            <td style="font-size:12px;color:var(--text2);">${e.seller}</td>
+            <td style="text-align:right;font-family:var(--mono);font-weight:600;color:${e.status==='정산 완료'?'var(--text3)':'var(--accent)'};">${e.amount.toLocaleString()}만원</td>
+            <td><span class="status-chip ${e.status==='보관 중'?'chip-pending':e.status==='정산 대기'?'chip-settle':'chip-done'}">${e.status}</span></td>
+            <td style="font-family:var(--mono);color:${e.days>10?'var(--red)':e.days>5?'var(--amber)':'var(--text3)'};">${e.days>0?e.days+'일':'—'}</td>
+            <td>
+              ${e.status==='정산 대기'?`<button class="btn btn-accent btn-sm" onclick="processSettle('${e.id}')">정산 실행</button>`:''}
+              ${e.status==='보관 중'?`<button class="btn btn-ghost btn-sm">상세</button>`:''}
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderDispute(){
+  return`
+    <div class="section-title">분쟁 처리</div>
+    <div class="section-sub">에스크로 대금 동결 중 · 30일 내 해결 필요</div>
+    <div>
+      ${DISPUTES.map(d=>`
+        <div class="dispute-card">
+          <div class="dc-top">
+            <div style="font-size:22px;">⚠️</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+                <span class="dc-title">${d.task}</span>
+                <span style="font-family:var(--mono);font-size:10px;color:var(--text3);">${d.id}</span>
+                <span style="font-family:var(--mono);font-size:12px;font-weight:700;color:var(--red);margin-left:auto;">${d.amount.toLocaleString()}만원 동결</span>
+              </div>
+              <div class="dc-meta">${d.buyer} ↔ ${d.seller} · 접수일 ${d.date}</div>
+            </div>
+          </div>
+          <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.07em;">분쟁 내용</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">${d.issue}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:var(--blue-dim);border-radius:6px;padding:8px;"><div style="font-size:10px;color:var(--blue);margin-bottom:3px;">발주처 주장</div><div style="font-size:12px;color:var(--text2);">${d.buyerSide}</div></div>
+              <div style="background:var(--amber-dim);border-radius:6px;padding:8px;"><div style="font-size:10px;color:var(--amber);margin-bottom:3px;">제작사 주장</div><div style="font-size:12px;color:var(--text2);">${d.sellerSide}</div></div>
+            </div>
+          </div>
+          <div class="dc-actions">
+            <button class="btn btn-approve btn-sm" onclick="resolveDispute('${d.id}','seller')">제작사 손 들어주기 (대금 지급)</button>
+            <button class="btn btn-danger btn-sm" onclick="resolveDispute('${d.id}','buyer')">발주처 손 들어주기 (대금 반환)</button>
+            <button class="btn btn-ghost btn-sm">조정안 제시</button>
+            <button class="btn btn-ghost btn-sm">💬 양측 메시지</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderSettle(){
+  return`
+    <div class="section-title">정산 관리</div>
+    <div class="section-sub">수수료 정산 및 제작사 대금 지급</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+      ${[{label:'이번 달 수수료',val:'732만원',color:'var(--accent)'},{label:'정산 대기',val:'1건',color:'var(--amber)'},{label:'정산 완료',val:'18건',color:'var(--text)'},{label:'총 누계 수수료',val:'4,820만원',color:'var(--blue)'}].map(s=>`
+        <div class="stat-card"><div class="sc-label">${s.label}</div><div class="sc-val" style="color:${s.color};font-size:18px;">${s.val}</div></div>`).join('')}
+    </div>
+    <table class="data-table">
+      <thead><tr><th>에스크로 ID</th><th>과업명</th><th>제작사</th><th style="text-align:right;">공급가액</th><th style="text-align:right;">수수료(5%)</th><th style="text-align:right;">지급액(사업비)</th><th>상태</th><th>관리</th></tr></thead>
+      <tbody>
+        ${ESCROWS.map(e=>{
+          const supply=Math.round(e.amount/1.1);
+          const comm=Math.round(supply*.05);
+          const biz=supply-comm;
+          return`<tr>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text3);">${e.id}</td>
+            <td style="font-weight:500;font-size:12px;">${e.task}</td>
+            <td style="font-size:12px;color:var(--text2);">${e.seller}</td>
+            <td style="text-align:right;font-family:var(--mono);font-size:12px;">${supply.toLocaleString()}</td>
+            <td style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--amber);">-${comm.toLocaleString()}</td>
+            <td style="text-align:right;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);">${biz.toLocaleString()}</td>
+            <td><span class="status-chip ${e.status==='정산 완료'?'chip-done':e.status==='정산 대기'?'chip-settle':'chip-pending'}">${e.status}</span></td>
+            <td>${e.status==='정산 대기'?`<button class="btn btn-accent btn-sm" onclick="processSettle('${e.id}')">지급 실행</button>`:''}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderPrice(){
+  return`
+    <div class="section-title">표준단가 관리</div>
+    <div class="section-sub">플랫폼 노출 표준단가를 관리합니다. 변경 시 즉시 반영됩니다.</div>
+    <table class="data-table">
+      <thead><tr><th>분야</th><th>항목</th><th style="text-align:right;">최솟값(만원)</th><th style="text-align:right;">표준가(만원)</th><th style="text-align:right;">최댓값(만원)</th><th>최종 수정</th><th>관리</th></tr></thead>
+      <tbody>
+        ${[{field:'SNS·디지털',item:'SNS 카드뉴스',min:800,std:1500,max:2500,date:'2025.04.01'},
+           {field:'영상',item:'홍보영상 (3분)',min:3000,std:5000,max:8000,date:'2025.04.01'},
+           {field:'인쇄',item:'브로슈어 A4',min:800,std:1500,max:2500,date:'2025.03.15'},
+           {field:'SNS운영',item:'SNS 채널운영/월',min:200,std:350,max:500,date:'2025.03.01'}].map(r=>`
+          <tr>
+            <td style="font-size:11px;color:var(--text3);">${r.field}</td>
+            <td style="font-weight:500;">${r.item}</td>
+            <td style="text-align:right;font-family:var(--mono);">${r.min.toLocaleString()}</td>
+            <td style="text-align:right;font-family:var(--mono);font-weight:700;color:var(--accent);">${r.std.toLocaleString()}</td>
+            <td style="text-align:right;font-family:var(--mono);">${r.max.toLocaleString()}</td>
+            <td style="font-size:11px;color:var(--text3);">${r.date}</td>
+            <td><button class="btn btn-ghost btn-sm">수정</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderLog(){
+  return`
+    <div class="section-title">감사 로그</div>
+    <div class="section-sub">플랫폼 주요 이벤트 기록</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px 16px;">
+      ${[{time:'2025.05.05 14:32',type:'승인',msg:'㈜ 모션픽스 가입 승인 처리 (admin@pubcontent.kr)'},
+         {time:'2025.05.05 13:10',type:'정산',msg:'ESC-003 정산 실행 — 비주얼팩토리 636만원 지급'},
+         {time:'2025.05.05 11:45',type:'분쟁',msg:'DIS-001 분쟁 접수 — 행안부 홍보영상 수정 건'},
+         {time:'2025.05.04 16:20',type:'단가',msg:'SNS 카드뉴스 표준단가 수정: 1,200만 → 1,500만원'},
+         {time:'2025.05.04 10:00',type:'가입',msg:'국토부 소통협력관 회원 가입 완료'},
+       ].map(l=>`
+        <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text3);white-space:nowrap;">${l.time}</div>
+          <span style="font-size:10px;padding:2px 7px;border-radius:5px;font-weight:600;height:fit-content;background:var(--accent-dim);color:var(--accent);">${l.type}</span>
+          <div style="color:var(--text2);">${l.msg}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function approveMember(id){alert('승인 완료. 가입 확인 이메일이 발송됩니다.');}
+function rejectMember(id){alert('반려 처리되었습니다. 사유 이메일이 발송됩니다.');}
+function processSettle(id){alert(`${id} 정산 실행 완료. 제작사 계좌로 사업비가 지급됩니다.`);}
+function resolveDispute(id,side){
+  const msg=side==='seller'?'제작사에 대금 지급 처리됩니다.':'발주처에 대금 반환 처리됩니다.';
+  alert(`${id} 분쟁 해결: ${msg}`);
+}
+
+render();
+</script>
+
+<div id="doc-viewer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;">
+  <div style="background:#161b27;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:0;max-width:640px;width:92%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:14px;font-weight:700;color:#e8eaf2;" id="dv-title">서류 확인</div>
+      <button onclick="document.getElementById('doc-viewer').style.display='none'" style="background:rgba(255,255,255,.1);border:none;color:#e8eaf2;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:22px;" id="dv-content"></div>
+    <div style="padding:16px 22px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:10px;justify-content:flex-end;" id="dv-actions"></div>
+  </div>
+</div>
+
+<script>
+
+function openDocViewer(memberId) {
+  const m = PENDING_MEMBERS.find(x=>x.id===memberId);
+  if(!m) return;
+  document.getElementById('dv-title').textContent = m.name + ' 제출 서류';
+  document.getElementById('dv-content').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:12px;text-transform:uppercase;letter-spacing:.07em;">제출 서류 목록</div>
+      ${(m.docs||[m.verify||'인증 서류']).map(doc=>`
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:24px;">📄</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:500;color:#e8eaf2;">${doc}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.4);">제출일: ${m.date}</div>
+          </div>
+          <span style="font-size:11px;padding:3px 9px;background:rgba(29,217,160,.15);color:#1dd9a0;border-radius:6px;font-weight:600;">확인 완료</span>
+        </div>`).join('')}
+    </div>
+    <div style="background:rgba(255,255,255,.03);border-radius:10px;padding:14px;">
+      <div style="font-size:12px;color:rgba(255,255,255,.4);margin-bottom:10px;">신청자 정보</div>
+      ${[
+        ['유형', m.type],
+        ['이름/회사', m.name],
+        ['이메일', m.email],
+        ['신청일', m.date],
+        m.bizNum ? ['사업자번호', m.bizNum] : null,
+        m.ceo ? ['대표자', m.ceo] : null,
+        m.career ? ['경력', m.career+'년'] : null,
+      ].filter(Boolean).map(([k,v])=>`
+        <div style="display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;">
+          <span style="color:rgba(255,255,255,.4);min-width:80px;">${k}</span>
+          <span style="color:rgba(255,255,255,.8);">${v}</span>
+        </div>`).join('')}
+    </div>`;
+  document.getElementById('dv-actions').innerHTML = `
+    <button onclick="rejectMember(${memberId});document.getElementById('doc-viewer').style.display='none'" style="padding:9px 18px;background:rgba(255,77,106,.15);color:#ff4d6a;border:1px solid rgba(255,77,106,.2);border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:12px;">✕ 반려</button>
+    <button onclick="approveMember(${memberId});document.getElementById('doc-viewer').style.display='none'" style="padding:9px 18px;background:#1dd9a0;color:#0d1117;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--sans);font-size:12px;">✓ 승인</button>`;
+  document.getElementById('doc-viewer').style.display='flex';
+}
+
+// 승인 후 상태 반영
+let approvedIds = new Set();
+let rejectedIds = new Set();
+
+const _origApprove = approveMember;
+approveMember = function(id) {
+  approvedIds.add(id);
+  rejectedIds.delete(id);
+  alert('승인 완료. 가입 확인 이메일이 발송됩니다.');
+  render();
+};
+const _origReject = rejectMember;
+rejectMember = function(id) {
+  rejectedIds.add(id);
+  approvedIds.delete(id);
+  alert('반려 처리되었습니다. 사유 이메일이 발송됩니다.');
+  render();
+};
+</script>
+</body>
+</html>

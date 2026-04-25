@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>견적 요청 수신 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.logo-role{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:2px 8px;margin-left:6px;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-danger{background:var(--red-light);color:var(--red);border:1px solid rgba(220,53,69,.2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.main{max-width:800px;margin:0 auto;padding:32px 24px;}
+.page-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text2);font-weight:300;margin-bottom:24px;}
+.req-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px;transition:box-shadow .15s;}
+.req-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07);}
+.rc-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;}
+.rc-icon{font-size:28px;flex-shrink:0;}
+.rc-info{flex:1;}
+.rc-title{font-size:15px;font-weight:700;margin-bottom:4px;}
+.rc-meta{font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap;}
+.rc-status{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+.s-new{background:var(--blue-light);color:var(--blue);}
+.s-sent{background:var(--amber-light);color:var(--amber);}
+.s-accepted{background:var(--accent-light);color:var(--accent);}
+.s-rejected{background:var(--red-light);color:var(--red);}
+.rc-budget{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--blue);}
+.rc-detail{background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rd-item{font-size:12px;}
+.rd-key{color:var(--text3);margin-bottom:2px;}
+.rd-val{font-weight:500;color:var(--text);}
+.rc-task{background:var(--blue-light);border:1px solid rgba(26,86,219,.12);border-radius:10px;padding:14px;margin-bottom:14px;}
+.rt-label{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.rt-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.rt-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+.rc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.deadline-badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:8px;}
+.db-ok{background:var(--accent-light);color:var(--accent);}
+.db-warn{background:var(--amber-light);color:var(--amber);}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+@media(max-width:768px){.rc-detail{grid-template-columns:1fr;}.rc-actions{flex-direction:column;}}
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo" onclick="nav('마이페이지_콘텐츠사.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+      <span class="logo-role">콘텐츠사</span>
+    </div>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="nav('마이페이지_콘텐츠사.html')">← 마이페이지</button>
+</div>
+<div class="main">
+  <div class="page-title">견적 요청 수신함</div>
+  <div class="page-sub">발주처로부터 받은 견적 요청을 확인하고 견적서를 제출하세요</div>
+  <div id="req-list"></div>
+</div>
+<script>
+
+
+
+function nav(p){window.location.href=p;}
+
+// 멤버십 접근 제어
+var _membership = 'none';
+try { _membership = sessionStorage.getItem('pcm_membership') || 'none'; } catch(e){}
+
+(function(){
+  if(!['standard','pro'].includes(_membership)){
+    // 페이지 상단에 잠금 배너 삽입
+    document.addEventListener('DOMContentLoaded', function(){
+      var main = document.querySelector('.main') || document.body;
+      var banner = document.createElement('div');
+      banner.style.cssText = 'background:#e8f5ef;border:1.5px solid rgba(26,107,74,.2);border-radius:12px;padding:24px;text-align:center;margin-bottom:20px;';
+      banner.innerHTML = '<div style="font-size:36px;margin-bottom:10px;">🔒</div>'
+        +'<div style="font-size:16px;font-weight:700;color:#1a6b4a;margin-bottom:6px;">스탠다드 이상 멤버십 필요</div>'
+        +'<div style="font-size:13px;color:#4a5568;margin-bottom:14px;line-height:1.7;">고객사 의뢰 확인 및 견적 제안은<br><strong>월 3만원 스탠다드</strong> 이상에서 사용 가능합니다.</div>'
+        +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">'
+        +'<button onclick="window.location.href='멤버십.html' /* upgrade */" style="padding:10px 24px;background:#1a6b4a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;">💼 멤버십 업그레이드</button>'
+        +'<button onclick="window.location.href='마이페이지_콘텐츠사.html'" style="padding:10px 18px;background:transparent;border:1px solid rgba(0,0,0,.14);border-radius:8px;font-size:13px;cursor:pointer;font-family:sans-serif;">← 돌아가기</button>'
+        +'</div>';
+      // 기존 내용 위에 배너 추가
+      if(main.firstChild) main.insertBefore(banner, main.firstChild);
+      // 기존 req-list 흐리게
+      var reqList = document.getElementById('req-list');
+      if(reqList){ reqList.style.filter='blur(4px)'; reqList.style.pointerEvents='none'; reqList.style.userSelect='none'; }
+    });
+  }
+})();
+
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+const REQUESTS = [
+  {id:1, icon:"🏛", org:"환경부 홍보기획과", title:"탄소중립 SNS 카드뉴스 제작", budget:18000000, deadline:"2025.05.10", daysLeft:5,
+   deliverables:["카드뉴스 10장","원본 PSD","SNS 최적화본"], purpose:"정책 홍보, 국민 인식 제고", targets:"일반 국민, 청년층",
+   status:"new", receivedAt:"2025.05.01 10:30", note:"공공언어 가이드라인 준수 필수"},
+  {id:2, icon:"🏛", org:"국토부 주거복지기획과", title:"주거복지 인포그래픽 5종", budget:3500000, deadline:"2025.05.20", daysLeft:15,
+   deliverables:["인포그래픽 5종","PDF 인쇄용","PNG 웹용"], purpose:"제도 안내", targets:"일반 국민",
+   status:"sent", receivedAt:"2025.04.29 14:00", note:"통계 수치 최신화 필수"},
+  {id:3, icon:"🏛", org:"서울시 디지털소통담당관", title:"SNS 채널 3개월 운영", budget:10500000, deadline:"2025.06.01", daysLeft:27,
+   deliverables:["월간 캘린더","게시물 원본","월간 보고서"], purpose:"기관 브랜딩", targets:"청년층, 일반 국민",
+   status:"accepted", receivedAt:"2025.04.25 09:00", note:""},
+];
+
+const STATUS_MAP = {
+  new:{label:"신규 요청", cls:"s-new"},
+  sent:{label:"견적 발송 완료", cls:"s-sent"},
+  accepted:{label:"계약 체결", cls:"s-accepted"},
+  rejected:{label:"거절됨", cls:"s-rejected"},
+};
+
+function render(){
+  const el=document.getElementById("req-list");
+  if(REQUESTS.length===0){
+    el.innerHTML=`<div class="empty-state"><div style="font-size:44px;margin-bottom:14px;">📭</div><div style="font-size:17px;font-weight:700;color:var(--text2);margin-bottom:8px;">수신된 견적 요청이 없습니다</div><div style="font-size:13px;">발주처가 견적을 요청하면 이곳에 표시됩니다.</div></div>`;
+    return;
+  }
+  el.innerHTML=REQUESTS.map(r=>{
+    const st=STATUS_MAP[r.status]||{label:r.status,cls:"s-new"};
+    const dbCls=r.daysLeft<=3?"db-warn":"db-ok";
+    const bd=Math.round(r.budget/1.1);
+    const biz=Math.round(bd*0.9);
+    return `<div class="req-card">
+      <div class="rc-top">
+        <div class="rc-icon">${r.icon}</div>
+        <div class="rc-info">
+          <div class="rc-title">${r.title}</div>
+          <div class="rc-meta">
+            <span>${r.org}</span>
+            <span>📅 납기 ${r.deadline}</span>
+            <span class="deadline-badge ${dbCls}">D-${r.daysLeft}</span>
+          </div>
+        </div>
+        <div>
+          <span class="rc-status ${st.cls}">${st.label}</span><br>
+          <div class="rc-budget" style="margin-top:6px;text-align:right;">${(r.budget/10000).toLocaleString()}만원</div>
+        </div>
+      </div>
+      <div class="rc-task">
+        <div class="rt-label">과업 상세</div>
+        <div class="rt-title">${r.title}</div>
+        <div class="rt-desc">납품물: ${r.deliverables.join(", ")} · 목적: ${r.purpose} · 타깃: ${r.targets}${r.note?" · 특이사항: "+r.note:""}</div>
+      </div>
+      <div class="rc-detail">
+        <div class="rd-item"><div class="rd-key">발주 예산 (VAT포함)</div><div class="rd-val" style="font-family:var(--mono);color:var(--blue);">${r.budget.toLocaleString()}원</div></div>
+        <div class="rd-item"><div class="rd-key">예상 사업비 (실수령)</div><div class="rd-val" style="font-family:var(--mono);color:var(--accent);">${biz.toLocaleString()}원</div></div>
+        <div class="rd-item"><div class="rd-key">희망 납기</div><div class="rd-val">${r.deadline}</div></div>
+        <div class="rd-item"><div class="rd-key">요청 수신일</div><div class="rd-val">${r.receivedAt}</div></div>
+      </div>
+      <div class="rc-actions">
+        ${r.status==="new"?`
+          <button class="btn btn-primary" onclick="nav('견적서_제출.html')">✍️ 견적서 작성</button>
+          <button class="btn btn-ghost" onclick="viewTask(${r.id})">📋 과업지시서 보기</button>
+          <button class="btn btn-danger" onclick="rejectReq(${r.id})">✕ 거절</button>
+        `:r.status==="sent"?`
+          <button class="btn btn-ghost" onclick="nav('견적서_제출.html')">✏️ 견적 수정</button>
+          <button class="btn btn-ghost">📋 발송된 견적서 보기</button>
+        `:r.status==="accepted"?`
+          <button class="btn btn-primary" onclick="nav('납품_제출.html')">📦 납품 제출</button>
+          <button class="btn btn-ghost" onclick="nav('계약서.html')">📄 계약서 보기</button>
+        `:`<span style="font-size:12px;color:var(--text3);">처리 완료</span>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function viewTask(id){ alert("과업지시서 상세 보기 (실제 서비스에서 제공)"); }
+function rejectReq(id){
+  if(confirm("이 견적 요청을 거절하시겠습니까?")){
+    const r=REQUESTS.find(x=>x.id===id);
+    if(r){r.status="rejected";render();}
+  }
+}
+
+render();
+</script>
+</body>
+</html>

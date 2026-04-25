@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과업지시서 생성기 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #ffffff;
+  --surface2: #f9f8f5;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1f2e;
+  --text2: #4a5568;
+  --text3: #8492a6;
+  --accent: #1a6b4a;
+  --accent2: #2d9e72;
+  --accent-light: #e8f5ef;
+  --accent-mid: rgba(26,107,74,0.12);
+  --serif: 'Noto Serif KR', serif;
+  --sans: 'Noto Sans KR', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 700; font-size: 12px; color: #fff; }
+.logo-name { font-family: var(--serif); font-size: 14px; font-weight: 700; }
+.logo-sep { color: var(--text3); margin: 0 8px; }
+.logo-page { font-size: 13px; color: var(--text2); }
+
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: var(--sans); transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { background: var(--surface2); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* MAIN LAYOUT */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 0;
+  min-height: calc(100vh - 58px);
+}
+
+/* LEFT — WIZARD */
+.wizard-panel {
+  padding: 32px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+.wizard-header { margin-bottom: 28px; }
+.wizard-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.wizard-sub { font-size: 13px; color: var(--text2); font-weight: 300; }
+
+/* MODE TOGGLE */
+.mode-toggle {
+  display: flex;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 28px;
+  width: fit-content;
+}
+.mode-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: var(--sans);
+  color: var(--text3);
+  background: transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.mode-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* STEP INDICATOR */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+.si-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text3);
+}
+.si-dot {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--text3);
+  transition: all 0.2s;
+}
+.si-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+.si-dot.active { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.si-label { font-weight: 500; }
+.si-label.active { color: var(--accent); }
+.si-label.done { color: var(--text2); }
+.si-line { flex: 1; height: 1px; background: var(--border2); margin: 0 8px; max-width: 40px; }
+.si-line.done { background: var(--accent); }
+
+/* SECTION */
+.wizard-section { margin-bottom: 28px; }
+.ws-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ws-label-num {
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* CONTENT TYPE GRID */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.type-card {
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  background: var(--surface);
+}
+.type-card:hover { border-color: var(--accent); background: var(--accent-light); }
+.type-card.selected { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 3px rgba(26,107,74,0.1); }
+.type-icon { font-size: 24px; margin-bottom: 8px; }
+.type-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.type-sub { font-size: 10px; color: var(--text3); }
+
+/* OPTIONS */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.option-chip {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  font-size: 13px;
+  color: var(--text2);
+}
+.option-chip:hover { border-color: var(--accent); color: var(--text); }
+.option-chip.selected { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.option-check { width: 16px; height: 16px; border-radius: 4px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 700; opacity: 0; transition: opacity 0.15s; }
+.option-chip.selected .option-check { opacity: 1; }
+
+/* SPEC INPUTS */
+.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--text2); }
+input[type="text"], input[type="number"], select, textarea {
+  background: var(--surface);
+  border: 1.5px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 9px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input::placeholder, textarea::placeholder { color: var(--text3); }
+textarea { resize: vertical; min-height: 80px; }
+
+.input-unit {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.input-unit input { border-radius: 8px 0 0 8px; }
+.unit-badge {
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: var(--text3);
+  white-space: nowrap;
+}
+
+/* CHECKLIST */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--surface);
+}
+.check-item-row:hover { border-color: var(--accent); }
+.check-item-row.checked { border-color: var(--accent); background: var(--accent-light); }
+.check-box {
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.check-item-row.checked .check-box { background: var(--accent); border-color: var(--accent); color: #fff; }
+.check-item-text { font-size: 13px; color: var(--text2); }
+.check-item-row.checked .check-item-text { color: var(--text); font-weight: 500; }
+
+/* NAV BUTTONS */
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* RIGHT — PREVIEW */
+.preview-panel {
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 58px);
+  position: sticky;
+  top: 58px;
+}
+
+.preview-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.preview-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.preview-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+.preview-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.doc-section { margin-bottom: 20px; }
+.doc-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--accent-light);
+}
+.doc-row {
+  display: flex;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.doc-row:last-child { border-bottom: none; }
+.doc-key { color: var(--text3); min-width: 100px; flex-shrink: 0; }
+.doc-val { color: var(--text); font-weight: 500; line-height: 1.5; }
+.doc-val.placeholder { color: var(--text3); font-weight: 400; font-style: italic; }
+
+.doc-checklist { list-style: none; }
+.doc-checklist li {
+  font-size: 12px;
+  color: var(--text2);
+  padding: 3px 0;
+  padding-left: 14px;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.doc-checklist li:last-child { border-bottom: none; }
+.doc-checklist li::before { content: '·'; position: absolute; left: 4px; color: var(--accent); font-weight: 700; }
+
+.preview-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* CHAT MODE */
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 58px - 56px - 28px);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.msg {
+  display: flex;
+  gap: 10px;
+  animation: msgIn 0.3s ease both;
+}
+
+@keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.msg.user { flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.msg.bot .msg-avatar { background: var(--accent-light); color: var(--accent); }
+.msg.user .msg-avatar { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+
+.msg-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.msg.bot .msg-bubble {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px 12px 12px 12px;
+}
+.msg.user .msg-bubble {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 12px 4px 12px 12px;
+}
+
+.msg-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.msg-option {
+  border: 1.5px solid var(--accent);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+  font-family: var(--sans);
+}
+.msg-option:hover { background: var(--accent-light); }
+.msg-option.selected { background: var(--accent); color: #fff; }
+
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+.chat-input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: var(--sans);
+  color: var(--text);
+  outline: none;
+  resize: none;
+  height: 42px;
+}
+.chat-input:focus { border-color: var(--accent); }
+.chat-input::placeholder { color: var(--text3); }
+.chat-send { width: 42px; height: 42px; border-radius: 10px; background: var(--accent); border: none; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+.chat-send:hover { background: var(--accent2); }
+
+/* TYPING */
+.typing { display: flex; gap: 4px; align-items: center; padding: 10px 14px; }
+.typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: typing 1.2s ease infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,60%,100%{ opacity: 0.3; transform: translateY(0); } 30%{ opacity: 1; transform: translateY(-4px); } }
+
+/* COMPLETE */
+.complete-banner {
+  background: var(--accent-light);
+  border: 1.5px solid rgba(26,107,74,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+    <span class="logo-sep">/</span>
+    <span class="logo-page">과업지시서 생성기</span>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button id="dark-toggle" onclick="toggleDarkMode()" title="다크모드" style="background:transparent;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:14px;">🌙</button>
+    <button class="btn btn-ghost btn-sm" onclick="resetAll()">처음부터</button>
+    <button class="btn btn-primary btn-sm" onclick="exportDoc()">과업지시서 다운로드</button>
+  </div>
+</div>
+
+<div class="main-layout">
+  <!-- LEFT -->
+  <div class="wizard-panel" id="wizard-panel">
+  </div>
+
+  <!-- RIGHT PREVIEW -->
+  <div class="preview-panel">
+    <div class="preview-header">
+      <div class="preview-title">과업지시서 미리보기</div>
+      <div class="preview-badge" id="preview-badge">작성 중</div>
+    </div>
+    <div class="preview-body" id="preview-body">
+    </div>
+    <div class="preview-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="exportDoc()">과업지시서 완성 및 의뢰 등록 →</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="copyDoc()">텍스트 복사</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+const state = {
+  mode: 'wizard', // wizard | chat
+  step: 0,
+  data: {
+    contentType: null,
+    quantity: '',
+    quantityUnit: '',
+    purpose: [],
+    targets: [],
+    budget: '',
+    deadline: '',
+    womanBiz: false,
+    deliverables: [],
+    checkItems: [],
+    notes: '',
+    orgName: '',
+    deptName: ''
+  }
+};
+
+// ─── CONTENT TYPES ───────────────────────────────────
+const contentTypes = [
+  { id: 'card', icon: '🃏', name: 'SNS 카드뉴스', sub: '인스타·페이스북', unit: '장', defaultQty: '10' },
+  { id: 'video', icon: '🎬', name: '홍보 영상', sub: 'YouTube·TV', unit: '편', defaultQty: '1' },
+  { id: 'info', icon: '📊', name: '인포그래픽', sub: '정책·통계 시각화', unit: '종', defaultQty: '5' },
+  { id: 'print', icon: '📄', name: '인쇄 홍보물', sub: '브로슈어·리플렛', unit: '종', defaultQty: '1' },
+  { id: 'sns', icon: '📱', name: 'SNS 채널운영', sub: '월간 운영 대행', unit: '개월', defaultQty: '6' },
+  { id: 'web', icon: '🌐', name: '웹 콘텐츠', sub: '배너·팝업·웹툰', unit: '종', defaultQty: '3' },
+  { id: 'campaign', icon: '📣', name: '캠페인 기획', sub: '통합 홍보 전략', unit: '건', defaultQty: '1' },
+  { id: 'photo', icon: '📷', name: '사진 촬영', sub: '행사·제품·인물', unit: '건', defaultQty: '1' },
+  { id: 'motion', icon: '✨', name: '모션그래픽', sub: 'GIF·짧은 영상', unit: '편', defaultQty: '5' },
+];
+
+const purposeOptions = ['정책 홍보', '국민 인식 제고', '캠페인·이벤트', '행사 홍보', '제도 안내', '기관 브랜딩', '보도 자료 지원', '내부 교육용'];
+const targetOptions = ['일반 국민', '청년층(20~30대)', '중장년층(40~60대)', '어린이·청소년', '노인층', '장애인', '외국인', '전문가·공무원'];
+const deliverableOptions = {
+  card: ['원본 PSD/AI 파일', 'JPG 최종본 (300dpi)', 'SNS용 최적화본', '영문 버전', '저해상도 웹용'],
+  video: ['원본 소스 파일', 'MP4 4K본', 'MP4 FHD 유튜브용', '자막 SRT 파일', '썸네일 이미지', '숏폼(60초) 편집본'],
+  info: ['원본 AI/PSD', 'PDF 인쇄용', 'PNG 웹용', '영문 버전'],
+  print: ['원본 AI 파일', 'PDF 인쇄교정본', '인쇄 완료본', '디지털 배포본'],
+  sns: ['월간 콘텐츠 캘린더', '게시물 원본 파일', '월간 운영 보고서', '성과 분석 리포트'],
+  web: ['원본 소스', 'PNG/JPG 완성본', '웹용 최적화본'],
+  campaign: ['기획서', '콘텐츠 패키지', '성과 보고서'],
+  photo: ['원본 RAW 파일', 'JPG 보정본', '웹용 리사이징본'],
+  motion: ['원본 AE 파일', 'GIF 최적화본', 'MP4 무음버전'],
+};
+const checkItemOptions = {
+  card: ['공공언어 가이드라인 준수', '정부 시각 디자인 가이드 적용', '저작권 무료 이미지 사용', '색상 접근성(명도비) 확인', '폰트 라이선스 확인', '텍스트 오탈자 검수'],
+  video: ['저작권 음원 사용', '자막 전 구간 삽입', '영상 길이 준수', '정부상징 사용 지침 확인', '4K 해상도 납품', '폭력·선정성 없음'],
+  info: ['출처 표기 완비', '통계 수치 최신화', '색상 접근성 확인', '정부 시각 디자인 적용'],
+  print: ['인쇄용 해상도(300dpi) 확인', '색상 모드 CMYK 전환', '여백(재단선) 설정', '폰트 아웃라인 처리'],
+  sns: ['게시 일정 준수', '해시태그 가이드 준수', '댓글 대응 매뉴얼 포함', '월간 성과 보고 포함'],
+  web: ['웹 접근성 지침 준수', '반응형 디자인 적용', '파일 용량 최적화'],
+  campaign: ['전략 방향성 보고', '채널별 콘텐츠 계획', '예산 집행 계획 포함'],
+  photo: ['저작권 귀속 확인', '초상권 동의서 포함', 'RAW 원본 제공'],
+  motion: ['프레임레이트(30fps) 확인', '루프 재생 확인', '용량 최적화(5MB 이하)'],
+};
+
+// ─── WIZARD STEPS ─────────────────────────────────────
+const steps = [
+  { id: 'type', label: '유형 선택' },
+  { id: 'spec', label: '세부 사양' },
+  { id: 'target', label: '목적·대상' },
+  { id: 'budget', label: '예산·납기' },
+  { id: 'checklist', label: '검수 기준' },
+];
+
+function renderWizard() {
+  const panel = document.getElementById('wizard-panel');
+  const s = state.data;
+  const step = state.step;
+
+  let html = `
+    <div class="wizard-header">
+      <div class="wizard-title">과업지시서 만들기</div>
+      <div class="wizard-sub">옵션을 선택하면 과업지시서가 자동으로 작성됩니다</div>
+    </div>
+
+    <div class="mode-toggle">
+      <button class="mode-btn ${state.mode==='wizard'?'active':''}" onclick="setMode('wizard')">🎛 옵션 선택</button>
+      <button class="mode-btn ${state.mode==='chat'?'active':''}" onclick="setMode('chat')">💬 AI 대화</button>
+    </div>`;
+
+  if (state.mode === 'chat') {
+    panel.innerHTML = html + renderChat();
+    renderPreview();
+    return;
+  }
+
+  // STEP INDICATOR
+  html += `<div class="step-indicator">`;
+  steps.forEach((st, i) => {
+    const isDone = i < step;
+    const isActive = i === step;
+    html += `
+      <div class="si-step">
+        <div class="si-dot ${isDone?'done':isActive?'active':''}">${isDone?'✓':(i+1)}</div>
+        <span class="si-label ${isDone?'done':isActive?'active':''}">${st.label}</span>
+      </div>
+      ${i < steps.length-1 ? `<div class="si-line ${isDone?'done':''}"></div>` : ''}`;
+  });
+  html += `</div>`;
+
+  // STEP CONTENT
+  if (step === 0) {
+    html += `
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">1</div>콘텐츠 유형을 선택하세요</div>
+        <div class="type-grid">
+          ${contentTypes.map(t => `
+            <div class="type-card ${s.contentType===t.id?'selected':''}" onclick="selectType('${t.id}')">
+              <div class="type-icon">${t.icon}</div>
+              <div class="type-name">${t.name}</div>
+              <div class="type-sub">${t.sub}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  else if (step === 1) {
+    const ct = contentTypes.find(t => t.id === s.contentType);
+    html += `
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">2</div>세부 사양</div>
+        <div class="spec-grid">
+          <div class="form-group">
+            <div class="form-label">기관명</div>
+            <input type="text" value="${s.orgName}" placeholder="예: 환경부" oninput="updateData('orgName', this.value)">
+          </div>
+          <div class="form-group">
+            <div class="form-label">부서명</div>
+            <input type="text" value="${s.deptName}" placeholder="예: 홍보기획과" oninput="updateData('deptName', this.value)">
+          </div>
+          <div class="form-group">
+            <div class="form-label">수량</div>
+            <div class="input-unit">
+              <input type="number" value="${s.quantity || ct?.defaultQty || ''}" placeholder="${ct?.defaultQty||'1'}" oninput="updateData('quantity', this.value)" style="border-radius:8px 0 0 8px;">
+              <div class="unit-badge">${ct?.unit||'건'}</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">예상 규모</div>
+            <select onchange="updateSpecNote(this.value)">
+              <option value="">선택</option>
+              ${ct?.id==='video' ? `
+                <option>1분 이내</option><option>3분 이내</option><option>5분 이내</option><option>10분 이내</option>` :
+              ct?.id==='card' ? `
+                <option>5장</option><option>10장</option><option>15장</option><option>20장</option>` :
+              ct?.id==='sns' ? `
+                <option>주 3회 게시</option><option>주 5회 게시</option><option>일 1회 게시</option>` :
+              `<option>소규모</option><option>중규모</option><option>대규모</option>`}
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <div class="form-label">납품물 형태 (복수 선택)</div>
+          <div class="options-grid" style="margin-top:6px;">
+            ${(deliverableOptions[s.contentType]||[]).map(d => `
+              <div class="option-chip ${s.deliverables.includes(d)?'selected':''}" onclick="toggleArr('deliverables','${d}')">
+                <span>${d}</span>
+                <div class="option-check">✓</div>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  else if (step === 2) {
+    html += `
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">3</div>제작 목적</div>
+        <div class="options-grid">
+          ${purposeOptions.map(p => `
+            <div class="option-chip ${s.purpose.includes(p)?'selected':''}" onclick="toggleArr('purpose','${p}')">
+              <span>${p}</span>
+              <div class="option-check">✓</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">4</div>주요 타깃</div>
+        <div class="options-grid">
+          ${targetOptions.map(t => `
+            <div class="option-chip ${s.targets.includes(t)?'selected':''}" onclick="toggleArr('targets','${t}')">
+              <span>${t}</span>
+              <div class="option-check">✓</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">5</div>추가 요청사항</div>
+        <textarea placeholder="참고 자료, 벤치마크 사례, 특이 요구사항 등을 자유롭게 입력하세요." oninput="updateData('notes', this.value)">${s.notes}</textarea>
+      </div>`;
+  }
+
+  else if (step === 3) {
+    html += `
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">6</div>예산 및 납기</div>
+        <div class="spec-grid">
+          <div class="form-group">
+            <div class="form-label">계약 예산</div>
+            <div class="input-unit">
+              <input type="text" value="${s.budget}" placeholder="18,000,000" oninput="updateData('budget', this.value)" style="border-radius:8px 0 0 8px;">
+              <div class="unit-badge">원</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">납기일</div>
+            <input type="text" value="${s.deadline}" placeholder="2025.05.10" oninput="updateData('deadline', this.value)">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <div class="ws-label" style="margin-bottom:8px;"><div class="ws-label-num">7</div>여성기업 우선 구매</div>
+          <div class="checklist">
+            <div class="check-item-row ${s.womanBiz?'checked':''}" onclick="toggleBool('womanBiz')">
+              <div class="check-box">${s.womanBiz?'✓':''}</div>
+              <div>
+                <div class="check-item-text">여성기업 인증 제작사 우선 배정 요청</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px;">수의계약 한도 5천만원 적용 · 법적 우선구매 의무 이행</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  else if (step === 4) {
+    html += `
+      <div class="wizard-section">
+        <div class="ws-label"><div class="ws-label-num">8</div>AI·전문가 검수 기준 선택</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">선택한 항목은 1차 AI 검수 체크리스트로 자동 적용됩니다</div>
+        <div class="checklist">
+          ${(checkItemOptions[s.contentType]||[]).map(c => `
+            <div class="check-item-row ${s.checkItems.includes(c)?'checked':''}" onclick="toggleArr('checkItems','${c}')">
+              <div class="check-box">${s.checkItems.includes(c)?'✓':''}</div>
+              <span class="check-item-text">${c}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  // NAV BUTTONS
+  html += `<div class="wizard-nav">`;
+  if (step > 0) html += `<button class="btn btn-ghost" onclick="prevStep()">← 이전</button>`;
+  else html += `<div></div>`;
+  if (step < steps.length - 1) {
+    html += `<button class="btn btn-primary" onclick="nextStep()" ${step===0&&!s.contentType?'disabled':''}>다음 →</button>`;
+  } else {
+    html += `<button class="btn btn-primary" onclick="exportDoc()">과업지시서 완성 →</button>`;
+  }
+  html += `</div>`;
+
+  panel.innerHTML = html;
+  renderPreview();
+}
+
+// ─── CHAT MODE ───────────────────────────────────────
+let chatMessages = [];
+let chatStep = 0;
+
+const chatFlow = [
+  { bot: '안녕하세요! 과업지시서 작성을 도와드리겠습니다. 어떤 콘텐츠를 제작하실 건가요?', options: contentTypes.map(t => t.name), key: 'contentType' },
+  { bot: '좋습니다! 이 콘텐츠의 주요 목적은 무엇인가요? (복수 선택 가능)', options: purposeOptions, key: 'purpose', multi: true },
+  { bot: '주요 타깃은 어떻게 되나요?', options: targetOptions, key: 'targets', multi: true },
+  { bot: '예산과 납기일을 알려주세요.\n예) "1800만원, 5월 10일까지"', options: null, key: 'budget_deadline', input: true },
+  { bot: '여성기업 인증 제작사를 우선 배정해 드릴까요?\n수의계약 한도 5천만원이 적용됩니다.', options: ['네, 우선 배정해주세요', '아니요, 상관없어요'], key: 'womanBiz' },
+  { bot: '모든 정보가 입력되었습니다! 오른쪽 미리보기에서 과업지시서를 확인해주세요.', options: null, key: null },
+];
+
+function renderChat() {
+  if (chatMessages.length === 0) {
+    chatMessages = [{ role: 'bot', text: chatFlow[0].bot, options: chatFlow[0].options, step: 0 }];
+  }
+
+  let html = `<div class="chat-panel">
+    <div class="chat-messages" id="chat-messages">
+      ${chatMessages.map((m, i) => renderMsg(m, i)).join('')}
+    </div>
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chat-input" placeholder="메시지를 입력하거나 위 옵션을 클릭하세요..." onkeydown="handleChatKey(event)"></textarea>
+      <button class="chat-send" onclick="sendChatMsg()">↑</button>
+    </div>
+  </div>`;
+
+  return html;
+}
+
+function renderMsg(m, idx) {
+  const isUser = m.role === 'user';
+  let html = `<div class="msg ${isUser?'user':'bot'}">
+    <div class="msg-avatar">${isUser?'나':'AI'}</div>
+    <div>
+      <div class="msg-bubble">${m.text.replace(/\n/g,'<br>')}</div>`;
+
+  if (!isUser && m.options && !m.optionSelected) {
+    html += `<div class="msg-options">
+      ${m.options.map(o => `<button class="msg-option ${m.selected?.includes(o)?'selected':''}" onclick="selectChatOption(${idx},'${o}')">${o}</button>`).join('')}
+    </div>`;
+    if (chatFlow[m.step]?.multi) {
+      html += `<button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="confirmMulti(${idx})">선택 완료 →</button>`;
+    }
+  }
+
+  html += `</div></div>`;
+  return html;
+}
+
+function selectChatOption(msgIdx, option) {
+  const msg = chatMessages[msgIdx];
+  const flow = chatFlow[msg.step];
+  if (!flow) return;
+
+  if (flow.multi) {
+    if (!msg.selected) msg.selected = [];
+    const idx = msg.selected.indexOf(option);
+    if (idx >= 0) msg.selected.splice(idx, 1);
+    else msg.selected.push(option);
+  } else {
+    msg.selected = [option];
+    msg.optionSelected = true;
+    processChatSelection(flow, [option]);
+    addUserMsg(option);
+    advanceChatStep(msg.step);
+  }
+  renderWizard();
+  scrollChat();
+}
+
+function confirmMulti(msgIdx) {
+  const msg = chatMessages[msgIdx];
+  if (!msg.selected || msg.selected.length === 0) return;
+  msg.optionSelected = true;
+  const flow = chatFlow[msg.step];
+  processChatSelection(flow, msg.selected);
+  addUserMsg(msg.selected.join(', '));
+  advanceChatStep(msg.step);
+  renderWizard();
+  scrollChat();
+}
+
+function processChatSelection(flow, values) {
+  const s = state.data;
+  if (flow.key === 'contentType') {
+    const ct = contentTypes.find(t => t.name === values[0]);
+    if (ct) s.contentType = ct.id;
+  } else if (flow.key === 'purpose') {
+    s.purpose = values;
+  } else if (flow.key === 'targets') {
+    s.targets = values;
+  } else if (flow.key === 'womanBiz') {
+    s.womanBiz = values[0].startsWith('네');
+  }
+}
+
+function sendChatMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const curFlow = chatFlow[chatStep];
+  if (curFlow?.key === 'budget_deadline') {
+    const nums = text.match(/\d[\d,]*/g);
+    if (nums && nums.length >= 1) state.data.budget = nums[0].replace(/,/g,'');
+    const dateMatch = text.match(/(\d+)월\s*(\d+)일/);
+    if (dateMatch) state.data.deadline = `2025.${dateMatch[1].padStart(2,'0')}.${dateMatch[2].padStart(2,'0')}`;
+    else {
+      const dotDate = text.match(/\d{4}\.\d{2}\.\d{2}/);
+      if (dotDate) state.data.deadline = dotDate[0];
+    }
+    addUserMsg(text);
+    chatMessages[chatMessages.length-1 > 0 ? chatMessages.length-1 : 0].optionSelected = true;
+    advanceChatStep(chatStep);
+    renderWizard();
+    scrollChat();
+  } else {
+    addUserMsg(text);
+    renderWizard();
+    scrollChat();
+  }
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMsg(); }
+}
+
+function addUserMsg(text) {
+  chatMessages.push({ role: 'user', text });
+}
+
+function advanceChatStep(fromStep) {
+  chatStep = fromStep + 1;
+  if (chatStep < chatFlow.length) {
+    setTimeout(() => {
+      const nextFlow = chatFlow[chatStep];
+      chatMessages.push({ role: 'bot', text: nextFlow.bot, options: nextFlow.options, step: chatStep });
+      renderWizard();
+      scrollChat();
+    }, 600);
+  }
+}
+
+function scrollChat() {
+  setTimeout(() => {
+    const el = document.getElementById('chat-messages');
+    if (el) el.scrollTop = el.scrollHeight;
+  }, 100);
+}
+
+// ─── ACTIONS ─────────────────────────────────────────
+function setMode(m) { state.mode = m; renderWizard(); }
+
+function selectType(id) {
+  state.data.contentType = id;
+  const ct = contentTypes.find(t => t.id === id);
+  state.data.quantity = ct?.defaultQty || '1';
+  state.data.deliverables = deliverableOptions[id]?.slice(0, 2) || [];
+  state.data.checkItems = checkItemOptions[id]?.slice(0, 4) || [];
+  renderWizard();
+}
+
+function updateData(key, val) { state.data[key] = val; renderPreview(); }
+function updateSpecNote(val) { state.data.specNote = val; renderPreview(); }
+
+function toggleArr(key, val) {
+  const arr = state.data[key];
+  const idx = arr.indexOf(val);
+  if (idx >= 0) arr.splice(idx, 1);
+  else arr.push(val);
+  renderWizard();
+}
+
+function toggleBool(key) { state.data[key] = !state.data[key]; renderWizard(); }
+
+function nextStep() {
+  if (state.step < steps.length - 1) { state.step++; renderWizard(); window.scrollTo(0, 0); }
+}
+function prevStep() {
+  if (state.step > 0) { state.step--; renderWizard(); }
+}
+
+function resetAll() {
+  state.step = 0; state.mode = 'wizard';
+  state.data = { contentType: null, quantity: '', quantityUnit: '', purpose: [], targets: [], budget: '', deadline: '', womanBiz: false, deliverables: [], checkItems: [], notes: '', orgName: '', deptName: '' };
+  chatMessages = []; chatStep = 0;
+  renderWizard();
+}
+
+// ─── PREVIEW ─────────────────────────────────────────
+function renderPreview() {
+  const s = state.data;
+  const ct = contentTypes.find(t => t.id === s.contentType);
+  const body = document.getElementById('preview-body');
+  const badge = document.getElementById('preview-badge');
+
+  const completeness = [s.contentType, s.quantity, s.purpose.length > 0, s.budget, s.deadline].filter(Boolean).length;
+  badge.textContent = completeness >= 5 ? '작성 완료' : `${Math.round(completeness/5*100)}% 작성 중`;
+  badge.style.background = completeness >= 5 ? 'var(--accent-light)' : '#fef3c7';
+  badge.style.color = completeness >= 5 ? 'var(--accent)' : '#92400e';
+
+  const today = new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.\s*/g,'.').slice(0,-1);
+
+  const val = (v, ph='미입력') => v ? `<span class="doc-val">${v}</span>` : `<span class="doc-val placeholder">${ph}</span>`;
+
+  body.innerHTML = `
+    <div style="text-align:center;padding-bottom:16px;border-bottom:2px solid var(--text);margin-bottom:16px;">
+      <div style="font-family:var(--serif);font-size:16px;font-weight:700;color:var(--text);">과업지시서</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;">공공콘텐츠마켓 · 작성일 ${today}</div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-section-title">1. 발주 기관</div>
+      <div class="doc-row"><span class="doc-key">기관명</span>${val(s.orgName,'기관명 입력 전')}</div>
+      <div class="doc-row"><span class="doc-key">담당 부서</span>${val(s.deptName,'부서명 입력 전')}</div>
+      <div class="doc-row"><span class="doc-key">여성기업</span>${val(s.womanBiz ? '여성기업 인증 제작사 우선 배정 요청' : '조건 없음', '미선택')}</div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-section-title">2. 과업 개요</div>
+      <div class="doc-row"><span class="doc-key">콘텐츠 유형</span>${val(ct ? `${ct.icon} ${ct.name}` : null, '유형 미선택')}</div>
+      <div class="doc-row"><span class="doc-key">제작 수량</span>${val(s.quantity && ct ? `${s.quantity}${ct.unit}${s.specNote ? ` (${s.specNote})` : ''}` : null, '미입력')}</div>
+      <div class="doc-row"><span class="doc-key">제작 목적</span>${val(s.purpose.length ? s.purpose.join(', ') : null, '미선택')}</div>
+      <div class="doc-row"><span class="doc-key">주요 타깃</span>${val(s.targets.length ? s.targets.join(', ') : null, '미선택')}</div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-section-title">3. 계약 조건</div>
+      <div class="doc-row"><span class="doc-key">계약 예산</span>${val(s.budget ? Number(s.budget.replace(/,/g,'')).toLocaleString() + '원' : null, '미입력')}</div>
+      <div class="doc-row"><span class="doc-key">납기일</span>${val(s.deadline,'미입력')}</div>
+      <div class="doc-row"><span class="doc-key">계약 방식</span><span class="doc-val">수의계약 (단수 견적)</span></div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-section-title">4. 납품물 목록</div>
+      ${s.deliverables.length ? `<ul class="doc-checklist">${s.deliverables.map(d=>`<li>${d}</li>`).join('')}</ul>` : `<span class="doc-val placeholder">납품물 미선택</span>`}
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-section-title">5. 검수 기준 (AI 자동 적용)</div>
+      ${s.checkItems.length ? `<ul class="doc-checklist">${s.checkItems.map(c=>`<li>${c}</li>`).join('')}</ul>` : `<span class="doc-val placeholder">검수 기준 미선택</span>`}
+    </div>
+
+    ${s.notes ? `
+    <div class="doc-section">
+      <div class="doc-section-title">6. 추가 요청사항</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;">${s.notes}</div>
+    </div>` : ''}
+
+    <div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);text-align:center;">
+      본 과업지시서는 공공콘텐츠마켓 플랫폼에서 자동 생성되었습니다.<br>
+      제출 전 내용을 반드시 검토하여 주시기 바랍니다.
+    </div>`;
+}
+
+function exportDoc() {
+  const s = state.data;
+  if (!s.contentType) { alert('콘텐츠 유형을 선택해주세요.'); return; }
+  alert('과업지시서가 완성되었습니다!\n실제 서비스에서는 PDF 다운로드 및 의뢰 등록이 진행됩니다.');
+}
+
+function copyDoc() {
+  const body = document.getElementById('preview-body');
+  const text = body.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('과업지시서가 클립보드에 복사되었습니다.');
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────
+renderWizard();
+</script>
+</body>
+</html>

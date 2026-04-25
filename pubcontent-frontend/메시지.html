@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메시지 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.logo-role{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:2px 8px;margin-left:6px;}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+
+/* LAYOUT */
+.chat-layout{display:grid;grid-template-columns:300px 1fr;flex:1;overflow:hidden;}
+
+/* 채팅방 목록 */
+.room-list{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.rl-header{padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.rl-title{font-size:14px;font-weight:700;margin-bottom:10px;}
+.rl-search{position:relative;}
+.rl-search input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;padding:8px 12px 8px 32px;font-size:12px;font-family:var(--sans);color:var(--text);outline:none;width:100%;}
+.rl-search input:focus{border-color:var(--accent);}
+.rl-search::before{content:'🔍';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;}
+
+.room-items{flex:1;overflow-y:auto;}
+.room-item{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;transition:background .13s;border-bottom:1px solid var(--border);position:relative;}
+.room-item:hover{background:var(--surface2);}
+.room-item.active{background:var(--accent-light);}
+.ri-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--surface2);}
+.ri-info{flex:1;min-width:0;}
+.ri-name{font-size:13px;font-weight:600;margin-bottom:2px;display:flex;align-items:center;justify-content:space-between;}
+.ri-name-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ri-time{font-size:10px;color:var(--text3);white-space:nowrap;margin-left:8px;flex-shrink:0;}
+.ri-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ri-preview.unread{color:var(--text2);font-weight:500;}
+.ri-badge{position:absolute;top:10px;right:12px;background:var(--accent);color:#fff;border-radius:10px;font-size:9px;font-weight:700;padding:1px 6px;min-width:16px;text-align:center;}
+.ri-type{font-size:10px;padding:1px 6px;border-radius:5px;font-weight:500;margin-right:4px;}
+.rt-public{background:var(--blue-light);color:var(--blue);}
+.rt-maker{background:var(--accent-light);color:var(--accent);}
+.rt-system{background:var(--amber-light);color:var(--amber);}
+
+/* 채팅창 */
+.chat-window{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.cw-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.cw-avatar{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--surface2);}
+.cw-info{flex:1;}
+.cw-name{font-size:14px;font-weight:700;}
+.cw-sub{font-size:11px;color:var(--text3);}
+.cw-actions{display:flex;gap:6px;}
+
+.msg-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;}
+
+/* 날짜 구분선 */
+.date-divider{display:flex;align-items:center;gap:10px;margin:8px 0;}
+.dd-line{flex:1;height:1px;background:var(--border);}
+.dd-date{font-size:11px;color:var(--text3);background:var(--bg);padding:0 8px;}
+
+/* 메시지 */
+.msg-row{display:flex;gap:10px;align-items:flex-end;}
+.msg-row.mine{flex-direction:row-reverse;}
+.msg-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;background:var(--surface2);}
+.msg-col{max-width:68%;}
+.msg-sender{font-size:11px;color:var(--text3);margin-bottom:4px;padding-left:2px;}
+.msg-row.mine .msg-sender{text-align:right;padding-right:2px;padding-left:0;}
+.bubble{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.65;word-break:break-word;}
+.bubble-other{background:var(--surface);border:1px solid var(--border);border-radius:4px 16px 16px 16px;color:var(--text);}
+.bubble-mine{background:var(--accent);color:#fff;border-radius:16px 4px 16px 16px;}
+.msg-time{font-size:10px;color:var(--text3);margin-top:4px;padding:0 2px;}
+.msg-row.mine .msg-time{text-align:right;}
+
+/* 시스템 메시지 */
+.system-msg{text-align:center;margin:4px 0;}
+.sm-bubble{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);}
+.sm-bubble.sm-important{background:var(--amber-light);border-color:rgba(180,83,9,.2);color:var(--amber);}
+.sm-bubble.sm-success{background:var(--accent-light);border-color:rgba(26,107,74,.2);color:var(--accent);}
+
+/* 파일 메시지 */
+.file-bubble{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .13s;max-width:280px;}
+.file-bubble:hover{border-color:var(--accent);}
+.fb-icon{font-size:24px;flex-shrink:0;}
+.fb-info{flex:1;min-width:0;}
+.fb-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fb-size{font-size:10px;color:var(--text3);}
+.fb-dl{font-size:11px;color:var(--accent);margin-top:2px;}
+.bubble-mine .file-bubble{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);}
+.bubble-mine .fb-name,.bubble-mine .fb-size,.bubble-mine .fb-dl{color:#fff;}
+
+/* 입력창 */
+.input-area{background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;flex-shrink:0;}
+.input-toolbar{display:flex;gap:6px;margin-bottom:8px;}
+.tool-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .13s;}
+.tool-btn:hover{background:var(--surface2);border-color:var(--accent);}
+.input-row{display:flex;gap:8px;align-items:flex-end;}
+.msg-input{flex:1;background:var(--surface2);border:1.5px solid var(--border2);border-radius:12px;padding:10px 14px;font-size:13px;font-family:var(--sans);color:var(--text);outline:none;resize:none;max-height:120px;overflow-y:auto;line-height:1.5;}
+.msg-input:focus{border-color:var(--accent);background:var(--surface);}
+.msg-input::placeholder{color:var(--text3);}
+.send-btn{width:40px;height:40px;border-radius:10px;background:var(--accent);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .13s;}
+.send-btn:hover{background:var(--accent2);}
+.send-btn:disabled{background:var(--border2);cursor:not-allowed;}
+
+/* 빈 채팅방 */
+.empty-chat{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--text3);}
+.ec-icon{font-size:48px;opacity:.4;}
+.ec-title{font-size:15px;font-weight:500;}
+.ec-sub{font-size:12px;text-align:center;line-height:1.7;}
+
+/* 퀵 액션 (시스템 알림 클릭) */
+.quick-action{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:4px;max-width:300px;}
+.qa-title{font-size:12px;font-weight:700;margin-bottom:8px;}
+.qa-btn{display:block;width:100%;padding:8px;border:1.5px solid var(--accent);border-radius:7px;background:transparent;color:var(--accent);font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:all .13s;margin-bottom:5px;text-align:center;}
+.qa-btn:last-child{margin-bottom:0;}
+.qa-btn:hover{background:var(--accent-light);}
+
+/* 온라인 상태 */
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);display:inline-block;margin-right:4px;animation:blink 2.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* 타이핑 인디케이터 */
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:4px 16px 16px 16px;width:fit-content;}
+.ti-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite;}
+.ti-dot:nth-child(2){animation-delay:.2s;}
+.ti-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg-row,.system-msg{animation:msgIn .25s ease both;}
+
+/* 모바일 반응형 */
+@media(max-width:640px){
+  .chat-layout{grid-template-columns:1fr;}
+  .room-list{display:none;}
+  .room-list.mobile-show{display:flex;position:fixed;inset:0;top:58px;z-index:40;}
+  .chat-window{display:flex;}
+  .mob-back{display:flex!important;}
+}
+.mob-back{display:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:transparent;font-family:var(--sans);}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo" onclick="nav('발주처_대시보드.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+      <span class="logo-role">발주처</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-ghost mob-back" id="mob-back" onclick="showRoomList()">← 목록</button>
+    <button class="btn btn-ghost" onclick="nav('마이페이지_발주처.html')">← 마이페이지</button>
+  </div>
+</div>
+
+<div class="chat-layout">
+  <!-- 채팅방 목록 -->
+  <div class="room-list" id="room-list">
+    <div class="rl-header">
+      <div class="rl-title">💬 메시지</div>
+      <div class="rl-search"><input type="text" placeholder="대화 검색" oninput="filterRooms(this.value)"></div>
+    </div>
+    <div class="room-items" id="room-items"></div>
+  </div>
+
+  <!-- 채팅창 -->
+  <div class="chat-window" id="chat-window">
+    <div class="empty-chat" id="empty-chat">
+      <div class="ec-icon">💬</div>
+      <div class="ec-title">대화를 선택하세요</div>
+      <div class="ec-sub">왼쪽 목록에서 대화를 선택하면<br>메시지를 주고받을 수 있습니다.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+// DM 발송 멤버십 제어 (standard 이상: 기본 채팅, pro: 선제안 DM)
+var _mbDM = 'none';
+try { _mbDM = sessionStorage.getItem('pcm_membership') || 'none'; } catch(e){}
+
+function checkDMPermission(){
+  if(_mbDM !== 'pro'){
+    // 선제안 DM 버튼 클릭 시 잠금 모달
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:32px;max-width:360px;width:90%;text-align:center;">'
+      +'<div style="font-size:44px;margin-bottom:12px;">👑</div>'
+      +'<div style="font-size:18px;font-weight:700;margin-bottom:8px;">프로 플랜 전용 기능</div>'
+      +'<div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:20px;">발주처 선제안 DM은<br><strong>월 5만원 프로 플랜</strong>에서 사용 가능합니다.<br>월 10건 한도로 발주처에게 직접 제안하세요.</div>'
+      +'<div style="display:flex;flex-direction:column;gap:8px;">'
+      +'<button onclick="window.location.href='멤버십.html'" style="padding:11px;background:#6b46c1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;">👑 프로로 업그레이드</button>'
+      +'<button onclick="this.closest('div[style*=fixed]').remove()" style="padding:10px;background:transparent;border:1px solid rgba(0,0,0,.14);border-radius:8px;font-size:13px;cursor:pointer;font-family:sans-serif;">닫기</button>'
+      +'</div></div>';
+    document.body.appendChild(modal);
+    return false;
+  }
+  return true;
+}
+
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+const ME = { id:'me', name:'김담당', role:'발주처', avatar:'🏛' };
+
+const ROOMS = [
+  { id:'r1', type:'maker', name:'㈜ 그린스튜디오', sub:'탄소중립 SNS 카드뉴스', avatar:'🎬', unread:2, lastMsg:'초안을 확인해주세요.', lastTime:'10분 전',
+    messages:[
+      {id:'d1',type:'date',text:'2025년 5월 5일'},
+      {id:'s1',type:'system',text:'탄소중립 SNS 카드뉴스 계약이 체결되었습니다.',cls:'sm-success'},
+      {id:'s2',type:'system',text:'에스크로 18,000,000원이 예치되었습니다.',cls:'sm-success'},
+      {id:'m1',from:'them',sender:'㈜ 그린스튜디오',avatar:'🎬',text:'안녕하세요. 계약 확인했습니다. 제작 시작하겠습니다.',time:'13:10'},
+      {id:'m2',from:'me',text:'네, 잘 부탁드립니다. 공공언어 가이드라인 꼭 준수 부탁드려요.',time:'13:15'},
+      {id:'m3',from:'them',sender:'㈜ 그린스튜디오',avatar:'🎬',text:'네, 알겠습니다. 궁금한 점 있으면 연락드릴게요.',time:'13:17'},
+      {id:'d2',type:'date',text:'2025년 5월 6일'},
+      {id:'m4',from:'them',sender:'㈜ 그린스튜디오',avatar:'🎬',text:'담당자님, 3번 슬라이드 연도 표기 관련해서 문의드립니다. 2023년 데이터를 쓸까요, 2024년 데이터를 쓸까요?',time:'09:30'},
+      {id:'m5',from:'me',text:'2024년 최신 데이터로 부탁드립니다. 환경부 공식 보도자료 참고해주세요.',time:'09:45'},
+      {id:'m6',from:'them',sender:'㈜ 그린스튜디오',avatar:'🎬',text:'알겠습니다. 감사합니다!',time:'09:47'},
+      {id:'s3',type:'system',text:'㈜ 그린스튜디오가 납품물을 제출했습니다.',cls:'sm-important'},
+      {id:'m7',from:'them',sender:'㈜ 그린스튜디오',avatar:'🎬',text:'초안을 확인해주세요. 수정 사항 있으면 말씀해주세요.',time:'14:22',
+        file:{name:'탄소중립_카드뉴스_초안.zip',size:'18MB',icon:'📦'}},
+    ]
+  },
+  { id:'r2', type:'maker', name:'비주얼팩토리', sub:'환경 인포그래픽 제작', avatar:'📊', unread:0, lastMsg:'납품 완료했습니다.', lastTime:'어제',
+    messages:[
+      {id:'d1',type:'date',text:'2025년 5월 3일'},
+      {id:'s1',type:'system',text:'환경 정책 인포그래픽 계약이 체결되었습니다.',cls:'sm-success'},
+      {id:'m1',from:'them',sender:'비주얼팩토리',avatar:'📊',text:'안녕하세요! 제작 시작하겠습니다.',time:'10:00'},
+      {id:'m2',from:'me',text:'잘 부탁드립니다.',time:'10:05'},
+      {id:'s2',type:'system',text:'납품물이 제출되었습니다. 검수가 시작됩니다.',cls:'sm-important'},
+      {id:'m3',from:'them',sender:'비주얼팩토리',avatar:'📊',text:'납품 완료했습니다. 검토 부탁드립니다.',time:'16:30'},
+      {id:'s3',type:'system',text:'최종 승인이 완료되었습니다. 정산이 진행됩니다.',cls:'sm-success'},
+    ]
+  },
+  { id:'r3', type:'system', name:'공공콘텐츠마켓', sub:'시스템 알림', avatar:'🔔', unread:1, lastMsg:'새로운 견적 요청이 도착했습니다.', lastTime:'30분 전',
+    messages:[
+      {id:'d1',type:'date',text:'2025년 5월 5일'},
+      {id:'s1',type:'system',text:'가입을 환영합니다! 첫 의뢰를 등록해보세요.',cls:'sm-success'},
+      {id:'m1',from:'them',sender:'시스템',avatar:'🔔',text:'탄소중립 SNS 카드뉴스 — AI 검수가 완료되었습니다. 결과를 확인해주세요.',time:'14:35',
+        quickAction:{title:'빠른 이동',btns:[{label:'검수 결과 보기',url:'검수_결과.html'},{label:'납품물 열람',url:'납품물_열람.html'}]}},
+      {id:'m2',from:'them',sender:'시스템',avatar:'🔔',text:'새로운 견적 요청이 도착했습니다. 캠페인하우스에서 견적을 보냈습니다.',time:'14:50',
+        quickAction:{title:'빠른 이동',btns:[{label:'견적 확인',url:'견적_요청비교.html'}]}},
+    ]
+  },
+  { id:'r4', type:'expert', name:'김민정 전문가', sub:'검수 결과 문의', avatar:'👩‍💼', unread:0, lastMsg:'검수 리포트 확인해주세요.', lastTime:'1시간 전',
+    messages:[
+      {id:'d1',type:'date',text:'2025년 5월 5일'},
+      {id:'m1',from:'them',sender:'김민정',avatar:'👩‍💼',text:'안녕하세요. 탄소중립 카드뉴스 검수를 완료했습니다. 리포트 확인해주세요.',time:'15:20'},
+      {id:'m2',from:'me',text:'감사합니다. 주의 항목 2건 확인했습니다. 혹시 6번 슬라이드 색상 관련해서 구체적인 수정 방향 조언 주실 수 있나요?',time:'15:35'},
+      {id:'m3',from:'them',sender:'김민정',avatar:'👩‍💼',text:'네, 6번 슬라이드 배경색을 #1a1a2e에서 #2a2a4e 정도로 밝게 조정하면 명도비 기준을 충족할 수 있습니다. 텍스트는 흰색 유지하셔도 됩니다.',time:'15:42'},
+      {id:'m4',from:'me',text:'상세한 설명 감사합니다!',time:'15:45'},
+    ]
+  },
+];
+
+let currentRoomId = null;
+let isTyping = false;
+
+function render(){
+  renderRooms(ROOMS);
+}
+
+function renderRooms(rooms){
+  const el=document.getElementById('room-items');
+  el.innerHTML=rooms.map(r=>`
+    <div class="room-item ${currentRoomId===r.id?'active':''}" onclick="openRoom('${r.id}')">
+      <div class="ri-avatar">${r.avatar}</div>
+      <div class="ri-info">
+        <div class="ri-name">
+          <span class="ri-name-text">
+            <span class="ri-type ${r.type==='maker'?'rt-maker':r.type==='system'?'rt-system':'rt-public'}">${r.type==='maker'?'제작사':r.type==='system'?'시스템':'전문가'}</span>
+            ${r.name}
+          </span>
+          <span class="ri-time">${r.lastTime}</span>
+        </div>
+        <div class="ri-preview ${r.unread?'unread':''}">${r.lastMsg}</div>
+      </div>
+      ${r.unread?`<div class="ri-badge">${r.unread}</div>`:''}
+    </div>`).join('');
+}
+
+function filterRooms(q){
+  const filtered=ROOMS.filter(r=>r.name.includes(q)||r.sub.includes(q)||r.lastMsg.includes(q));
+  renderRooms(filtered);
+}
+
+function openRoom(id){
+  currentRoomId=id;
+  const room=ROOMS.find(r=>r.id===id);
+  if(!room) return;
+  room.unread=0;
+  PCM.markRead(); // 알림 읽음 처리
+  render();
+
+  // 채팅창 렌더
+  document.getElementById('empty-chat')?.remove();
+  const cw=document.getElementById('chat-window');
+  cw.innerHTML=`
+    <div class="cw-header">
+      <div class="cw-avatar">${room.avatar}</div>
+      <div class="cw-info">
+        <div class="cw-name">${room.name}</div>
+        <div class="cw-sub"><span class="online-dot"></span>${room.sub} · 온라인</div>
+      </div>
+      <div class="cw-actions">
+        <button class="btn btn-ghost" onclick="nav('검수_결과.html')" title="검수 결과">📋</button>
+        <button class="btn btn-ghost" onclick="nav('납품물_열람.html')" title="납품물">📁</button>
+      </div>
+    </div>
+    <div class="msg-area" id="msg-area"></div>
+    <div class="input-area">
+      <div class="input-toolbar">
+        <button class="tool-btn" title="파일 첨부" onclick="attachFile()">📎</button>
+        <button class="tool-btn" title="이모지">😊</button>
+        <button class="tool-btn" title="수정 요청" onclick="nav('수정_요청.html')">✏️</button>
+        <button class="tool-btn" title="납품물 보기" onclick="nav('납품물_열람.html')">📁</button>
+      </div>
+      <div class="input-row">
+        <textarea class="msg-input" id="msg-input" placeholder="메시지를 입력하세요..." rows="1"
+          oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>↑</button>
+      </div>
+    </div>`;
+
+  document.getElementById('msg-input').addEventListener('input', function(){
+    document.getElementById('send-btn').disabled = !this.value.trim();
+  });
+
+  renderMessages(room.messages);
+
+  // 모바일: 목록 숨기기
+  if(window.innerWidth<=640){
+    document.getElementById('room-list').classList.remove('mobile-show');
+    document.getElementById('mob-back').style.display='flex';
+  }
+}
+
+function renderMessages(msgs){
+  const area=document.getElementById('msg-area');
+  if(!area) return;
+  area.innerHTML=msgs.map(m=>{
+    if(m.type==='date') return `<div class="date-divider"><div class="dd-line"></div><div class="dd-date">${m.text}</div><div class="dd-line"></div></div>`;
+    if(m.type==='system') return `<div class="system-msg"><span class="sm-bubble ${m.cls||''}">${m.text}</span></div>`;
+
+    const isMe=m.from==='me';
+    let content=`<div class="bubble ${isMe?'bubble-mine':'bubble-other'}">${m.text}</div>`;
+    if(m.file){
+      content=`<div class="bubble ${isMe?'bubble-mine':'bubble-other'}" style="padding:0;">
+        <div class="file-bubble" onclick="showToast('파일 다운로드')">
+          <div class="fb-icon">${m.file.icon}</div>
+          <div class="fb-info">
+            <div class="fb-name">${m.file.name}</div>
+            <div class="fb-size">${m.file.size}</div>
+            <div class="fb-dl">클릭하여 다운로드</div>
+          </div>
+        </div>
+      </div>`;
+    }
+    let qa='';
+    if(m.quickAction){
+      qa=`<div class="quick-action">
+        <div class="qa-title">${m.quickAction.title}</div>
+        ${m.quickAction.btns.map(b=>`<button class="qa-btn" onclick="nav('${b.url}')">${b.label}</button>`).join('')}
+      </div>`;
+    }
+
+    return `<div class="msg-row ${isMe?'mine':''}">
+      ${!isMe?`<div class="msg-avatar">${m.avatar||'👤'}</div>`:''}
+      <div class="msg-col">
+        ${!isMe?`<div class="msg-sender">${m.sender}</div>`:''}
+        ${content}
+        ${qa}
+        <div class="msg-time">${m.time}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  area.scrollTop=area.scrollHeight;
+}
+
+function sendMsg(){
+  const input=document.getElementById('msg-input');
+  const text=input.value.trim();
+  if(!text) return;
+
+  const room=ROOMS.find(r=>r.id===currentRoomId);
+  if(!room) return;
+
+  const now=new Date();
+  const timeStr=`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+  const newMsg={id:'new-'+Date.now(),from:'me',text,time:timeStr};
+  room.messages.push(newMsg);
+  room.lastMsg=text;
+  room.lastTime='방금';
+
+  input.value='';
+  input.style.height='auto';
+  document.getElementById('send-btn').disabled=true;
+
+  renderMessages(room.messages);
+  render();
+
+  // 타이핑 인디케이터 후 자동 답장 (데모)
+  setTimeout(()=>{
+    const area=document.getElementById('msg-area');
+    if(!area) return;
+    const typing=document.createElement('div');
+    typing.className='msg-row';
+    typing.innerHTML=`<div class="msg-avatar">${room.avatar}</div><div class="msg-col"><div class="typing-indicator"><div class="ti-dot"></div><div class="ti-dot"></div><div class="ti-dot"></div></div></div>`;
+    area.appendChild(typing);
+    area.scrollTop=area.scrollHeight;
+
+    setTimeout(()=>{
+      const autoReplies=['확인했습니다.','알겠습니다, 반영하겠습니다.','감사합니다!','네, 최대한 빠르게 처리하겠습니다.'];
+      const reply=autoReplies[Math.floor(Math.random()*autoReplies.length)];
+      const replyMsg={id:'auto-'+Date.now(),from:'them',sender:room.name,avatar:room.avatar,text:reply,time:timeStr};
+      room.messages.push(replyMsg);
+      room.lastMsg=reply;
+      renderMessages(room.messages);
+      render();
+    },1500);
+  },800);
+}
+
+function handleKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}
+}
+
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,120)+'px';
+}
+
+function attachFile(){
+  showToast('파일 첨부 기능은 실제 서비스에서 제공됩니다.');
+}
+
+function showRoomList(){
+  document.getElementById('room-list').classList.toggle('mobile-show');
+}
+
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1a1f2e;color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;z-index:400;transition:all .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';
+  setTimeout(()=>{t.style.opacity='0';},2500);
+}
+
+// 첫 번째 채팅방 자동 오픈
+
+// PCM 알림 → 메시지 뱃지 반영
+(function(){
+  var unreadNotifs = PCM.getNotifs().filter(function(n){return n.unread;}).length;
+  // 첫 번째 채팅방 뱃지에 반영
+  if(ROOMS[0] && unreadNotifs > 0) ROOMS[0].unread = Math.max(ROOMS[0].unread, unreadNotifs);
+})();
+
+render();
+openRoom('r1');
+</script>
+</body>
+</html>

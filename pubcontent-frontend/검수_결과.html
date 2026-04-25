@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>검수 결과 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --purple:#6b46c1;--purple-light:#f3effe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-amber{background:var(--amber-light);color:var(--amber);border:1px solid rgba(180,83,9,.2);}
+
+.main{max-width:900px;margin:0 auto;padding:32px 24px;}
+.page-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text2);font-weight:300;margin-bottom:24px;}
+
+/* RESULT HERO */
+.result-hero{border-radius:16px;padding:28px;margin-bottom:24px;display:flex;align-items:center;gap:24px;}
+.rh-pass{background:linear-gradient(135deg,rgba(26,107,74,.1),rgba(26,107,74,.03));border:1.5px solid rgba(26,107,74,.2);}
+.rh-fail{background:linear-gradient(135deg,rgba(220,53,69,.1),rgba(220,53,69,.03));border:1.5px solid rgba(220,53,69,.2);}
+.rh-pending{background:linear-gradient(135deg,rgba(180,83,9,.1),rgba(180,83,9,.03));border:1.5px solid rgba(180,83,9,.2);}
+.rh-score-wrap{text-align:center;flex-shrink:0;}
+.rh-score-label{font-size:11px;color:var(--text3);margin-bottom:4px;}
+.rh-score{font-family:var(--mono);font-size:56px;font-weight:700;line-height:1;}
+.rh-score.pass{color:var(--accent);}
+.rh-score.fail{color:var(--red);}
+.rh-score.pending{color:var(--amber);}
+.rh-score-max{font-size:14px;color:var(--text3);margin-top:2px;}
+.rh-info{flex:1;}
+.rh-status{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;margin-bottom:8px;}
+.rh-status.pass{color:var(--accent);}
+.rh-status.fail{color:var(--red);}
+.rh-status.pending{color:var(--amber);}
+.rh-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:12px;}
+.rh-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text3);}
+
+/* TAB */
+.tab-nav{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab-btn{padding:10px 20px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--sans);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* SCORE BREAKDOWN */
+.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.score-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
+.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sc-badge{font-size:11px;padding:3px 9px;border-radius:8px;font-weight:600;}
+.sc-badge-ai{background:var(--blue-light);color:var(--blue);}
+.sc-badge-expert{background:var(--purple-light);color:var(--purple);}
+.sc-badge-pending{background:var(--amber-light);color:var(--amber);}
+.sc-score-big{font-family:var(--mono);font-size:40px;font-weight:700;text-align:center;margin-bottom:4px;}
+.sc-score-big.pass{color:var(--accent);}
+.sc-score-big.fail{color:var(--red);}
+.sc-score-big.pending{color:var(--text3);}
+.sc-score-label{text-align:center;font-size:11px;color:var(--text3);margin-bottom:14px;}
+.sc-reviewer{font-size:12px;color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+
+/* CRITERIA TABLE */
+.criteria-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:16px;}
+.criteria-table th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);background:var(--surface2);}
+.criteria-table td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:top;}
+.criteria-table tr:last-child td{border-bottom:none;}
+.criteria-table tr:hover td{background:var(--surface2);}
+.criteria-name{font-weight:500;color:var(--text);margin-bottom:3px;}
+.criteria-note{font-size:11px;color:var(--text3);}
+.criteria-score{font-family:var(--mono);font-size:15px;font-weight:700;text-align:right;}
+.cs-pass{color:var(--accent);}
+.cs-warn{color:var(--amber);}
+.cs-fail{color:var(--red);}
+.cs-pending{color:var(--text3);}
+.score-bar-mini{height:4px;border-radius:2px;background:var(--border);margin-top:4px;overflow:hidden;}
+.sbm-fill{height:100%;border-radius:2px;}
+.sbm-pass{background:var(--accent);}
+.sbm-warn{background:var(--amber);}
+.sbm-fail{background:var(--red);}
+
+.result-chip{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap;}
+.rc-pass{background:var(--accent-light);color:var(--accent);}
+.rc-warn{background:var(--amber-light);color:var(--amber);}
+.rc-fail{background:var(--red-light);color:var(--red);}
+.rc-pending{background:var(--surface2);color:var(--text3);border:1px solid var(--border2);}
+
+/* FEEDBACK */
+.feedback-item{background:var(--surface);border-left:3px solid var(--border2);border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:10px;}
+.feedback-item.level-pass{border-left-color:var(--accent);}
+.feedback-item.level-warn{border-left-color:var(--amber);}
+.feedback-item.level-fail{border-left-color:var(--red);}
+.fi-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.fi-cat{font-size:12px;font-weight:700;}
+.fi-score{font-family:var(--mono);font-size:12px;margin-left:auto;}
+.fi-text{font-size:13px;color:var(--text2);line-height:1.65;}
+.fi-suggest{margin-top:8px;font-size:12px;color:var(--accent);background:var(--accent-light);border-radius:6px;padding:8px 10px;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--border);}
+.tl-item{position:relative;padding-bottom:20px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{position:absolute;left:-24px;width:16px;height:16px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);top:2px;}
+.tl-dot.done{border-color:var(--accent);background:var(--accent);}
+.tl-dot.active{border-color:var(--amber);background:var(--amber);}
+.tl-dot.wait{border-color:var(--border2);background:var(--surface);}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.tl-desc{font-size:12px;color:var(--text3);}
+.tl-time{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* ACTION BOX */
+.action-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:20px;}
+.ab-title{font-size:14px;font-weight:700;margin-bottom:14px;}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo" onclick="nav('마이페이지_콘텐츠사.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-ghost" onclick="nav('마이페이지_콘텐츠사.html')">← 마이페이지</button>
+    <button class="btn btn-ghost" onclick="nav('마이페이지_발주처.html')">발주처 화면으로 보기</button>
+  </div>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+// ── 검수 점수 차트 ──
+function renderScoreChart(containerId) {
+  var el = document.getElementById(containerId);
+  if(!el) return;
+  var scores = [
+    {label:'공공언어 준수', score:98, color:'#1a6b4a'},
+    {label:'정부 디자인 규정', score:95, color:'#2d9e72'},
+    {label:'저작권 검증', score:100, color:'#1a56db'},
+    {label:'오탈자·수치', score:88, color:'#b45309'},
+    {label:'색상 접근성', score:82, color:'#6b46c1'},
+    {label:'메시지 효과성', score:91, color:'#1a6b4a'},
+  ];
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px;">'
+    + scores.map(function(s){
+        var color = s.score>=95?'var(--accent,#1a6b4a)':s.score>=85?'var(--amber,#b45309)':'var(--red,#dc3545)';
+        return '<div>'
+          +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">'
+          +'<span>'+s.label+'</span>'
+          +'<span style="font-weight:700;color:'+color+';font-family:monospace;">'+s.score+'점</span>'
+          +'</div>'
+          +'<div style="height:8px;background:rgba(0,0,0,.06);border-radius:4px;overflow:hidden;">'
+          +'<div style="height:100%;width:'+s.score+'%;background:'+color+';border-radius:4px;transition:width .6s ease;"></div>'
+          +'</div></div>';
+    }).join('')
+  +'</div>';
+}
+// ── END 검수 점수 차트 ──
+
+
+const VIEW = sessionStorage.getItem('userType') === 'public' ? 'buyer' : 'maker';
+
+const RESULT = {
+  taskTitle: '탄소중립 SNS 카드뉴스 제작',
+  org: '환경부 홍보기획과',
+  maker: '㈜ 그린스튜디오',
+  submittedAt: '2025.05.05 14:22',
+  totalScore: 94,
+  status: 'pass', // pass | fail | pending
+  ai: {
+    score: 94, status: 'pass', completedAt: '2025.05.05 14:35',
+    reviewer: 'Claude AI 검수 시스템 v2.1',
+    criteria: [
+      {name:'공공언어 가이드라인 준수', score:19, max:20, status:'pass', note:'문체, 어휘 모두 기준 충족. "추진" → "진행"으로 1건 권장 수정.'},
+      {name:'정부 시각 디자인 적용', score:20, max:20, status:'pass', note:'정부상징 위치·크기·색상 모두 지침 준수.'},
+      {name:'오탈자·수치 검수', score:18, max:20, status:'warn', note:'\'2023년\' → \'2024년\' 수치 불일치 1건 발견. 검토 필요.'},
+      {name:'저작권 이미지 확인', score:19, max:20, status:'pass', note:'사용 이미지 19건 모두 CC0 또는 구매 라이선스 확인. 1건 출처 표기 누락.'},
+      {name:'색상 접근성(명도비)', score:18, max:20, status:'warn', note:'6번 슬라이드 배경-텍스트 명도비 3.8:1 (기준 4.5:1 미달). 수정 권장.'},
+    ],
+  },
+  expert: {
+    score: null, status: 'pending', completedAt: null,
+    reviewer: '김민정 (공공마케팅 전문가 · 랭킹 #1)',
+    assignedAt: '2025.05.05 14:36',
+    note: '전문가 검수가 진행 중입니다. 보통 24~48시간 내 완료됩니다.',
+  },
+  buyer: {
+    score: null, status: 'pending',
+  }
+};
+
+let activeTab = 'overview';
+
+function render() {
+  const el = document.getElementById('main');
+  el.innerHTML = renderHero() + renderTabs() + renderTabContent();
+}
+
+function renderHero() {
+  const r = RESULT;
+  const heroClass = r.status==='pass'?'rh-pass':r.status==='fail'?'rh-fail':'rh-pending';
+  const scoreClass = r.status==='pass'?'pass':r.status==='fail'?'fail':'pending';
+  const statusIcon = r.status==='pass'?'✅':r.status==='fail'?'❌':'⏳';
+  const statusText = r.status==='pass'?'AI 검수 통과':'fail'?'AI 검수 반려':'검수 진행 중';
+  const desc = r.status==='pass'
+    ? 'AI 자동 검수를 통과했습니다. 전문가 2차 검수가 진행 중이며, 완료 후 발주처 최종 승인 단계로 넘어갑니다.'
+    : r.status==='fail'
+    ? 'AI 자동 검수에서 필수 항목 미달 항목이 발견되었습니다. 수정 후 재납품해주세요.'
+    : 'AI 검수 결과를 분석하고 있습니다.';
+
+  return `
+    <div class="page-title">검수 결과</div>
+    <div class="page-sub">${r.taskTitle} · ${r.org}</div>
+    <div class="result-hero ${heroClass}">
+      <div class="rh-score-wrap">
+        <div class="rh-score-label">종합 점수</div>
+        <div class="rh-score ${scoreClass}">${r.totalScore}</div>
+        <div class="rh-score-max">/ 100</div>
+      </div>
+      <div class="rh-info">
+        <div class="rh-status ${r.status}">
+          <span>${statusIcon}</span>
+          <span>${statusText}</span>
+        </div>
+        <div class="rh-desc">${desc}</div>
+        <div class="rh-meta">
+          <span>📤 납품일 ${r.submittedAt}</span>
+          <span>🤖 AI 검수 완료 ${r.ai.completedAt}</span>
+          <span>👩‍💼 전문가 검수 진행 중</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderTabs() {
+  const tabs = [
+    {id:'overview', label:'전체 요약'},
+    {id:'ai', label:'🤖 AI 검수 상세'},
+    {id:'expert', label:'👩‍💼 전문가 검수'},
+    {id:'timeline', label:'진행 타임라인'},
+  ];
+  return `
+    <div class="tab-nav">
+      ${tabs.map(t=>`<button class="tab-btn ${activeTab===t.id?'active':''}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('')}
+    </div>`;
+}
+
+function renderTabContent() {
+  if (activeTab==='overview')  return renderOverview();
+  if (activeTab==='ai')        return renderAI();
+  if (activeTab==='expert')    return renderExpert();
+  return renderTimeline();
+}
+
+function renderOverview() {
+  return `
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="sc-header">
+          <span style="font-size:13px;font-weight:700;">🤖 AI 자동 검수</span>
+          <span class="sc-badge sc-badge-ai">완료</span>
+        </div>
+        <div class="sc-score-big pass">${RESULT.ai.score}</div>
+        <div class="sc-score-label">/ 100점</div>
+        <div style="background:var(--border);height:6px;border-radius:3px;overflow:hidden;">
+          <div style="width:${RESULT.ai.score}%;height:100%;background:var(--accent);border-radius:3px;"></div>
+        </div>
+        <div class="sc-reviewer">검수자: ${RESULT.ai.reviewer}</div>
+      </div>
+      <div class="score-card">
+        <div class="sc-header">
+          <span style="font-size:13px;font-weight:700;">👩‍💼 전문가 검수</span>
+          <span class="sc-badge sc-badge-pending">진행 중</span>
+        </div>
+        <div class="sc-score-big pending">—</div>
+        <div class="sc-score-label">검수 중</div>
+        <div style="background:var(--border);height:6px;border-radius:3px;"></div>
+        <div class="sc-reviewer">배정: ${RESULT.expert.reviewer}</div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">AI 검수 항목 요약</div>
+    <table class="criteria-table">
+      <thead><tr><th>검수 항목</th><th style="text-align:center;">결과</th><th style="text-align:right;">점수</th></tr></thead>
+      <tbody>
+        ${RESULT.ai.criteria.map(c=>{
+          const pct = c.score/c.max*100;
+          const cls = c.status==='pass'?'pass':c.status==='warn'?'warn':'fail';
+          const chipLabel = c.status==='pass'?'통과':c.status==='warn'?'주의':'반려';
+          return `<tr>
+            <td>
+              <div class="criteria-name">${c.name}</div>
+              <div class="criteria-note">${c.note}</div>
+            </td>
+            <td style="text-align:center;"><span class="result-chip rc-${c.status}">${chipLabel}</span></td>
+            <td>
+              <div class="criteria-score cs-${cls}">${c.score}<span style="font-size:11px;color:var(--text3);">/${c.max}</span></div>
+              <div class="score-bar-mini"><div class="sbm-fill sbm-${cls}" style="width:${pct}%"></div></div>
+            </td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:var(--surface2);font-weight:700;">
+          <td>합계</td>
+          <td style="text-align:center;"><span class="result-chip rc-pass">통과</span></td>
+          <td class="criteria-score cs-pass">${RESULT.ai.score}<span style="font-size:11px;color:var(--text3);">/100</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    
+<div style="background:var(--surface,#fff);border:1px solid var(--border,rgba(0,0,0,.08));border-radius:12px;padding:20px;margin-bottom:14px;">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border,rgba(0,0,0,.08));">📊 항목별 검수 점수</div>
+  <div id="score-chart"></div>
+</div>
+
+<div class="action-box">
+      <div class="ab-title">다음 단계</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        ${VIEW === 'buyer' ? `
+        <button class="btn btn-primary" onclick="nav('납품물_열람.html')">📁 납품물 열람 및 승인</button>
+        <button class="btn btn-amber" onclick="nav('수정_요청.html')">✏️ 수정 요청</button>
+        ` : `
+        <button class="btn btn-ghost" onclick="nav('납품_제출.html')">📁 납품물 보기</button>
+        <button class="btn btn-amber" onclick="resubmit()">🔄 재납품 준비</button>
+        `}
+        <button class="btn btn-ghost" onclick="switchTab('timeline')">타임라인 보기</button>
+      </div>
+    </div>`;
+}
+
+function renderAI() {
+  return `
+    <div style="display:flex;align-items:center;gap:12px;background:var(--blue-light);border:1px solid rgba(26,86,219,.15);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+      <span style="font-size:20px;">🤖</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--blue);">AI 자동 검수 완료</div>
+        <div style="font-size:12px;color:var(--blue);opacity:.8;">${RESULT.ai.reviewer} · ${RESULT.ai.completedAt} 완료</div>
+      </div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:28px;font-weight:700;color:var(--accent);">${RESULT.ai.score}점</div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">항목별 상세 피드백</div>
+    ${RESULT.ai.criteria.map(c=>`
+      <div class="feedback-item level-${c.status}">
+        <div class="fi-header">
+          <span style="font-size:16px;">${c.status==='pass'?'✅':c.status==='warn'?'⚠️':'❌'}</span>
+          <span class="fi-cat">${c.name}</span>
+          <span class="result-chip rc-${c.status}" style="margin-left:4px;">${c.status==='pass'?'통과':c.status==='warn'?'주의':'반려'}</span>
+          <span class="fi-score" style="color:${c.status==='pass'?'var(--accent)':c.status==='warn'?'var(--amber)':'var(--red)'};">${c.score}/${c.max}점</span>
+        </div>
+        <div class="fi-text">${c.note}</div>
+        ${c.status!=='pass'?`<div class="fi-suggest">💡 권장 조치: ${
+          c.name.includes('수치')?'슬라이드 내 연도·통계 수치를 최신 자료와 대조 확인해주세요.':
+          c.name.includes('색상')?'해당 슬라이드의 배경색 또는 텍스트 색상을 조정하여 명도비 4.5:1 이상으로 맞춰주세요.':
+          '해당 항목을 수정 후 재납품해주세요.'
+        }</div>`:''}
+      </div>`).join('')}
+
+    <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-top:16px;font-size:12px;color:var(--text3);line-height:1.7;">
+      ⚠️ AI 검수 결과는 참고용이며, 최종 판단은 전문가 검수 및 발주처 승인을 통해 이루어집니다. 주의(⚠️) 항목은 필수 수정 사항은 아니나 개선을 권장합니다.
+    </div>`;
+}
+
+function renderExpert() {
+  return `
+    <div style="background:var(--amber-light);border:1px solid rgba(180,83,9,.2);border-radius:10px;padding:18px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start;">
+      <span style="font-size:28px;">⏳</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:var(--amber);margin-bottom:4px;">전문가 검수 진행 중</div>
+        <div style="font-size:13px;color:var(--amber);line-height:1.65;">배정 전문가: <strong>${RESULT.expert.reviewer}</strong><br>배정 시각: ${RESULT.expert.assignedAt}<br>예상 완료: 배정 후 48시간 내</div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">전문가 검수 기준</div>
+      ${['콘텐츠의 정책 메시지 정확성','공공 커뮤니케이션 맥락 적합성','시각적 완성도 및 전달력','디자인의 공공성·접근성','전반적 품질 수준'].map((item,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="width:20px;height:20px;border-radius:50%;background:var(--surface2);color:var(--text3);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+          <span style="font-size:13px;flex:1;">${item}</span>
+          <span style="font-size:11px;color:var(--text3);">검수 대기</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderTimeline() {
+  const items = [
+    {status:'done', title:'납품 제출', desc:'㈜ 그린스튜디오가 파일 3개를 제출했습니다.', time:'2025.05.05 14:22'},
+    {status:'done', title:'AI 자동 검수 완료', desc:`94점 / 100점 · 통과 · 주의 항목 2건 발견`, time:'2025.05.05 14:35'},
+    {status:'active', title:'전문가 검수 진행 중', desc:`${RESULT.expert.reviewer}에게 배정됨`, time:'2025.05.05 14:36 ~'},
+    {status:'wait', title:'발주처 최종 승인', desc:'전문가 검수 완료 후 발주처에 알림 발송', time:'예정'},
+    {status:'wait', title:'에스크로 해제 및 정산', desc:'최종 승인 시 사업비 자동 지급', time:'예정'},
+  ];
+
+  return `
+    <div class="timeline">
+      ${items.map(item=>`
+        <div class="tl-item">
+          <div class="tl-dot ${item.status}"></div>
+          <div class="tl-title" style="color:${item.status==='done'?'var(--accent)':item.status==='active'?'var(--amber)':'var(--text3)'}">${item.title}</div>
+          <div class="tl-desc">${item.desc}</div>
+          <div class="tl-time">${item.time}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function resubmit() {
+  if(typeof PCM !== 'undefined') PCM.toast('재납품 화면으로 이동합니다','info');
+  setTimeout(()=>nav('납품_제출.html'), 800);
+}
+function switchTab(tab) {
+  activeTab = tab;
+  render();
+}
+
+render();
+setTimeout(function(){renderScoreChart("score-chart");}, 200);
+</script>
+</body>
+</html>

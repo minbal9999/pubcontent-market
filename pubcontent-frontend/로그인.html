@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>로그인 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --blue:#1a56db;--purple:#6b46c1;--red:#dc3545;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;display:flex;flex-direction:column;}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:58px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--text);}
+.header-right{font-size:13px;color:var(--text2);}
+.header-right a{color:var(--accent);text-decoration:none;font-weight:500;cursor:pointer;}
+
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+.wrap{width:100%;max-width:420px;}
+
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px 32px;}
+.login-title{font-family:var(--serif);font-size:22px;font-weight:700;text-align:center;margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px;font-weight:300;}
+
+/* TYPE TABS */
+.type-tabs{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;gap:0;}
+.type-tab{flex:1;padding:8px 6px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);color:var(--text3);background:transparent;transition:all 0.18s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.type-tab .tab-icon{font-size:16px;}
+.type-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.08);font-weight:700;}
+.type-tab.active-blue{background:var(--surface);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,0.08);font-weight:700;}
+.type-tab.active-purple{background:var(--surface);color:var(--purple);box-shadow:0 1px 4px rgba(0,0,0,0.08);font-weight:700;}
+
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:11px 13px;outline:none;width:100%;transition:border-color 0.15s;}
+input:focus{border-color:var(--accent);background:var(--surface);}
+input::placeholder{color:var(--text3);}
+
+.forgot{text-align:right;font-size:12px;color:var(--text3);margin-top:-8px;margin-bottom:20px;}
+.forgot a{color:var(--accent);text-decoration:none;}
+
+.btn-login{width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all 0.15s;color:#fff;margin-bottom:16px;}
+.btn-green{background:var(--accent);}
+.btn-green:hover{background:var(--accent2);}
+.btn-blue{background:var(--blue);}
+.btn-blue:hover{background:#1447b5;}
+.btn-purple{background:var(--purple);}
+.btn-purple:hover{background:#5a38a8;}
+
+.divider-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.divider-line{flex:1;height:1px;background:var(--border);}
+.divider-text{font-size:11px;color:var(--text3);}
+
+.signup-row{text-align:center;font-size:13px;color:var(--text2);}
+.signup-row a{color:var(--accent);text-decoration:none;font-weight:500;cursor:pointer;}
+
+.err-msg{background:#fce8e6;border:1px solid rgba(220,53,69,0.2);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--red);margin-bottom:14px;display:none;}
+.err-msg.show{display:block;}
+
+/* 데모 힌트 */
+.demo-hint{background:var(--accent-light);border:1px solid rgba(26,107,74,0.15);border-radius:10px;padding:12px 14px;margin-top:20px;}
+.demo-hint-title{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+.demo-accounts{display:flex;flex-direction:column;gap:6px;}
+.demo-account{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:7px;padding:8px 12px;cursor:pointer;border:1px solid rgba(26,107,74,0.12);transition:background 0.13s;}
+.demo-account:hover{background:var(--accent-light);}
+.da-label{font-size:12px;font-weight:500;color:var(--text);}
+.da-info{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.da-arrow{font-size:12px;color:var(--accent);}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+<script src="api.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <div class="header-right">
+    아직 회원이 아니신가요? <a onclick="nav('회원가입_v2.html')">회원가입</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="wrap">
+    <div class="login-card">
+      <div class="login-title">로그인</div>
+      <div class="login-sub">공공 콘텐츠 생태계에 오신 것을 환영합니다</div>
+
+      <div class="type-tabs">
+        <button class="type-tab active" id="tab-public" onclick="setTab('public')">
+          <span class="tab-icon">🏛</span>공공기관
+        </button>
+        <button class="type-tab" id="tab-maker" onclick="setTab('maker')">
+          <span class="tab-icon">🎬</span>콘텐츠사
+        </button>
+        <button class="type-tab" id="tab-expert" onclick="setTab('expert')">
+          <span class="tab-icon">👩‍💼</span>콘텐츠 전문가
+        </button>
+      </div>
+
+      <div class="err-msg" id="err-msg">이메일 또는 비밀번호가 올바르지 않습니다.</div>
+
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" id="email" placeholder="이메일 주소를 입력하세요" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="pw" placeholder="비밀번호를 입력하세요" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="forgot"><a onclick="nav('비밀번호찾기.html')" style="cursor:pointer;">비밀번호를 잊으셨나요?</a></div>
+
+      <button class="btn-login btn-green" id="btn-login" onclick="doLogin()">로그인</button>
+
+      <div class="divider-row">
+        <div class="divider-line"></div>
+        <div class="divider-text">또는</div>
+        <div class="divider-line"></div>
+      </div>
+
+      <div class="signup-row">
+        처음 방문하셨나요? <a onclick="nav('회원가입_v2.html')">회원가입하기</a>
+      </div>
+    </div>
+
+    <div class="demo-hint">
+      <div class="demo-hint-title">🔑 데모 계정으로 빠르게 체험하기</div>
+      <div class="demo-accounts">
+        <div class="demo-account" onclick="quickLogin('public')">
+          <span class="da-label">🏛 공공기관 담당자</span>
+          <span class="da-info">public@demo.kr</span>
+          <span class="da-arrow">→</span>
+        </div>
+        <div class="demo-account" onclick="quickLogin('maker')">
+          <span class="da-label">🎬 콘텐츠사</span>
+          <span class="da-info">maker@demo.kr</span>
+          <span class="da-arrow">→</span>
+        </div>
+        <div class="demo-account" onclick="quickLogin('expert')">
+          <span class="da-label">👩‍💼 콘텐츠 전문가</span>
+          <span class="da-info">expert@demo.kr</span>
+          <span class="da-arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function nav(page) { window.location.href = page; }
+
+function setTab(type) {
+  currentTab = type;
+  ['public','maker','expert'].forEach(t => {
+    const tab = document.getElementById('tab-'+t);
+    tab.className = 'type-tab';
+    if (t === type) {
+      tab.classList.add(t==='public'?'active':t==='maker'?'active':'active-purple');
+    }
+  });
+  const btn = document.getElementById('btn-login');
+  btn.className = 'btn-login btn-green';
+  document.getElementById('err-msg').classList.remove('show');
+}
+
+
+async function doLogin() {
+  const email    = document.getElementById('email')?.value?.trim();
+  const password = document.getElementById('password')?.value;
+  const role     = document.getElementById('role')?.value || sessionStorage.getItem('loginRole') || 'public';
+
+  if (!email || !password) {
+    PCM.toast('이메일과 비밀번호를 입력하세요.', 'error'); return;
+  }
+
+  // 로딩 상태
+  const btn = document.getElementById('login-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '로그인 중...'; }
+
+  try {
+    // API 호출 시도
+    const res = await API.auth.login(email, password);
+
+    if (res && res.success) {
+      // 역할별 리다이렉트
+      const role = res.data.user.role;
+      if (role === 'BUYER')  window.location.href = '발주처_대시보드.html';
+      else if (role === 'MAKER')  window.location.href = '마이페이지_콘텐츠사.html';
+      else if (role === 'EXPERT') window.location.href = '마이페이지_전문가.html';
+      else if (role === 'ADMIN')  window.location.href = '관리자_백오피스.html';
+    } else if (res === null) {
+      // 서버 연결 실패 → 더미 로그인
+      dummyLogin(email, role);
+    }
+  } catch(e) {
+    dummyLogin(email, role);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
+  }
+}
+
+function dummyLogin(email, role) {
+  // 백엔드 없을 때 더미 모드
+  sessionStorage.setItem('userType', role || 'public');
+  sessionStorage.setItem('userName', email.split('@')[0]);
+  PCM.toast('더미 모드로 로그인합니다.', 'info');
+  setTimeout(() => {
+    if ((role||'public') === 'maker') window.location.href = '마이페이지_콘텐츠사.html';
+    else if (role === 'expert')       window.location.href = '마이페이지_전문가.html';
+    else                              window.location.href = '발주처_대시보드.html';
+  }, 800);
+}
+
+
+function quickLogin(type) {
+  sessionStorage.setItem('userType', type);
+  sessionStorage.setItem('userEmail', type+'@demo.kr');
+  nav(DEST[type]);
+}
+</script>
+</body>
+</html>

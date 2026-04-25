@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>견적서 제출 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.logo-role{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:2px 8px;margin-left:6px;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 58px);}
+
+/* 왼쪽 — 견적 작성 */
+.form-panel{padding:32px;}
+.page-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text2);font-weight:300;margin-bottom:24px;}
+
+/* 요청 과업 요약 */
+.task-summary{background:var(--blue-light);border:1px solid rgba(26,86,219,.15);border-radius:12px;padding:18px 20px;margin-bottom:24px;}
+.ts-label{font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.ts-title{font-size:15px;font-weight:700;margin-bottom:6px;}
+.ts-meta{font-size:12px;color:var(--text2);display:flex;gap:14px;flex-wrap:wrap;}
+.ts-budget{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--blue);}
+
+/* 카드 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.card-num{width:22px;height:22px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg-full{grid-column:1/-1;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+.req{color:var(--red);font-size:11px;}
+input,select,textarea{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:10px 12px;outline:none;width:100%;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--surface);}
+input::placeholder,textarea::placeholder{color:var(--text3);}
+textarea{resize:vertical;min-height:80px;}
+.input-unit{display:flex;}
+.input-unit input{border-radius:8px 0 0 8px;border-right:none;}
+.unit-tag{background:var(--surface2);border:1.5px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--text3);white-space:nowrap;}
+
+/* 금액 실시간 분해 */
+.amount-breakdown{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:10px;}
+.ab-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.ab-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border);}
+.ab-row:last-child{border-bottom:none;}
+.ab-key{color:var(--text2);}
+.ab-val{font-family:var(--mono);font-weight:600;}
+.ab-val.accent{color:var(--accent);}
+.ab-val.amber{color:var(--amber);}
+.ab-val.blue{color:var(--blue);}
+
+/* 납품 항목 */
+.deliverable-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.dl-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;}
+.dl-text{flex:1;font-size:13px;}
+.dl-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px;transition:color .13s;}
+.dl-remove:hover{color:var(--red);}
+.add-dl-btn{width:100%;padding:8px;border:2px dashed var(--border2);border-radius:8px;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.add-dl-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+
+/* 체크리스트 */
+.check-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.check-chip{border:1.5px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .13s;background:var(--surface);}
+.check-chip:hover{border-color:var(--accent);}
+.check-chip.on{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
+
+/* 오른쪽 — 미리보기 */
+.preview-panel{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 58px);position:sticky;top:58px;}
+.pp-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);}
+.pp-title{font-size:13px;font-weight:700;}
+.pp-body{flex:1;overflow-y:auto;padding:18px 22px;}
+
+/* 견적서 미리보기 */
+.quote-doc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;}
+.qd-header{text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--text);}
+.qd-title{font-family:var(--serif);font-size:15px;font-weight:700;}
+.qd-num{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:3px;}
+.qd-section{margin-bottom:12px;}
+.qd-sec-title{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;padding-bottom:4px;border-bottom:1px solid var(--accent-light);margin-bottom:8px;}
+.qd-row{display:flex;gap:8px;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border);}
+.qd-row:last-child{border-bottom:none;}
+.qd-key{color:var(--text3);min-width:70px;flex-shrink:0;}
+.qd-val{color:var(--text);font-weight:500;}
+.qd-val.accent{color:var(--accent);font-family:var(--mono);}
+.qd-val.amber{color:var(--amber);font-family:var(--mono);}
+.qd-ph{color:var(--text3);font-style:italic;font-weight:400;}
+
+.pp-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+
+/* 성공 화면 */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.success-overlay.show{display:flex;}
+.success-modal{background:var(--surface);border-radius:16px;padding:36px;text-align:center;max-width:380px;width:90%;}
+.sm-icon{font-size:52px;margin-bottom:14px;display:block;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+/* 모바일 */
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr;}
+  .preview-panel{display:none;}
+  .form-grid{grid-template-columns:1fr;}
+}
+
+.notice{border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.65;}
+.notice-info{background:var(--blue-light);border:1px solid rgba(26,86,219,.15);color:var(--blue);}
+.notice-warn{background:var(--amber-light);border:1px solid rgba(180,83,9,.15);color:var(--amber);}
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+<script src="api.js"></script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo" onclick="nav('마이페이지_콘텐츠사.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+      <span class="logo-role">콘텐츠사</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <span style="font-size:12px;color:var(--text3);align-self:center;">㈜ 그린스튜디오</span>
+    <button class="btn btn-ghost btn-sm" onclick="nav('마이페이지_콘텐츠사.html')">← 마이페이지</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 왼쪽 폼 -->
+  <div class="form-panel">
+    <div class="page-title">견적서 제출</div>
+    <div class="page-sub">발주처 요청 내용을 확인하고 견적 조건을 입력해주세요</div>
+
+    <!-- 요청 과업 -->
+    <div class="task-summary">
+      <div class="ts-label">📋 발주처 요청 과업</div>
+      <div class="ts-title" id="task-title">탄소중립 SNS 카드뉴스 제작</div>
+      <div class="ts-meta">
+        <span>🏛 환경부 홍보기획과</span>
+        <span>📦 카드뉴스 10장</span>
+        <span>📅 희망 납기 2025.05.10</span>
+        <span class="ts-budget" id="task-budget">예산 18,000,000원</span>
+      </div>
+    </div>
+
+    <div class="notice notice-info">
+      ℹ️ 발주처 예산 범위 내에서 견적을 제출해주세요. 견적 수락 후 에스크로 예치가 진행됩니다.
+    </div>
+
+    <!-- 1. 견적 금액 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">1</div>견적 금액 <span class="req">*</span></div>
+      <div class="form-grid">
+        <div class="form-group fg-full">
+          <label>견적 금액 (VAT 포함) <span class="req">*</span></label>
+          <div class="input-unit">
+            <input type="text" id="quote-amount" placeholder="18,000,000" oninput="updateBreakdown(this.value)">
+            <div class="unit-tag">원</div>
+          </div>
+        </div>
+      </div>
+      <div class="amount-breakdown" id="breakdown" style="display:none;">
+        <div class="ab-title">금액 구조</div>
+        <div class="ab-row"><span class="ab-key">견적 금액 (VAT포함)</span><span class="ab-val blue" id="bd-vat">—</span></div>
+        <div class="ab-row"><span class="ab-key">공급가액</span><span class="ab-val" id="bd-supply">—</span></div>
+        <div class="ab-row"><span class="ab-key">부가세</span><span class="ab-val" id="bd-vat-amt">—</span></div>
+        <div class="ab-row"><span class="ab-key">플랫폼 수수료 (5%)</span><span class="ab-val amber" id="bd-comm">—</span></div>
+        <div class="ab-row"><span class="ab-key">실수령 사업비</span><span class="ab-val accent" id="bd-biz">—</span></div>
+      </div>
+    </div>
+
+    <!-- 2. 납기 및 조건 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">2</div>납기 및 조건</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>납품 예정일 <span class="req">*</span></label>
+          <input type="text" id="quote-deadline" placeholder="2025.05.10" value="2025.05.10">
+        </div>
+        <div class="form-group">
+          <label>수정 가능 횟수</label>
+          <select id="quote-revisions">
+            <option value="1">1회</option>
+            <option value="2" selected>2회 (기본)</option>
+            <option value="3">3회</option>
+            <option value="0">수정 없음</option>
+          </select>
+        </div>
+        <div class="form-group fg-full">
+          <label>작업 착수 가능일</label>
+          <input type="text" id="quote-start" placeholder="2025.04.28 (계약 직후 착수 가능)" value="2025.04.28">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 납품물 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">3</div>납품 항목</div>
+      <div class="deliverable-list" id="deliverable-list"></div>
+      <div class="input-unit" style="margin-bottom:8px;">
+        <input type="text" id="dl-input" placeholder="납품 항목을 입력하세요" onkeydown="if(event.key==='Enter')addDeliverable()">
+        <button class="btn btn-ghost btn-sm" style="border-radius:0 8px 8px 0;border-left:none;white-space:nowrap;" onclick="addDeliverable()">추가</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">
+        <span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;" onclick="quickAdd('원본 PSD/AI')">원본 PSD/AI</span>
+        <span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;" onclick="quickAdd('JPG 300dpi')">JPG 300dpi</span>
+        <span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;" onclick="quickAdd('SNS 최적화본')">SNS 최적화본</span>
+        <span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;" onclick="quickAdd('영문 버전')">영문 버전</span>
+        <span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;" onclick="quickAdd('작업 가이드')">작업 가이드</span>
+      </div>
+    </div>
+
+    <!-- 4. AI 검수 기준 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">4</div>검수 기준 (자가 체크)</div>
+      <div class="check-chips" id="check-chips"></div>
+    </div>
+
+    <!-- 5. 특이사항 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">5</div>제작 메모 <span style="font-size:11px;color:var(--text3);font-weight:400;">(선택)</span></div>
+      <textarea id="quote-memo" placeholder="발주처에게 전달할 특이사항, 강점, 포트폴리오 링크 등을 입력하세요." oninput="updatePreview()"></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-ghost" onclick="nav('마이페이지_콘텐츠사.html')">취소</button>
+      <button class="btn btn-primary" id="submit-btn" onclick="submitQuote()" style="padding:10px 28px;">견적서 발송</button>
+    </div>
+  </div>
+
+  <!-- 오른쪽 미리보기 -->
+  <div class="preview-panel">
+    <div class="pp-header">
+      <div class="pp-title">견적서 미리보기</div>
+    </div>
+    <div class="pp-body">
+      <div class="quote-doc" id="quote-preview"></div>
+    </div>
+    <div class="pp-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitQuote()">견적서 발송</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="saveDraft()">임시저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 성공 모달 -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-modal">
+    <span class="sm-icon">📨</span>
+    <div style="font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:8px;">견적서 발송 완료!</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;">
+      환경부 홍보기획과에 견적서가 전송되었습니다.<br>
+      발주처 수락 시 알림을 보내드립니다.
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="nav('마이페이지_콘텐츠사.html')">마이페이지로 이동</button>
+  </div>
+</div>
+
+<script>
+
+
+
+function nav(p){window.location.href=p;}
+
+// 견적 제출 API 연동
+const _origSubmitQuote = typeof submitQuote === 'function' ? submitQuote : null;
+async function submitQuote() {
+  const task = PCM.get('currentTask') || {};
+  const price = document.getElementById('price')?.value;
+  const days  = document.getElementById('days')?.value;
+  const msg   = document.getElementById('quote-msg')?.value;
+
+  if (!price || !days) { PCM.toast('금액과 납기일을 입력하세요.', 'error'); return; }
+
+  if (API.isLoggedIn() && task.projectId) {
+    const res = await API.quotes.submit({
+      projectId:     task.projectId,
+      proposedPrice: parseInt(price.replace(/,/g,'')),
+      deliveryDays:  parseInt(days),
+      revisionCount: 2,
+      message:       msg,
+    });
+    if (res?.success || res === null) {
+      // 기존 UI 완료 처리
+      const overlay = document.getElementById('success-overlay');
+      if (overlay) overlay.classList.add('show');
+      PCM.pushNotif({icon:'📨',title:'견적서 발송 완료',sub:'발주처 수락 시 알림을 드립니다.',time:'방금'});
+    }
+  } else {
+    // 더미 모드
+    if (_origSubmitQuote) _origSubmitQuote();
+    else {
+      const overlay = document.getElementById('success-overlay');
+      if (overlay) overlay.classList.add('show');
+      PCM.pushNotif({icon:'📨',title:'견적서 발송 완료',sub:'발주처 수락 시 알림을 드립니다.',time:'방금'});
+    }
+  }
+}
+
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+// 과업 데이터 (sessionStorage 우선, 없으면 기본값)
+const task = (() => {
+  try { const t=sessionStorage.getItem('pcm_currentTask'); return t?JSON.parse(t):null; } catch(e){return null;}
+})() || {
+  title:'탄소중립 SNS 카드뉴스 제작',
+  org:'환경부 홍보기획과',
+  budget:18000000,
+  deadline:'2025.05.10',
+  type:'카드뉴스 10장'
+};
+
+document.getElementById('task-title').textContent = task.title||'과업지시서 내용';
+document.getElementById('task-budget').textContent = '예산 '+(task.budget||18000000).toLocaleString()+'원';
+
+// 상태
+let deliverables = ['원본 PSD/AI 파일','JPG 300dpi 완성본','SNS 최적화본 (1:1, 4:5, 9:16)'];
+const CHECK_ITEMS = ['공공언어 가이드라인 준수','정부 시각 디자인 적용','오탈자·수치 검수','저작권 이미지 확인','색상 접근성 확인'];
+let checkedItems = new Set([0,1,2,3]);
+
+function init(){
+  renderDeliverables();
+  renderCheckChips();
+  updatePreview();
+}
+
+function renderDeliverables(){
+  document.getElementById('deliverable-list').innerHTML = deliverables.map((d,i)=>`
+    <div class="dl-item">
+      <span class="dl-text">${d}</span>
+      <button class="dl-remove" onclick="removeDl(${i})">✕</button>
+    </div>`).join('');
+  updatePreview();
+}
+
+function addDeliverable(){
+  const inp=document.getElementById('dl-input');
+  const v=inp.value.trim();
+  if(!v) return;
+  deliverables.push(v);
+  inp.value='';
+  renderDeliverables();
+}
+
+function quickAdd(d){ if(!deliverables.includes(d)){ deliverables.push(d); renderDeliverables(); } }
+function removeDl(i){ deliverables.splice(i,1); renderDeliverables(); }
+
+function renderCheckChips(){
+  document.getElementById('check-chips').innerHTML = CHECK_ITEMS.map((c,i)=>`
+    <span class="check-chip ${checkedItems.has(i)?'on':''}" onclick="toggleCheck(${i})">${c}</span>`).join('');
+}
+
+function toggleCheck(i){
+  checkedItems.has(i)?checkedItems.delete(i):checkedItems.add(i);
+  renderCheckChips();
+  updatePreview();
+}
+
+function updateBreakdown(raw){
+  const num=parseInt(raw.replace(/[^0-9]/g,''),10);
+  const bd_el=document.getElementById('breakdown');
+  if(!num||num<1){ bd_el.style.display='none'; updatePreview(); return; }
+  const bd=PCM.breakdown(num);
+  bd_el.style.display='block';
+  document.getElementById('bd-vat').textContent=PCM.fw(bd.vatIncl);
+  document.getElementById('bd-supply').textContent=PCM.fw(bd.supply);
+  document.getElementById('bd-vat-amt').textContent=PCM.fw(bd.vat);
+  document.getElementById('bd-comm').textContent='-'+PCM.fw(bd.comm);
+  document.getElementById('bd-biz').textContent=PCM.fw(bd.biz);
+
+  // 예산 초과 경고
+  const budget=task.budget||18000000;
+  if(num>budget) PCM.toast('발주처 예산('+budget.toLocaleString()+'원)을 초과합니다','warn');
+  updatePreview();
+}
+
+function updatePreview(){
+  const amount=document.getElementById('quote-amount')?.value||'';
+  const deadline=document.getElementById('quote-deadline')?.value||'';
+  const revisions=document.getElementById('quote-revisions')?.value||'2';
+  const start=document.getElementById('quote-start')?.value||'';
+  const memo=document.getElementById('quote-memo')?.value||'';
+  const num=parseInt(amount.replace(/[^0-9]/g,''),10);
+  const bd=num?PCM.breakdown(num):null;
+  const ph=(v,t='미입력')=>v?`<span class="qd-val">${v}</span>`:`<span class="qd-ph">${t}</span>`;
+  const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.\s*/g,'.').slice(0,-1);
+
+  document.getElementById('quote-preview').innerHTML=`
+    <div class="qd-header">
+      <div class="qd-title">견 적 서</div>
+      <div class="qd-num">㈜ 그린스튜디오 · ${today}</div>
+    </div>
+    <div class="qd-section">
+      <div class="qd-sec-title">발주 과업</div>
+      <div class="qd-row"><span class="qd-key">과업명</span>${ph(task.title)}</div>
+      <div class="qd-row"><span class="qd-key">발주처</span>${ph(task.org)}</div>
+    </div>
+    <div class="qd-section">
+      <div class="qd-sec-title">견적 조건</div>
+      <div class="qd-row"><span class="qd-key">견적 금액</span>${bd?`<span class="qd-val blue">${bd.vatIncl.toLocaleString()}원</span>`:'<span class="qd-ph">미입력</span>'}</div>
+      ${bd?`
+      <div class="qd-row"><span class="qd-key">공급가액</span><span class="qd-val">${bd.supply.toLocaleString()}원</span></div>
+      <div class="qd-row"><span class="qd-key">수수료</span><span class="qd-val amber">-${bd.comm.toLocaleString()}원</span></div>
+      <div class="qd-row"><span class="qd-key">사업비</span><span class="qd-val accent">${bd.biz.toLocaleString()}원</span></div>`:''}
+      <div class="qd-row"><span class="qd-key">납품 예정일</span>${ph(deadline)}</div>
+      <div class="qd-row"><span class="qd-key">착수 가능일</span>${ph(start)}</div>
+      <div class="qd-row"><span class="qd-key">수정 횟수</span>${ph(revisions+'회')}</div>
+    </div>
+    <div class="qd-section">
+      <div class="qd-sec-title">납품 항목 (${deliverables.length}개)</div>
+      ${deliverables.map(d=>`<div class="qd-row"><span class="qd-key">·</span><span class="qd-val">${d}</span></div>`).join('')||'<span class="qd-ph">없음</span>'}
+    </div>
+    ${memo?`<div class="qd-section"><div class="qd-sec-title">메모</div><div style="font-size:11px;color:var(--text2);line-height:1.7;">${memo}</div></div>`:''}
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);text-align:center;">㈜ 그린스튜디오 · 대표 김민준</div>`;
+}
+
+function saveDraft(){
+  try{
+    const data={amount:document.getElementById('quote-amount').value,deadline:document.getElementById('quote-deadline').value,deliverables,memo:document.getElementById('quote-memo').value};
+    sessionStorage.setItem('pcm_quoteDraft',JSON.stringify(data));
+    PCM.toast('임시저장 완료','success');
+  }catch(e){PCM.toast('저장 실패','error');}
+}
+
+function submitQuote(){
+  const amount=document.getElementById('quote-amount')?.value;
+  const deadline=document.getElementById('quote-deadline')?.value;
+  if(!amount||!parseInt(amount.replace(/[^0-9]/g,''),10)){PCM.toast('견적 금액을 입력해주세요','error');return;}
+  if(!deadline){PCM.toast('납품 예정일을 입력해주세요','error');return;}
+  if(deliverables.length===0){PCM.toast('납품 항목을 1개 이상 추가해주세요','error');return;}
+
+  // 세션에 견적 저장
+  const quote={
+    id:'QT-'+Date.now(),
+    maker:'㈜ 그린스튜디오',
+    amount:parseInt(amount.replace(/[^0-9]/g,''),10),
+    deadline,
+    deliverables,
+    status:'sent',
+    sentAt:new Date().toLocaleString('ko-KR')
+  };
+  try{sessionStorage.setItem('pcm_latestQuote',JSON.stringify(quote));}catch(e){}
+
+  PCM.pushNotif({icon:'📨',title:'견적서 발송 완료',sub:'발주처 수락 시 알림을 드립니다.',time:'방금'});
+  document.getElementById('success-overlay').classList.add('show');
+}
+
+init();
+</script>
+</body>
+</html>

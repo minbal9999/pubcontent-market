@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<!-- 공공콘텐츠마켓 회원가입 v2 --><html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&display=swap');
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #fff;
+  --surface2: #f9f8f5;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1f2e;
+  --text2: #4a5568;
+  --text3: #8492a6;
+  --accent: #1a6b4a;
+  --accent2: #2d9e72;
+  --accent-light: #e8f5ef;
+  --blue: #1a56db;
+  --blue-light: #e8f0fe;
+  --purple: #6b46c1;
+  --purple-light: #f3effe;
+  --amber: #b45309;
+  --amber-light: #fef3c7;
+  --red: #dc3545;
+  --serif: 'Noto Serif KR', serif;
+  --sans: 'Noto Sans KR', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* HEADER */
+.header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 32px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 700; font-size: 12px; color: #fff; }
+.logo-name { font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--text); }
+.header-right { font-size: 13px; color: var(--text2); }
+.header-right a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+/* MAIN */
+.main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 24px 64px; }
+.container { width: 100%; max-width: 560px; }
+
+.page-title { font-family: var(--serif); font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.page-sub { font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 32px; font-weight: 300; }
+
+/* STEP BAR */
+.step-bar { display: flex; align-items: center; gap: 0; margin-bottom: 36px; }
+.sb-step { display: flex; align-items: center; gap: 8px; flex: 1; }
+.sb-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid var(--border2); color: var(--text3); background: var(--surface); transition: all 0.2s; flex-shrink: 0; }
+.sb-dot.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+.sb-dot.done { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.sb-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+.sb-label.active { color: var(--accent); }
+.sb-label.done { color: var(--text2); }
+.sb-line { flex: 1; height: 1px; background: var(--border2); margin: 0 4px; }
+.sb-line.done { background: var(--accent); }
+
+/* CARDS */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
+
+/* TYPE SELECT */
+.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px; }
+.type-card {
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.18s;
+  background: var(--surface);
+  position: relative;
+}
+.type-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+.type-card.selected-public  { border-color: var(--blue);   background: var(--blue-light);   }
+.type-card.selected-expert  { border-color: var(--purple); background: var(--purple-light); }
+.type-card.selected-maker   { border-color: var(--accent); background: var(--accent-light); }
+
+.tc-icon { font-size: 32px; margin-bottom: 10px; }
+.tc-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.tc-sub  { font-size: 11px; color: var(--text3); line-height: 1.5; }
+.tc-badge {
+  position: absolute; top: 10px; right: 10px;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: none; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+}
+.type-card.selected-public  .tc-badge { display: flex; background: var(--blue);   }
+.type-card.selected-expert  .tc-badge { display: flex; background: var(--purple); }
+.type-card.selected-maker   .tc-badge { display: flex; background: var(--accent); }
+
+/* BENEFITS BOX */
+.benefit-box { border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
+.benefit-box.public  { background: var(--blue-light);   border: 1px solid rgba(26,86,219,0.15); }
+.benefit-box.expert  { background: var(--purple-light); border: 1px solid rgba(107,70,193,0.15); }
+.benefit-box.maker   { background: var(--accent-light); border: 1px solid rgba(26,107,74,0.15); }
+.benefit-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.benefit-box.public  .benefit-title { color: var(--blue);   }
+.benefit-box.expert  .benefit-title { color: var(--purple); }
+.benefit-box.maker   .benefit-title { color: var(--accent); }
+.benefit-list { list-style: none; }
+.benefit-list li { font-size: 12px; color: var(--text2); padding: 3px 0; padding-left: 14px; position: relative; }
+.benefit-list li::before { content: '✓'; position: absolute; left: 0; font-weight: 700; font-size: 10px; }
+.benefit-box.public  .benefit-list li::before { color: var(--blue);   }
+.benefit-box.expert  .benefit-list li::before { color: var(--purple); }
+.benefit-box.maker   .benefit-list li::before { color: var(--accent); }
+
+/* FORM */
+.form-section { margin-bottom: 20px; }
+.form-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label { font-size: 12px; font-weight: 500; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+.required { color: var(--red); font-size: 11px; }
+.optional { font-size: 10px; color: var(--text3); font-weight: 400; }
+
+input[type="text"], input[type="email"], input[type="password"], input[type="tel"], select, textarea {
+  background: var(--surface2);
+  border: 1.5px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); background: var(--surface); }
+input::placeholder, textarea::placeholder { color: var(--text3); }
+textarea { resize: vertical; min-height: 72px; }
+select { cursor: pointer; }
+
+.input-with-btn { display: flex; gap: 8px; }
+.input-with-btn input { flex: 1; }
+.verify-btn { padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--border2); background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; font-family: var(--sans); transition: all 0.15s; }
+.verify-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+.pw-strength { margin-top: 5px; display: flex; gap: 3px; }
+.pw-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.2s; }
+.pw-bar.weak { background: var(--red); }
+.pw-bar.mid  { background: var(--amber); }
+.pw-bar.strong { background: var(--accent); }
+.pw-label { font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+.checkbox-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.checkbox-row:last-child { border-bottom: none; }
+input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+.checkbox-label { font-size: 13px; color: var(--text2); line-height: 1.5; cursor: pointer; }
+.checkbox-label a { color: var(--accent); text-decoration: none; }
+.checkbox-label a:hover { text-decoration: underline; }
+.checkbox-label .sub { font-size: 11px; color: var(--text3); display: block; margin-top: 2px; }
+
+/* FILE UPLOAD */
+.file-upload-zone {
+  border: 2px dashed var(--border2);
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--surface2);
+}
+.file-upload-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+.file-upload-icon { font-size: 24px; margin-bottom: 6px; opacity: 0.5; }
+.file-upload-text { font-size: 12px; color: var(--text2); }
+.file-upload-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* CHIPS */
+.chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1.5px solid var(--border2); border-radius: 20px; padding: 5px 13px; font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.13s; background: var(--surface); user-select: none; }
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.on { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+/* BUTTON */
+.btn-submit {
+  width: 100%; padding: 14px;
+  border-radius: 10px; border: none;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; font-family: var(--sans);
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-public  { background: var(--blue);   color: #fff; }
+.btn-public:hover  { background: #1447b5; }
+.btn-expert  { background: var(--purple); color: #fff; }
+.btn-expert:hover  { background: #5a38a8; }
+.btn-maker   { background: var(--accent); color: #fff; }
+.btn-maker:hover   { background: var(--accent2); }
+.btn-next { background: var(--accent); color: #fff; }
+.btn-next:hover { background: var(--accent2); }
+
+.btn-back { background: transparent; border: 1.5px solid var(--border2); color: var(--text2); width: 100%; padding: 11px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: var(--sans); margin-bottom: 8px; transition: all 0.15s; }
+.btn-back:hover { background: var(--surface2); }
+
+.login-link { text-align: center; margin-top: 20px; font-size: 13px; color: var(--text2); }
+.login-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+/* SUCCESS */
+.success-card { text-align: center; padding: 40px 28px; }
+.success-icon { font-size: 48px; margin-bottom: 16px; }
+.success-title { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 28px; font-weight: 300; }
+.next-steps { list-style: none; text-align: left; }
+.next-steps li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2); }
+.next-steps li:last-child { border-bottom: none; }
+.ns-num { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-light); color: var(--accent); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+.err { font-size: 11px; color: var(--red); margin-top: 3px; }
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <a href="#" class="logo">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </a>
+  <div class="header-right">이미 회원이신가요? <a href="#">로그인</a></div>
+</div>
+
+<div class="main">
+  <div class="container" id="app"></div>
+</div>
+
+<script>
+
+function nav(p){window.location.href=p;}
+
+const TYPES = {
+  public: {
+    icon: '🏛',
+    name: '공공기관 담당자',
+    sub: '부처·공기업·지자체\n홍보·마케팅 담당',
+    color: 'blue',
+    benefits: ['콘텐츠 외주 의뢰 등록 무료', '여성기업 인증 제작사 우선 매칭', 'AI+전문가 이중 검수 보장', '에스크로 대금 보호', '수의계약 서류 자동 생성'],
+    steps: ['유형 선택', '기관 정보', '담당자 정보', '약관 동의'],
+    submitLabel: '공공기관 회원 가입'
+  },
+  expert: {
+    icon: '👩‍💼',
+    name: '검수 전문가',
+    sub: '마케터·PD·카피라이터\n콘텐츠 품질 검수 패널',
+    color: 'expert',
+    benefits: ['건당 1~3만원 검수 수수료', '공공 콘텐츠 전문성 인증', '재택 가능·자유로운 시간', '경력 증빙 자료로 활용', '전문가 네트워크 참여'],
+    steps: ['유형 선택', '기본 정보', '전문 분야', '약관 동의'],
+    submitLabel: '전문가 패널 신청'
+  },
+  maker: {
+    icon: '🎬',
+    name: '콘텐츠 제작사',
+    sub: '영상·SNS·인쇄·디자인\n공공기관 수주 희망 업체',
+    color: 'maker',
+    benefits: ['공공기관 발주 알림 수신', '여성기업 인증 시 우선 노출', '안정적인 공공 수주 채널', '나라장터 연동 지원', '포트폴리오 프로필 노출'],
+    steps: ['유형 선택', '회사 정보', '전문 분야', '약관 동의'],
+    submitLabel: '제작사 입점 신청'
+  }
+};
+
+const EXPERT_FIELDS = ['영상·영상편집','SNS·디지털마케팅','카피라이팅','시각디자인','공공언어','홍보기획','사진촬영','모션그래픽','인쇄·출판'];
+const MAKER_SERVICES = ['SNS 카드뉴스','홍보 영상','인포그래픽','인쇄 홍보물','SNS 채널운영','웹 콘텐츠','캠페인 기획','사진 촬영','모션그래픽'];
+const ORG_TYPES = ['중앙부처','공기업','지방자치단체','지방공기업','공공기관(기타)'];
+
+// ─── RENDER ───────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  if (S.step === 4) { app.innerHTML = renderSuccess(); return; }
+
+  const t = S.type ? TYPES[S.type] : null;
+  const steps = t ? t.steps : ['유형 선택', '정보 입력', '상세 정보', '약관 동의'];
+  const totalSteps = steps.length;
+
+  app.innerHTML = `
+    <div class="page-title">회원가입</div>
+    <div class="page-sub">공공 콘텐츠 생태계에 함께하세요</div>
+
+    <div class="step-bar">
+      ${steps.map((label, i) => `
+        <div class="sb-step">
+          <div class="sb-dot ${S.step===i?'active':S.step>i?'done':''}">${S.step>i?'✓':(i+1)}</div>
+          <span class="sb-label ${S.step===i?'active':S.step>i?'done':''}">${label}</span>
+        </div>
+        ${i < steps.length-1 ? `<div class="sb-line ${S.step>i?'done':''}"></div>` : ''}`).join('')}
+    </div>
+
+    ${S.step === 0 ? renderStep0() : ''}
+    ${S.step === 1 ? renderStep1() : ''}
+    ${S.step === 2 ? renderStep2() : ''}
+    ${S.step === 3 ? renderStep3() : ''}
+
+    <div class="login-link">이미 회원이신가요? <a href="#">로그인하기</a></div>`;
+}
+
+function renderStep0() {
+  return `
+    <div class="card">
+      <div class="type-grid">
+        ${Object.entries(TYPES).map(([key, t]) => `
+          <div class="type-card ${S.type===key?`selected-${t.color}`:''}" onclick="selectType('${key}')">
+            <div class="tc-badge">✓</div>
+            <div class="tc-icon">${t.icon}</div>
+            <div class="tc-name">${t.name}</div>
+            <div class="tc-sub">${t.sub.replace('\n','<br>')}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    ${S.type ? `
+    <div class="benefit-box ${TYPES[S.type].color}">
+      <div class="benefit-title">${TYPES[S.type].icon} ${TYPES[S.type].name} 혜택</div>
+      <ul class="benefit-list">
+        ${TYPES[S.type].benefits.map(b=>`<li>${b}</li>`).join('')}
+      </ul>
+    </div>
+    <button class="btn-submit btn-next" onclick="nextStep()">다음 단계 →</button>` :
+    `<button class="btn-submit" style="background:var(--border2);color:var(--text3);cursor:not-allowed;" disabled>유형을 선택해주세요</button>`}`;
+}
+
+function renderStep1() {
+  if (S.type === 'public') return renderStep1Public();
+  if (S.type === 'expert') return renderStep1Expert();
+  return renderStep1Maker();
+}
+
+function renderStep1Public() {
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">기관 정보</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>기관 유형 <span class="required">*</span></label>
+            <select id="orgType">
+              <option value="">선택하세요</option>
+              ${ORG_TYPES.map(o=>`<option>${o}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>기관명 <span class="required">*</span></label>
+            <input type="text" id="orgName" placeholder="예: 환경부" value="${S.form.orgName||''}">
+          </div>
+          <div class="form-group">
+            <label>부서명 <span class="required">*</span></label>
+            <input type="text" id="deptName" placeholder="예: 홍보기획과" value="${S.form.deptName||''}">
+          </div>
+          <div class="form-group">
+            <label>직책 <span class="optional">(선택)</span></label>
+            <input type="text" id="position" placeholder="예: 주무관" value="${S.form.position||''}">
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">담당자 정보</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>이름 <span class="required">*</span></label>
+            <input type="text" id="name" placeholder="홍길동" value="${S.form.name||''}">
+          </div>
+          <div class="form-group">
+            <label>연락처 <span class="required">*</span></label>
+            <input type="tel" id="phone" placeholder="010-0000-0000" value="${S.form.phone||''}">
+          </div>
+          <div class="form-group full">
+            <label>업무 이메일 <span class="required">*</span></label>
+            <div class="input-with-btn">
+              <input type="email" id="email" placeholder="hong@moenv.go.kr" value="${S.form.email||''}">
+              <button class="verify-btn" onclick="verifyEmail()">인증 발송</button>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>비밀번호 <span class="required">*</span></label>
+            <input type="password" id="pw" placeholder="영문+숫자+특수문자 8자 이상" oninput="checkPw(this.value)">
+            <div class="pw-strength">
+              <div class="pw-bar" id="pw1"></div>
+              <div class="pw-bar" id="pw2"></div>
+              <div class="pw-bar" id="pw3"></div>
+            </div>
+            <div class="pw-label" id="pw-label"></div>
+          </div>
+          <div class="form-group full">
+            <label>비밀번호 확인 <span class="required">*</span></label>
+            <input type="password" id="pw2" placeholder="비밀번호를 다시 입력하세요">
+          </div>
+        </div>
+      </div>
+    </div>
+    ${navBtns()}`;
+}
+
+function renderStep1Expert() {
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">기본 정보</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>이름 <span class="required">*</span></label>
+            <input type="text" id="name" placeholder="홍길동" value="${S.form.name||''}">
+          </div>
+          <div class="form-group">
+            <label>연락처 <span class="required">*</span></label>
+            <input type="tel" id="phone" placeholder="010-0000-0000" value="${S.form.phone||''}">
+          </div>
+          <div class="form-group full">
+            <label>이메일 <span class="required">*</span></label>
+            <div class="input-with-btn">
+              <input type="email" id="email" placeholder="hong@example.com" value="${S.form.email||''}">
+              <button class="verify-btn" onclick="verifyEmail()">인증 발송</button>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>현재 직함 / 소속 <span class="required">*</span></label>
+            <input type="text" id="title" placeholder="예: 공공마케팅 프리랜서 / 前 대행사 AE" value="${S.form.title||''}">
+          </div>
+          <div class="form-group">
+            <label>총 경력 연수 <span class="required">*</span></label>
+            <select id="career">
+              <option value="">선택</option>
+              <option>3년 미만</option><option>3~5년</option>
+              <option>5~10년</option><option>10년 이상</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>공공 분야 경험 <span class="required">*</span></label>
+            <select id="pubExp">
+              <option value="">선택</option>
+              <option>없음</option><option>1~2년</option>
+              <option>3~5년</option><option>5년 이상</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>비밀번호 <span class="required">*</span></label>
+            <input type="password" id="pw" placeholder="영문+숫자+특수문자 8자 이상" oninput="checkPw(this.value)">
+            <div class="pw-strength">
+              <div class="pw-bar" id="pw1"></div><div class="pw-bar" id="pw2"></div><div class="pw-bar" id="pw3"></div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>비밀번호 확인 <span class="required">*</span></label>
+            <input type="password" id="pw2" placeholder="비밀번호를 다시 입력하세요">
+          </div>
+        </div>
+      </div>
+    </div>
+    ${navBtns()}`;
+}
+
+function renderStep1Maker() {
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">회사 정보</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>회사명 <span class="required">*</span></label>
+            <input type="text" id="companyName" placeholder="예: ㈜ 크리에이티브랩" value="${S.form.companyName||''}">
+          </div>
+          <div class="form-group">
+            <label>사업자등록번호 <span class="required">*</span></label>
+            <input type="text" id="bizNum" placeholder="000-00-00000" value="${S.form.bizNum||''}">
+          </div>
+          <div class="form-group">
+            <label>설립연도</label>
+            <input type="text" id="founded" placeholder="예: 2019" value="${S.form.founded||''}">
+          </div>
+          <div class="form-group">
+            <label>직원 수</label>
+            <select id="empCount">
+              <option>1인</option><option>2~5인</option>
+              <option>6~10인</option><option>11인 이상</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>여성기업 인증</label>
+            <select id="womanBiz">
+              <option value="">미인증</option>
+              <option value="y">인증 보유</option>
+              <option value="ing">신청 중</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>나라장터 등록 여부</label>
+            <select id="g2b">
+              <option value="">미등록</option>
+              <option value="y">등록 완료</option>
+              <option value="plan">등록 예정</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">담당자 정보</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>담당자명 <span class="required">*</span></label>
+            <input type="text" id="name" placeholder="홍길동" value="${S.form.name||''}">
+          </div>
+          <div class="form-group">
+            <label>연락처 <span class="required">*</span></label>
+            <input type="tel" id="phone" placeholder="010-0000-0000" value="${S.form.phone||''}">
+          </div>
+          <div class="form-group full">
+            <label>업무 이메일 <span class="required">*</span></label>
+            <div class="input-with-btn">
+              <input type="email" id="email" placeholder="hong@company.com" value="${S.form.email||''}">
+              <button class="verify-btn" onclick="verifyEmail()">인증 발송</button>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>비밀번호 <span class="required">*</span></label>
+            <input type="password" id="pw" placeholder="영문+숫자+특수문자 8자 이상" oninput="checkPw(this.value)">
+            <div class="pw-strength">
+              <div class="pw-bar" id="pw1"></div><div class="pw-bar" id="pw2"></div><div class="pw-bar" id="pw3"></div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>비밀번호 확인 <span class="required">*</span></label>
+            <input type="password" id="pw2" placeholder="비밀번호를 다시 입력하세요">
+          </div>
+        </div>
+      </div>
+    </div>
+    ${navBtns()}`;
+}
+
+function renderStep2() {
+  if (S.type === 'public') return renderStep2Public();
+  if (S.type === 'expert') return renderStep2Expert();
+  return renderStep2Maker();
+}
+
+function renderStep2Public() {
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">주요 업무</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>연간 콘텐츠 외주 예산 규모 <span class="optional">(선택)</span></label>
+            <select id="annualBudget">
+              <option>1천만원 미만</option><option>1~3천만원</option>
+              <option>3천~1억원</option><option>1억원 이상</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>주로 발주하는 콘텐츠 <span class="optional">(복수 선택)</span></label>
+            <div class="chip-wrap" id="chip-service" style="margin-top:6px;">
+              ${MAKER_SERVICES.map(s=>`<div class="chip ${(S.chips.service||[]).includes(s)?'on':''}" onclick="toggleChip('service','${s}')">${s}</div>`).join('')}
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>추가 요청사항 <span class="optional">(선택)</span></label>
+            <textarea id="notes" placeholder="플랫폼에 바라는 점이나 특별히 알려주실 사항을 입력해주세요.">${S.form.notes||''}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${navBtns()}`;
+}
+
+function renderStep2Expert() {
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">전문 분야 <span style="font-size:11px;color:var(--text3);font-weight:400;">(복수 선택 가능)</span></div>
+        <div class="chip-wrap" id="chip-field" style="margin-bottom:16px;">
+          ${EXPERT_FIELDS.map(f=>`<div class="chip ${(S.chips.field||[]).includes(f)?'on':''}" onclick="toggleChip('field','${f}')">${f}</div>`).join('')}
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">포트폴리오 및 경력 증빙</div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>포트폴리오 링크 <span class="optional">(선택)</span></label>
+            <input type="text" id="portfolio" placeholder="https://notion.so/..." value="${S.form.portfolio||''}">
+          </div>
+          <div class="form-group full">
+            <label>경력 증빙 파일 첨부 <span class="optional">(선택)</span></label>
+            <div class="file-upload-zone" onclick="alert('실제 서비스에서 파일 업로드가 가능합니다')">
+              <div class="file-upload-icon">📎</div>
+              <div class="file-upload-text">PDF, JPG, PNG 파일을 첨부하세요</div>
+              <div class="file-upload-sub">이력서, 재직증명서, 포트폴리오 등 (최대 10MB)</div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>자기 소개 <span class="optional">(선택)</span></label>
+            <textarea id="intro" placeholder="전문 분야와 경험을 간략히 소개해주세요. 패널 선발 시 참고됩니다.">${S.form.intro||''}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${navBtns()}`;
+}
+
+function renderStep2Maker() {
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">제작 가능 분야 <span style="font-size:11px;color:var(--text3);font-weight:400;">(복수 선택)</span></div>
+        <div class="chip-wrap" id="chip-service" style="margin-bottom:16px;">
+          ${MAKER_SERVICES.map(s=>`<div class="chip ${(S.chips.service||[]).includes(s)?'on':''}" onclick="toggleChip('service','${s}')">${s}</div>`).join('')}
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">공공 실적 및 포트폴리오</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>공공기관 수행 실적</label>
+            <select id="pubRecord">
+              <option>없음</option><option>1~5건</option>
+              <option>6~20건</option><option>20건 이상</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>연간 매출 규모</label>
+            <select id="revenue">
+              <option>1억 미만</option><option>1~3억</option>
+              <option>3~10억</option><option>10억 이상</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>홈페이지 / 포트폴리오 <span class="optional">(선택)</span></label>
+            <input type="text" id="website" placeholder="https://company.com" value="${S.form.website||''}">
+          </div>
+          <div class="form-group full">
+            <label>대표 실적 파일 첨부 <span class="optional">(선택)</span></label>
+            <div class="file-upload-zone" onclick="alert('실제 서비스에서 파일 업로드가 가능합니다')">
+              <div class="file-upload-icon">📎</div>
+              <div class="file-upload-text">사업자등록증, 실적 증빙 서류를 첨부하세요</div>
+              <div class="file-upload-sub">PDF, JPG 파일 (최대 20MB)</div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>회사 소개 <span class="optional">(선택)</span></label>
+            <textarea id="intro" placeholder="주요 제작 분야와 강점을 소개해주세요.">${S.form.intro||''}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${navBtns()}`;
+}
+
+function renderStep3() {
+  const t = TYPES[S.type];
+  const btnClass = S.type === 'public' ? 'btn-public' : S.type === 'expert' ? 'btn-expert' : 'btn-maker';
+  return `
+    <div class="card">
+      <div class="form-section">
+        <div class="form-section-title">약관 동의</div>
+        <div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="all" onchange="checkAll(this.checked)">
+            <label for="all" class="checkbox-label" style="font-weight:700;color:var(--text);">전체 동의 <span class="sub">필수 및 선택 항목 모두 동의합니다</span></label>
+          </div>
+          <div class="checkbox-row" style="padding-left:8px;">
+            <input type="checkbox" id="terms" class="agree-check">
+            <label for="terms" class="checkbox-label">[필수] 이용약관 동의 <a href="#">보기</a></label>
+          </div>
+          <div class="checkbox-row" style="padding-left:8px;">
+            <input type="checkbox" id="privacy" class="agree-check">
+            <label for="privacy" class="checkbox-label">[필수] 개인정보 수집·이용 동의 <a href="#">보기</a><span class="sub">성명, 연락처, 이메일 등 서비스 제공 목적으로 수집됩니다</span></label>
+          </div>
+          <div class="checkbox-row" style="padding-left:8px;">
+            <input type="checkbox" id="marketing" class="agree-check">
+            <label for="marketing" class="checkbox-label">[선택] 마케팅 정보 수신 동의 <span class="sub">신규 의뢰, 단가 업데이트 등 유용한 정보를 이메일로 받습니다</span></label>
+          </div>
+          ${S.type === 'maker' ? `
+          <div class="checkbox-row" style="padding-left:8px;">
+            <input type="checkbox" id="platform" class="agree-check">
+            <label for="platform" class="checkbox-label">[필수] 플랫폼 수수료 정책 동의 <a href="#">보기</a><span class="sub">거래 성사 시 공급가액의 5%가 플랫폼 수수료로 차감됩니다</span></label>
+          </div>` : ''}
+          ${S.type === 'expert' ? `
+          <div class="checkbox-row" style="padding-left:8px;">
+            <input type="checkbox" id="panel" class="agree-check">
+            <label for="panel" class="checkbox-label">[필수] 검수 패널 운영 정책 동의 <a href="#">보기</a><span class="sub">검수 결과는 플랫폼 품질 관리에 활용되며 외부에 공개되지 않습니다</span></label>
+          </div>` : ''}
+        </div>
+      </div>
+    </div>
+    <button class="btn-back" onclick="prevStep()">← 이전 단계</button>
+    <button class="btn-submit ${btnClass}" onclick="submitForm()">${t.icon} ${t.submitLabel}</button>`;
+}
+
+function renderSuccess() {
+  const t = TYPES[S.type];
+  const nextSteps = {
+    public: ['이메일 인증 링크를 확인해주세요','로그인 후 의뢰를 바로 등록할 수 있습니다','여성기업 인증 제작사 우선 매칭 옵션을 활용해보세요'],
+    expert: ['담당팀이 2영업일 내 검토 후 연락드립니다','검수 패널 승인 후 검수 요청이 배정됩니다','마이페이지에서 검수 이력과 수수료를 확인하세요'],
+    maker: ['이메일 인증 및 서류 검토 후 승인됩니다','승인 완료 시 발주 알림 수신이 시작됩니다','여성기업 인증 등록 시 우선 노출 혜택이 적용됩니다']
+  };
+  return `
+    <div class="card success-card">
+      <div class="success-icon">${t.icon}</div>
+      <div class="success-title">가입 신청 완료!</div>
+      <div class="success-sub">${t.name}으로 공공콘텐츠마켓에<br>오신 것을 환영합니다.</div>
+      <ul class="next-steps">
+        ${nextSteps[S.type].map((s,i)=>`
+          <li><div class="ns-num">${i+1}</div><span>${s}</span></li>`).join('')}
+      </ul>
+      <button class="btn-submit btn-next" style="margin-top:24px;" onclick="goLogin()">로그인하러 가기 →</button>
+    </div>`;
+}
+
+function navBtns() {
+  return `
+    <button class="btn-back" onclick="prevStep()">← 이전 단계</button>
+    <button class="btn-submit btn-next" onclick="nextStep()">다음 단계 →</button>`;
+}
+
+// ─── ACTIONS ──────────────────────────────────────────
+function selectType(type) { S.type = type; render(); }
+
+function nextStep() {
+  if (S.step === 0 && !S.type) return;
+  S.step++;
+  render(); window.scrollTo(0, 0);
+}
+
+function prevStep() {
+  S.step = Math.max(0, S.step - 1);
+  render(); window.scrollTo(0, 0);
+}
+
+function toggleChip(key, val) {
+  if (!S.chips[key]) S.chips[key] = [];
+  const i = S.chips[key].indexOf(val);
+  if (i >= 0) S.chips[key].splice(i, 1); else S.chips[key].push(val);
+  render();
+}
+
+function checkAll(checked) {
+  document.querySelectorAll('.agree-check').forEach(cb => cb.checked = checked);
+}
+
+function checkPw(val) {
+  const bars = [document.getElementById('pw1'), document.getElementById('pw2'), document.getElementById('pw3')];
+  const label = document.getElementById('pw-label');
+  if (!bars[0]) return;
+  const len = val.length >= 8;
+  const hasNum = /\d/.test(val);
+  const hasSpec = /[!@#$%^&*]/.test(val);
+  const score = [len, hasNum, hasSpec].filter(Boolean).length;
+  const levels = ['weak','weak','mid','strong'];
+  const labels = ['','너무 짧습니다','보통','안전한 비밀번호'];
+  bars.forEach((b, i) => { b.className = 'pw-bar' + (i < score ? ` ${levels[score]}` : ''); });
+  if (label) label.textContent = labels[score];
+}
+
+function verifyEmail() { alert('인증 메일이 발송되었습니다.\n(실제 서비스에서 이메일로 인증 링크가 전송됩니다)'); }
+
+function submitForm() {
+  const requiredChecks = document.querySelectorAll('.agree-check[id="terms"], .agree-check[id="privacy"]');
+  let ok = true;
+  requiredChecks.forEach(cb => { if (!cb.checked) ok = false; });
+  if (!ok) { alert('[필수] 항목에 동의해주세요.'); return; }
+  if (S.type === 'maker') {
+    const platform = document.getElementById('platform');
+    if (platform && !platform.checked) { alert('[필수] 플랫폼 수수료 정책에 동의해주세요.'); return; }
+  }
+  S.step = 4;
+  render(); window.scrollTo(0, 0);
+}
+
+function goLogin() { alert('로그인 페이지로 이동합니다'); }
+
+render();
+</script>
+</body>
+</html>

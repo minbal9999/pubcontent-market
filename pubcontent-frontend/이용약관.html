@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이용약관 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
+
+/* 사이드 TOC */
+.toc{background:var(--surface);border-right:1px solid var(--border);padding:20px 16px;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
+.toc-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding:0 6px;}
+.toc-section{margin-bottom:20px;}
+.toc-section-title{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px;padding:4px 8px;}
+.toc-item{display:block;padding:5px 8px;font-size:12px;color:var(--text2);cursor:pointer;border-radius:6px;transition:all .13s;text-decoration:none;}
+.toc-item:hover{background:var(--surface2);color:var(--text);}
+.toc-item.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+
+/* 탭 */
+.tab-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 40px;display:flex;}
+.tab-btn{padding:14px 20px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--sans);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+/* 본문 */
+.content-area{padding:40px;}
+.doc-wrap{max-width:720px;}
+.doc-header{margin-bottom:32px;}
+.doc-title{font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:6px;}
+.doc-meta{font-size:12px;color:var(--text3);}
+.doc-updated{display:inline-block;background:var(--amber-light);color:var(--amber);border-radius:6px;padding:2px 10px;font-size:11px;font-weight:500;margin-left:8px;}
+
+.chapter{margin-bottom:36px;scroll-margin-top:80px;}
+.chapter-title{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border);}
+.article{margin-bottom:20px;}
+.article-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.article-content{font-size:13px;color:var(--text2);line-height:2.0;}
+.article-content p{margin-bottom:8px;}
+.article-content ol,.article-content ul{padding-left:20px;margin:8px 0;}
+.article-content li{margin-bottom:4px;}
+.article-content strong{color:var(--text);font-weight:600;}
+
+/* 표 */
+.policy-table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0;}
+.policy-table th{background:var(--surface2);padding:10px 14px;text-align:left;font-weight:600;border:1px solid var(--border2);color:var(--text2);font-size:12px;}
+.policy-table td{padding:10px 14px;border:1px solid var(--border2);color:var(--text);line-height:1.6;}
+.policy-table td.accent{color:var(--accent);font-weight:600;font-family:var(--mono);}
+.policy-table td.amber{color:var(--amber);font-weight:600;}
+
+/* 하이라이트 */
+.hl-box{border-radius:8px;padding:14px 16px;margin:12px 0;font-size:13px;line-height:1.7;}
+.hl-accent{background:var(--accent-light);border-left:3px solid var(--accent);color:var(--text);}
+.hl-amber{background:var(--amber-light);border-left:3px solid var(--amber);color:var(--text);}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <button class="btn btn-ghost" onclick="history.back()">← 뒤로</button>
+</div>
+
+<div class="layout">
+  <div class="toc" id="toc">
+    <div class="toc-title">목차</div>
+    <div id="toc-content"></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;">
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-terms" onclick="switchTab('terms')">이용약관</button>
+      <button class="tab-btn" id="tab-privacy" onclick="switchTab('privacy')">개인정보처리방침</button>
+      <button class="tab-btn" id="tab-fee" onclick="switchTab('fee')">수수료 정책</button>
+    </div>
+    <div class="content-area">
+      <div class="doc-wrap" id="doc-content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+const DOCS = {
+  terms: {
+    title: '이용약관',
+    updated: '2025.05.01',
+    chapters: [
+      { id:'ch1', title:'제1장 총칙', articles:[
+        { title:'제1조 (목적)', content:`본 약관은 ㈜공공콘텐츠마켓(이하 "회사")이 운영하는 공공콘텐츠마켓 플랫폼(이하 "플랫폼")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.` },
+        { title:'제2조 (정의)', content:`<ol><li><strong>"플랫폼"</strong>이란 회사가 제공하는 공공기관 콘텐츠 외주 매칭 서비스 및 관련 부가 서비스를 의미합니다.</li><li><strong>"공공기관 담당자"</strong>란 공공기관에 소속되어 콘텐츠 외주를 발주하는 이용자를 말합니다.</li><li><strong>"콘텐츠사"</strong>란 플랫폼에 입점하여 콘텐츠 제작 서비스를 제공하는 사업자를 말합니다.</li><li><strong>"콘텐츠 전문가"</strong>란 납품물 검수 서비스를 제공하는 개인 패널을 말합니다.</li><li><strong>"에스크로"</strong>란 거래 안전을 위해 회사가 대금을 위탁 보관하는 서비스를 말합니다.</li></ol>` },
+        { title:'제3조 (약관의 효력)', content:`본 약관은 플랫폼 회원가입 시 동의함으로써 효력이 발생하며, 회사는 관련 법령을 위반하지 않는 범위에서 약관을 변경할 수 있습니다. 변경 시 최소 7일 전 플랫폼 내 공지합니다.` },
+      ]},
+      { id:'ch2', title:'제2장 회원 가입 및 관리', articles:[
+        { title:'제4조 (회원 가입)', content:`<ol><li>이용자는 플랫폼이 정한 가입 양식에 따라 회원 정보를 기입하고 본 약관에 동의함으로써 회원 가입을 신청합니다.</li><li>콘텐츠사 및 콘텐츠 전문가는 회사의 서류 심사를 거쳐 최종 승인됩니다.</li><li>공공기관 담당자는 재직 중인 기관의 이메일 인증을 통해 가입이 완료됩니다.</li></ol>` },
+        { title:'제5조 (회원 탈퇴)', content:`회원은 언제든지 탈퇴를 신청할 수 있으며, 진행 중인 거래가 없는 경우 즉시 처리됩니다. 탈퇴 후 90일간 재가입이 제한되며, 거래 기록은 관련 법령에 따라 보존됩니다.` },
+      ]},
+      { id:'ch3', title:'제3장 서비스 이용', articles:[
+        { title:'제6조 (서비스의 내용)', content:`플랫폼은 다음 서비스를 제공합니다.<ul><li>공공기관 콘텐츠 외주 매칭 서비스</li><li>과업지시서 자동 생성 서비스</li><li>AI 및 전문가 2단계 검수 서비스</li><li>에스크로 기반 대금 보호 서비스</li><li>랭킹 및 평점 제공 서비스</li></ul>` },
+        { title:'제7조 (에스크로 서비스)', content:`<ol><li>에스크로 대금은 최종 납품 승인 시 콘텐츠사에게 지급됩니다.</li><li>발주처가 정당한 사유 없이 7일 이상 승인을 지연하는 경우, 회사는 직권으로 에스크로를 해제할 수 있습니다.</li><li>분쟁 발생 시 회사가 1차 조정을 담당하며, 조정안에 양측이 동의하지 않는 경우 관할 법원에 소를 제기할 수 있습니다.</li></ol>` },
+        { title:'제8조 (수정 횟수)', content:`납품물에 대한 수정 요청은 계약서에 명시된 횟수(기본 2회)로 한정합니다. 수정 횟수 소진 후 추가 수정이 필요한 경우 양측 합의에 따른 추가 계약 또는 분쟁 처리 절차로 이관됩니다.` },
+      ]},
+      { id:'ch4', title:'제4장 금지 행위', articles:[
+        { title:'제9조 (이용자 금지 행위)', content:`이용자는 다음 행위를 해서는 안 됩니다.<ul><li>허위 정보 등록 및 사기적 거래</li><li>플랫폼 외부에서의 직접 거래 유도</li><li>타 이용자의 개인정보 무단 수집·이용</li><li>플랫폼 서비스의 무단 크롤링·자동화</li><li>에스크로 시스템을 통하지 않은 대금 수수</li></ul>` },
+      ]},
+    ]
+  },
+  privacy: {
+    title: '개인정보처리방침',
+    updated: '2025.05.01',
+    chapters: [
+      { id:'p1', title:'1. 수집하는 개인정보', articles:[
+        { title:'수집 항목', content:`<table class="policy-table"><thead><tr><th>구분</th><th>수집 항목</th><th>수집 목적</th></tr></thead><tbody><tr><td>공공기관 담당자</td><td>이름, 이메일, 소속 기관, 부서명</td><td>서비스 제공, 본인 확인</td></tr><tr><td>콘텐츠사</td><td>회사명, 대표자명, 사업자번호, 계좌정보</td><td>계약 체결, 정산</td></tr><tr><td>콘텐츠 전문가</td><td>이름, 이메일, 경력 정보, 계좌정보</td><td>검수 배정, 수수료 지급</td></tr></tbody></table>` },
+      ]},
+      { id:'p2', title:'2. 보유 및 이용 기간', articles:[
+        { title:'보유 기간', content:`<ul><li>회원 정보: 탈퇴 후 90일</li><li>거래 기록: 계약 종료 후 5년 (전자상거래법)</li><li>결제 정보: 5년 (전자금융거래법)</li><li>분쟁 기록: 3년</li></ul>` },
+      ]},
+      { id:'p3', title:'3. 제3자 제공', articles:[
+        { title:'제3자 제공 현황', content:`회사는 원칙적으로 이용자의 개인정보를 제3자에게 제공하지 않습니다. 다음의 경우에는 예외입니다.<ul><li>이용자의 사전 동의가 있는 경우</li><li>법령에 의거하거나 수사기관의 요청이 있는 경우</li><li>계약 이행을 위해 최소한의 정보를 공유하는 경우 (에스크로 계좌 정보 등)</li></ul>` },
+      ]},
+      { id:'p4', title:'4. 개인정보 보호책임자', articles:[
+        { title:'담당자', content:`<ul><li>성명: 개인정보보호팀</li><li>이메일: privacy@pubcontent.kr</li><li>전화: 02-0000-0000</li></ul>` },
+      ]},
+    ]
+  },
+  fee: {
+    title: '수수료 정책',
+    updated: '2025.05.01',
+    chapters: [
+      { id:'f1', title:'기본 수수료 구조', articles:[
+        { title:'수수료 체계', content:`<div class="hl-box hl-accent">공공콘텐츠마켓의 수수료는 <strong>공급가액의 5%</strong>이며, 콘텐츠사가 부담합니다. 발주처(공공기관)에게는 수수료가 청구되지 않습니다.</div><table class="policy-table"><thead><tr><th>항목</th><th>금액</th><th>산정 기준</th></tr></thead><tbody><tr><td>발주 예산 (VAT 포함)</td><td class="accent">A원</td><td>발주처 입력 금액</td></tr><tr><td>공급가액</td><td>A ÷ 1.1</td><td>부가세 제외</td></tr><tr><td>부가가치세</td><td>공급가액 × 10%</td><td>콘텐츠사 납부</td></tr><tr><td class="amber">플랫폼 수수료</td><td class="amber">공급가액 × 10%</td><td>콘텐츠사 부담</td></tr><tr><td>콘텐츠사 사업비</td><td class="accent">공급가액 × 90%</td><td>콘텐츠사 실수령</td></tr></tbody></table>` },
+        { title:'예시 (발주 예산 18,000,000원)', content:`<table class="policy-table"><tbody><tr><td>발주 예산</td><td class="accent">18,000,000원</td></tr><tr><td>공급가액</td><td>16,364,000원</td></tr><tr><td>부가세</td><td>1,636,000원</td></tr><tr><td>플랫폼 수수료</td><td class="amber">1,637,000원</td></tr><tr><td>콘텐츠사 실수령</td><td class="accent">14,727,000원</td></tr></tbody></table>` },
+      ]},
+      { id:'f2', title:'검수 전문가 수수료', articles:[
+        { title:'전문가 수수료', content:`<div class="hl-box hl-amber">검수 전문가 수수료는 플랫폼 수수료와 별도이며, 플랫폼 운영 재원에서 지급됩니다. 발주처 및 콘텐츠사에게 추가 비용이 발생하지 않습니다.</div><table class="policy-table"><thead><tr><th>검수 유형</th><th>수수료 (건당)</th></tr></thead><tbody><tr><td>AI 자동 검수</td><td>무료 (시스템 자동)</td></tr><tr><td>전문가 2차 검수</td><td>10,000원 ~ 30,000원</td></tr></tbody></table>` },
+      ]},
+      { id:'f3', title:'수수료 정책 변경', articles:[
+        { title:'변경 공지', content:`수수료 정책 변경 시 최소 30일 전 플랫폼 공지사항을 통해 안내합니다. 기존 진행 중인 거래는 계약 체결 시점의 수수료율이 적용됩니다.` },
+      ]},
+    ]
+  }
+};
+
+let currentTab = 'terms';
+
+function switchTab(tab){
+  currentTab=tab;
+  ['terms','privacy','fee'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  renderDoc();
+}
+
+function renderDoc(){
+  const doc = DOCS[currentTab];
+  const el = document.getElementById('doc-content');
+  el.innerHTML = `
+    <div class="doc-header">
+      <div class="doc-title">${doc.title} <span class="doc-updated">최종 수정: ${doc.updated}</span></div>
+      <div class="doc-meta">㈜공공콘텐츠마켓 · 본 약관은 대한민국 법령에 따라 작성되었습니다.</div>
+    </div>
+    ${doc.chapters.map(ch=>`
+      <div class="chapter" id="${ch.id}">
+        <div class="chapter-title">${ch.title}</div>
+        ${ch.articles.map(a=>`
+          <div class="article">
+            <div class="article-title">${a.title}</div>
+            <div class="article-content">${a.content}</div>
+          </div>`).join('')}
+      </div>`).join('')}`;
+
+  renderTOC(doc);
+}
+
+function renderTOC(doc){
+  document.getElementById('toc-content').innerHTML = `
+    <div class="toc-section">
+      <div class="toc-section-title">${doc.title}</div>
+      ${doc.chapters.map(ch=>`
+        <a class="toc-item" onclick="scrollTo('${ch.id}')">${ch.title}</a>`).join('')}
+    </div>`;
+}
+
+function scrollTo(id){
+  document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
+}
+
+renderDoc();
+</script>
+</body>
+</html>

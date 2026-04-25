@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시작하기 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1e2535;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+  --accent:#1dd9a0;--accent2:#0fb87f;--accent-dim:rgba(29,217,160,0.12);
+  --blue:#4f7cff;--blue-dim:rgba(79,124,255,0.12);
+  --purple:#a07cfc;--purple-dim:rgba(160,124,252,0.12);
+  --amber:#f5c842;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;overflow-x:hidden;}
+
+/* BG EFFECT */
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.glow-1{position:absolute;top:-10%;left:-10%;width:60vw;height:60vw;border-radius:50%;background:radial-gradient(circle,rgba(29,217,160,0.07) 0%,transparent 70%);}
+.glow-2{position:absolute;bottom:-20%;right:-10%;width:50vw;height:50vw;border-radius:50%;background:radial-gradient(circle,rgba(79,124,255,0.06) 0%,transparent 70%);}
+
+.header{background:rgba(13,17,23,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#0d1117;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--text);}
+.header-right{display:flex;align-items:center;gap:10px;}
+.user-pill{display:flex;align-items:center;gap:7px;padding:5px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;}
+.ua{width:22px;height:22px;border-radius:50%;background:var(--accent-dim);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:var(--sans);transition:all .18s;display:inline-flex;align-items:center;gap:7px;}
+.btn-accent{background:var(--accent);color:#0d1117;}
+.btn-accent:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-blue:hover{background:#3a65e0;}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-purple:hover{background:#8a5ee0;}
+
+/* MAIN */
+.main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:56px 24px 80px;}
+
+/* WELCOME BLOCK */
+.welcome-block{text-align:center;margin-bottom:52px;}
+.welcome-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;background:var(--accent-dim);border:1px solid rgba(29,217,160,.2);border-radius:20px;padding:5px 14px;margin-bottom:20px;}
+.welcome-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.welcome-title{font-family:var(--serif);font-size:38px;font-weight:900;line-height:1.2;margin-bottom:14px;letter-spacing:-1px;}
+.welcome-title span{color:var(--accent);}
+.welcome-sub{font-size:16px;color:var(--text2);font-weight:300;line-height:1.7;}
+
+/* STEP CARDS */
+.steps-section{margin-bottom:44px;}
+.steps-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.steps-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.steps-list{display:flex;flex-direction:column;gap:12px;}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;display:flex;align-items:flex-start;gap:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--step-color-dim) 0%,transparent 50%);opacity:0;transition:opacity .2s;}
+.step-card:hover{border-color:var(--step-color);transform:translateX(4px);}
+.step-card:hover::before{opacity:1;}
+.step-card.done{border-color:rgba(29,217,160,.3);background:rgba(29,217,160,.04);}
+.step-card.done::before{opacity:.5;background:linear-gradient(135deg,var(--accent-dim) 0%,transparent 50%);}
+.step-card.active{border-color:var(--step-color);box-shadow:0 0 0 1px var(--step-color), 0 8px 32px rgba(0,0,0,.2);}
+.step-card.active::before{opacity:1;}
+
+.step-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;border:2px solid var(--border2);background:var(--surface2);color:var(--text3);transition:all .2s;position:relative;z-index:1;}
+.step-card.done .step-num{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.step-card.active .step-num{background:var(--step-color);border-color:var(--step-color);color:#0d1117;font-size:18px;}
+
+.step-body{flex:1;position:relative;z-index:1;}
+.step-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text);}
+.step-desc{font-size:13px;color:var(--text2);line-height:1.6;}
+.step-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:8px;font-weight:600;margin-top:8px;}
+.sb-done{background:var(--accent-dim);color:var(--accent);}
+.sb-active{background:var(--step-color-dim);color:var(--step-color);}
+.sb-wait{background:var(--surface2);color:var(--text3);}
+
+.step-action{display:flex;align-items:center;gap:8px;margin-top:12px;}
+.step-arrow{width:32px;height:32px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:14px;flex-shrink:0;position:relative;z-index:1;transition:all .2s;}
+.step-card:hover .step-arrow,.step-card.active .step-arrow{border-color:var(--step-color);color:var(--step-color);}
+
+/* QUICK STATS */
+.quick-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:44px;}
+.qs-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.qs-val{font-family:var(--mono);font-size:24px;font-weight:700;margin-bottom:3px;}
+.qs-label{font-size:11px;color:var(--text3);}
+
+/* TIPS */
+.tips-section{}
+.tip-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;}
+.tip-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.tip-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.tip-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+
+/* SKIP */
+.skip-row{text-align:center;margin-top:32px;}
+.skip-btn{background:transparent;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--sans);text-decoration:underline;text-underline-offset:3px;}
+.skip-btn:hover{color:var(--text2);}
+
+/* PROGRESS BAR */
+.onboard-progress{background:var(--surface2);border-radius:4px;height:4px;width:100%;margin-bottom:40px;overflow:hidden;}
+.op-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;transition:width .6s ease;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease both;}
+.delay-1{animation-delay:.1s}
+.delay-2{animation-delay:.2s}
+.delay-3{animation-delay:.3s}
+.delay-4{animation-delay:.4s}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="bg-glow"><div class="glow-1"></div><div class="glow-2"></div></div>
+
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <div class="header-right">
+    <div class="user-pill">
+      <div class="ua" id="ua-init">김</div>
+      <span id="ua-name">김담당 · 환경부</span>
+    </div>
+    <button class="btn btn-ghost" style="font-size:12px;" onclick="skipOnboarding()">건너뛰기</button>
+  </div>
+</div>
+
+<div class="main" id="main-content"></div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+const userType = sessionStorage.getItem('userType') || 'public';
+
+const CONFIGS = {
+  public: {
+    color: '#4f7cff',
+    colorDim: 'rgba(79,124,255,0.12)',
+    btnClass: 'btn-blue',
+    emoji: '🏛',
+    name: '공공기관 담당자',
+    greeting: '환영합니다, 김담당님!',
+    subtitle: '공공기관 콘텐츠 외주, 이제 더 쉽고 투명하게.',
+    steps: [
+      { icon:'✅', title:'회원가입 완료', desc:'공공기관 담당자로 가입이 완료되었습니다.', status:'done', action:null },
+      { icon:'📋', title:'첫 과업지시서 작성', desc:'발주할 콘텐츠 종류, 예산, 납기를 입력하면 과업지시서가 자동으로 만들어집니다.', status:'active', action:'과업지시서_생성기_v3.html', actionLabel:'과업지시서 작성하기' },
+      { icon:'🎬', title:'콘텐츠사 찾기 & 견적 요청', desc:'랭킹 기반으로 추천된 콘텐츠사에게 견적을 요청하세요. 최대 3개사 동시 비교 가능합니다.', status:'wait', action:'제작사_디렉토리.html', actionLabel:'콘텐츠사 둘러보기' },
+      { icon:'🔒', title:'에스크로 예치 & 제작 시작', desc:'견적 수락 후 예산을 에스크로에 예치하면 제작이 시작됩니다. 최종 승인 전까지 안전하게 보관됩니다.', status:'wait', action:null },
+      { icon:'✓', title:'검수 & 최종 승인', desc:'AI + 전문가 2단계 검수 후, 발주처가 최종 승인하면 정산이 자동 완료됩니다.', status:'wait', action:null },
+    ],
+    stats: [{val:'무료', label:'의뢰 등록 비용'},{val:'2단계', label:'AI+전문가 검수'},{val:'100%', label:'에스크로 보호'}],
+    tips: [
+      {icon:'💡', title:'예산부터 입력하면 추천이 더 정확합니다', desc:'과업지시서 생성기에 예산을 먼저 입력하면 해당 예산 내 가능한 콘텐츠 유형을 자동으로 추천합니다.'},
+      {icon:'🏆', title:'여성기업 인증 제작사를 우선 배정받으세요', desc:'견적 요청 시 여성기업 옵션을 활성화하면 수의계약 한도 5천만원이 적용됩니다.'},
+    ],
+    completionPct: 20,
+    dashboardUrl: '발주처_대시보드.html',
+  },
+  maker: {
+    color: '#1dd9a0',
+    colorDim: 'rgba(29,217,160,0.12)',
+    btnClass: 'btn-accent',
+    emoji: '🎬',
+    name: '콘텐츠사',
+    greeting: '환영합니다, ㈜ 그린스튜디오!',
+    subtitle: '공공기관 발주를 더 쉽고 안정적으로.',
+    steps: [
+      { icon:'✅', title:'입점 신청 완료', desc:'서류 검토 중입니다. 보통 1~3영업일 내 승인 이메일을 보내드립니다.', status:'done', action:null },
+      { icon:'🏢', title:'프로필 완성하기', desc:'포트폴리오, 제작 분야, 공공 실적을 입력하면 발주처 검색에 더 잘 노출됩니다.', status:'active', action:'마이페이지_콘텐츠사.html', actionLabel:'프로필 완성하기' },
+      { icon:'🔔', title:'발주 알림 수신', desc:'발주처가 견적을 요청하면 이메일과 앱 알림으로 즉시 안내됩니다.', status:'wait', action:null },
+      { icon:'🏆', title:'랭킹 올리기', desc:'발주처 평점이 쌓일수록 랭킹이 올라가 더 많은 발주 기회를 얻습니다.', status:'wait', action:'랭킹.html', actionLabel:'랭킹 보기' },
+    ],
+    stats: [{val:'0%', label:'발주처 의뢰 수수료'},{val:'실시간', label:'랭킹 갱신'},{val:'자동', label:'에스크로 정산'}],
+    tips: [
+      {icon:'👑', title:'여성기업 인증 시 우선 노출', desc:'여성기업 인증을 등록하면 발주처 검색 결과 상단에 우선 노출되고, 수의계약 한도 5천만원이 적용됩니다.'},
+      {icon:'📊', title:'나라장터 등록으로 신뢰도 UP', desc:'나라장터 등록 여부는 발주처가 제작사를 선택할 때 중요하게 고려합니다.'},
+    ],
+    completionPct: 25,
+    dashboardUrl: '검수_모니터링_대시보드.html',
+  },
+  expert: {
+    color: '#a07cfc',
+    colorDim: 'rgba(160,124,252,0.12)',
+    btnClass: 'btn-purple',
+    emoji: '👩‍💼',
+    name: '콘텐츠 전문가',
+    greeting: '환영합니다, 김민정님!',
+    subtitle: '공공 콘텐츠 검수로 경력과 수익을 함께.',
+    steps: [
+      { icon:'✅', title:'패널 신청 완료', desc:'경력 및 인증 서류 검토 중입니다. 2영업일 내 검토 결과를 안내드립니다.', status:'done', action:null },
+      { icon:'👤', title:'전문 분야 & 단가 설정', desc:'검수 가능한 분야와 건당 희망 수수료를 입력해주세요. 배정 시 참고합니다.', status:'active', action:'마이페이지_전문가.html', actionLabel:'프로필 설정하기' },
+      { icon:'📋', title:'첫 검수 배정 대기', desc:'승인 완료 후 전문 분야에 맞는 검수 건이 자동 배정됩니다. 보통 승인 후 48시간 내 첫 배정이 이루어집니다.', status:'wait', action:null },
+      { icon:'💜', title:'수수료 수령', desc:'검수 완료 및 발주처 평점 등록 후 수수료가 등록 계좌로 자동 지급됩니다.', status:'wait', action:null },
+    ],
+    stats: [{val:'1~3만원', label:'건당 검수 수수료'},{val:'자동', label:'배정 시스템'},{val:'월 25일', label:'정기 지급'}],
+    tips: [
+      {icon:'🎯', title:'전문 분야를 좁게 설정할수록 배정률이 높습니다', desc:'넓게 선택하는 것보다 실제로 잘 아는 분야 2~3개를 선택하면 우선 배정 확률이 높아집니다.'},
+      {icon:'⭐', title:'발주처 평점이 랭킹의 70%', desc:'검수 리포트를 상세하게 작성할수록 발주처 평점이 높아지고, 랭킹이 올라갑니다.'},
+    ],
+    completionPct: 25,
+    dashboardUrl: '마이페이지_전문가.html',
+  },
+};
+
+function render() {
+  const cfg = CONFIGS[userType];
+  const pct = cfg.completionPct;
+
+  // CSS 변수 주입
+  document.documentElement.style.setProperty('--step-color', cfg.color);
+  document.documentElement.style.setProperty('--step-color-dim', cfg.colorDim);
+
+  // 유저 헤더 정보
+  document.getElementById('ua-init').textContent = userType==='maker'?'㈜':userType==='expert'?'김':'김';
+  document.getElementById('ua-name').textContent = userType==='maker'?'㈜ 그린스튜디오':userType==='expert'?'김민정 · 콘텐츠 전문가':'김담당 · 환경부';
+
+  const el = document.getElementById('main-content');
+  el.innerHTML = `
+    <!-- WELCOME -->
+    <div class="welcome-block fade-up">
+      <div class="welcome-eyebrow"><div class="welcome-dot"></div>온보딩</div>
+      <h1 class="welcome-title">${cfg.greeting.split(',')[0]},<br><span>${cfg.greeting.split(',')[1]?.trim()}</span></h1>
+      <p class="welcome-sub">${cfg.subtitle}</p>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="fade-up delay-1">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:8px;">
+        <span>시작 진행률</span><span style="font-family:var(--mono);font-weight:600;color:var(--accent);">${pct}%</span>
+      </div>
+      <div class="onboard-progress"><div class="op-fill" style="width:${pct}%"></div></div>
+    </div>
+
+    <!-- STEPS -->
+    <div class="steps-section fade-up delay-2">
+      <div class="steps-label">시작 단계</div>
+      <div class="steps-list">
+        ${cfg.steps.map((step, i) => `
+          <div class="step-card ${step.status}" style="--step-color:${cfg.color};--step-color-dim:${cfg.colorDim};"
+            ${step.action ? `onclick="nav('${step.action}')"` : ''}>
+            <div class="step-num">${step.status==='done'?'✓':step.icon}</div>
+            <div class="step-body">
+              <div class="step-title">${step.title}</div>
+              <div class="step-desc">${step.desc}</div>
+              ${step.status==='done' ? `<span class="step-badge sb-done">완료</span>` :
+                step.status==='active' ? `<span class="step-badge sb-active" style="background:${cfg.colorDim};color:${cfg.color};">지금 하세요</span>` :
+                `<span class="step-badge sb-wait">대기 중</span>`}
+              ${step.status !== 'wait' && step.action ? `
+                <div class="step-action">
+                  <button class="btn ${cfg.btnClass}" style="padding:7px 16px;font-size:12px;" onclick="event.stopPropagation();nav('${step.action}')">
+                    ${step.actionLabel} →
+                  </button>
+                </div>` : ''}
+            </div>
+            ${step.action ? `<div class="step-arrow">→</div>` : ''}
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="steps-label fade-up delay-3" style="margin-bottom:16px;">플랫폼 혜택</div>
+    <div class="quick-stats fade-up delay-3">
+      ${cfg.stats.map(s => `
+        <div class="qs-card">
+          <div class="qs-val" style="color:${cfg.color};">${s.val}</div>
+          <div class="qs-label">${s.label}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- TIPS -->
+    <div class="steps-label fade-up delay-4" style="margin-bottom:16px;">알아두면 좋은 것</div>
+    <div class="fade-up delay-4">
+      ${cfg.tips.map(t => `
+        <div class="tip-card">
+          <div class="tip-icon">${t.icon}</div>
+          <div>
+            <div class="tip-title">${t.title}</div>
+            <div class="tip-desc">${t.desc}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- SKIP -->
+    <div class="skip-row fade-up delay-4">
+      <button class="skip-btn" onclick="skipOnboarding()">건너뛰고 대시보드로 바로 이동 →</button>
+    </div>`;
+}
+
+function skipOnboarding() {
+  const cfg = CONFIGS[userType];
+  nav(cfg.dashboardUrl);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>표준단가 계산기 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 58px);gap:0;}
+
+/* 왼쪽 — 입력 */
+.input-panel{padding:32px;}
+.page-title{font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:6px;}
+.page-sub{font-size:13px;color:var(--text2);font-weight:300;margin-bottom:24px;line-height:1.7;}
+
+/* 콘텐츠 유형 선택 */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.type-card{border:1.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;text-align:center;background:var(--surface);}
+.type-card:hover{border-color:var(--accent);}
+.type-card.selected{border-color:var(--accent);background:var(--accent-light);}
+.tc-icon{font-size:26px;margin-bottom:6px;}
+.tc-name{font-size:12px;font-weight:600;margin-bottom:3px;}
+.tc-range{font-size:10px;color:var(--text3);}
+
+/* 옵션 */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+
+.option-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.op-chip{border:1.5px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all .13s;background:var(--surface);}
+.op-chip.on{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+
+input[type=range]{width:100%;accent-color:var(--accent);}
+.range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* 여성기업 강조 */
+.woman-notice{background:linear-gradient(135deg,rgba(200,100,220,0.1),rgba(200,100,220,0.04));border:1.5px solid rgba(180,80,180,0.25);border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start;}
+.wn-icon{font-size:22px;flex-shrink:0;}
+.wn-title{font-size:13px;font-weight:700;color:#8b4a94;margin-bottom:3px;}
+.wn-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+.wn-badge{display:inline-block;background:rgba(180,80,180,0.12);color:#8b4a94;border-radius:8px;padding:2px 9px;font-size:11px;font-weight:600;margin-top:4px;}
+
+/* 오른쪽 — 결과 */
+.result-panel{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 58px);position:sticky;top:58px;}
+.rp-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.rp-title{font-size:14px;font-weight:700;}
+.rp-body{flex:1;overflow-y:auto;padding:16px 22px;}
+
+/* 금액 히어로 */
+.amount-hero{background:var(--text);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;}
+.ah-label{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.ah-range{font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;}
+.ah-amount{font-family:var(--mono);font-size:32px;font-weight:700;color:#fff;line-height:1.2;}
+.ah-amount span{font-size:16px;color:rgba(255,255,255,0.7);}
+
+/* 금액 분해 */
+.breakdown-box{background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:14px;}
+.bb-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.bb-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border);}
+.bb-row:last-child{border-bottom:none;}
+.bb-key{color:var(--text2);}
+.bb-val{font-family:var(--mono);font-weight:600;}
+.bb-val.accent{color:var(--accent);}
+.bb-val.amber{color:var(--amber);}
+.bb-val.blue{color:var(--blue);}
+
+/* 수의계약 한도 게이지 */
+.limit-gauge{margin-bottom:14px;}
+.lg-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;}
+.lg-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative;}
+.lg-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+.lg-limit{position:absolute;top:0;bottom:0;width:2px;background:var(--red);}
+.lg-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px;}
+
+/* 여성기업 패널 */
+.woman-panel{background:rgba(180,80,180,0.07);border:1px solid rgba(180,80,180,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:none;}
+.woman-panel.show{display:block;}
+.wp-title{font-size:12px;font-weight:700;color:#8b4a94;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.wp-row{font-size:11px;color:var(--text2);padding:3px 0;}
+
+/* CTA */
+.rp-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+select{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:9px 12px;outline:none;width:100%;transition:border-color .15s;cursor:pointer;}
+select:focus{border-color:var(--accent);}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr;}.result-panel{height:auto;position:static;}.type-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-ghost btn-sm" onclick="nav('랜딩페이지.html')">← 홈</button>
+    <button class="btn btn-primary btn-sm" onclick="nav('로그인.html')">의뢰 시작하기</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 왼쪽 입력 -->
+  <div class="input-panel">
+    <div class="page-title">표준단가 계산기</div>
+    <div class="page-sub">
+      공공기관 콘텐츠 외주 예산을 미리 계산해보세요.<br>
+      수의계약 한도 및 여성기업 우대 조건을 함께 확인할 수 있습니다.
+    </div>
+
+    <!-- 여성기업 강조 배너 -->
+    <div class="woman-notice">
+      <div class="wn-icon">🎗</div>
+      <div>
+        <div class="wn-title">여성기업 우대 — 수의계약 한도 5천만원</div>
+        <div class="wn-desc">여성기업 인증 제작사에게 의뢰 시 수의계약 한도가 <strong>2천만원 → 5천만원</strong>으로 확대됩니다. 5천만원 이하 의뢰는 입찰 공고 없이 직접 계약이 가능합니다.</div>
+        <span class="wn-badge">여성기업법 제9조 우대조항</span>
+      </div>
+    </div>
+
+    <!-- 콘텐츠 유형 -->
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px;">① 콘텐츠 유형 선택</div>
+    <div class="type-grid" id="type-grid"></div>
+
+    <!-- 세부 옵션 -->
+    <div class="card" id="options-card" style="display:none;">
+      <div class="card-title">② 세부 조건</div>
+      <div id="options-body"></div>
+    </div>
+
+    <!-- 납기 -->
+    <div class="card">
+      <div class="card-title">③ 희망 납기</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <input type="range" id="deadline-slider" min="7" max="90" value="21" oninput="updateDeadline(this.value)">
+        <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent);min-width:50px;" id="deadline-val">21일</div>
+      </div>
+      <div class="range-labels"><span>7일 (급행)</span><span>90일 이상</span></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text3);" id="deadline-note">급행 의뢰 시 단가가 15~30% 높아질 수 있습니다.</div>
+    </div>
+
+    <!-- 여성기업 선택 -->
+    <div class="card">
+      <div class="card-title">④ 제작사 조건</div>
+      <div class="option-chips">
+        <div class="op-chip" id="woman-chip" onclick="womanOnly=!womanOnly;update()">🎗 여성기업 우선</div>
+        <div class="op-chip" id="g2b-chip" onclick="g2bOnly=!g2bOnly;update()">📋 나라장터 등록</div>
+        <div class="op-chip" id="rank-chip" onclick="rankTop=!rankTop;update()">🏆 랭킹 상위</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 오른쪽 결과 -->
+  <div class="result-panel">
+    <div class="rp-header">
+      <div class="rp-title">예산 계산 결과</div>
+      <button class="btn btn-ghost btn-sm" onclick="resetAll()">초기화</button>
+    </div>
+    <div class="rp-body" id="result-body">
+      <div style="text-align:center;padding:48px 20px;color:var(--text3);">
+        <div style="font-size:36px;margin-bottom:12px;">📊</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px;">콘텐츠 유형을 선택하세요</div>
+        <div style="font-size:12px;">왼쪽에서 콘텐츠 유형을 선택하면 예산 계산 결과가 표시됩니다.</div>
+      </div>
+    </div>
+    <div class="rp-footer" id="result-footer" style="display:none;">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="goQuote()">이 예산으로 의뢰 시작 →</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="nav('랭킹.html')">표준단가 전체 보기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+const TYPES = [
+  {id:'card',    icon:'📊', name:'카드뉴스',     min:800,  std:1500, max:2500, unit:'장',  units:[5,10,15,20]},
+  {id:'video',   icon:'🎬', name:'홍보영상',     min:2000, std:4000, max:8000, unit:'분',  units:[1,2,3,5,10]},
+  {id:'info',    icon:'📈', name:'인포그래픽',   min:500,  std:1000, max:2000, unit:'종',  units:[1,3,5,10]},
+  {id:'sns',     icon:'📱', name:'SNS 운영(월)', min:200,  std:350,  max:600,  unit:'개월',units:[1,3,6,12]},
+  {id:'brochure',icon:'📄', name:'브로슈어',     min:800,  std:1500, max:3000, unit:'페이지',units:[8,16,24,32]},
+  {id:'campaign',icon:'📣', name:'캠페인 기획',  min:2000, std:3500, max:6000, unit:'식',  units:[1]},
+  {id:'web',     icon:'🌐', name:'웹콘텐츠',     min:500,  std:1200, max:2500, unit:'페이지',units:[5,10,20,30]},
+  {id:'report',  icon:'📋', name:'보고서 제작',  min:800,  std:1500, max:3000, unit:'페이지',units:[10,20,40,60]},
+  {id:'photo',   icon:'📷', name:'사진 편집',    min:300,  std:600,  max:1200, unit:'컷',  units:[10,20,50,100]},
+];
+
+let selectedType = null;
+let quantity = 1;
+let deadlineDays = 21;
+let womanOnly = false;
+let g2bOnly = false;
+let rankTop = false;
+
+function renderTypeGrid(){
+  document.getElementById('type-grid').innerHTML = TYPES.map(t=>`
+    <div class="type-card ${selectedType?.id===t.id?'selected':''}" onclick="selectType('${t.id}')">
+      <div class="tc-icon">${t.icon}</div>
+      <div class="tc-name">${t.name}</div>
+      <div class="tc-range">${t.min.toLocaleString()}~${t.max.toLocaleString()}만원</div>
+    </div>`).join('');
+}
+
+function selectType(id){
+  selectedType = TYPES.find(t=>t.id===id);
+  quantity = selectedType.units[Math.floor(selectedType.units.length/2)];
+  renderTypeGrid();
+  renderOptions();
+  update();
+}
+
+function renderOptions(){
+  const card = document.getElementById('options-card');
+  const body = document.getElementById('options-body');
+  if(!selectedType){card.style.display='none';return;}
+  card.style.display='block';
+  const mid = Math.floor(selectedType.units.length/2);
+  body.innerHTML = `
+    <div class="form-group" style="margin-bottom:0;">
+      <label>${selectedType.unit} 수</label>
+      <div class="option-chips">
+        ${selectedType.units.map(u=>`
+          <div class="op-chip ${quantity===u?'on':''}" onclick="quantity=${u};renderOptions();update()">
+            ${u}${selectedType.unit}
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function updateDeadline(v){
+  deadlineDays = parseInt(v);
+  const el = document.getElementById('deadline-val');
+  const note = document.getElementById('deadline-note');
+  if(el) el.textContent = v+'일';
+  if(note){
+    if(v<=10) note.textContent='⚡ 급행 의뢰 — 단가 20~30% 추가 가능';
+    else if(v<=21) note.textContent='⚠ 빠른 납기 — 단가 10~15% 추가 가능';
+    else if(v>=60) note.textContent='✓ 여유 있는 납기 — 최적 단가 적용 가능';
+    else note.textContent='✓ 일반 납기 — 표준 단가 적용';
+  }
+  update();
+}
+
+function update(){
+
+  // 옵션 칩 상태 동기화
+  var wc = document.getElementById('woman-chip');
+  var gc = document.getElementById('g2b-chip');
+  var rc = document.getElementById('rank-chip');
+  if(wc) wc.className = 'op-chip' + (womanOnly ? ' on' : '');
+  if(gc) gc.className = 'op-chip' + (g2bOnly  ? ' on' : '');
+  if(rc) rc.className = 'op-chip' + (rankTop  ? ' on' : '');
+  // 옵션 칩 상태
+  ['woman','g2b','rank'].forEach((k,i)=>{
+    const chip = document.getElementById(k+'-chip');
+    if(!chip) return;
+    const vals = [womanOnly, g2bOnly, rankTop];
+    chip.className = 'op-chip' + (vals[i]?' on':'');
+  });
+
+  if(!selectedType){
+    document.getElementById('result-body').innerHTML = `
+      <div style="text-align:center;padding:48px 20px;color:var(--text3);">
+        <div style="font-size:36px;margin-bottom:12px;">📊</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text2);margin-bottom:6px;">콘텐츠 유형을 선택하세요</div>
+      </div>`;
+    document.getElementById('result-footer').style.display='none';
+    return;
+  }
+
+  // 금액 계산
+  const t = selectedType;
+  const deadlineMult = deadlineDays<=10?1.25:deadlineDays<=21?1.12:1.0;
+  const minAmt = Math.round(t.min * quantity * deadlineMult);
+  const stdAmt = Math.round(t.std * quantity * deadlineMult);
+  const maxAmt = Math.round(t.max * quantity * deadlineMult);
+
+  // 수의계약 한도
+  const normalLimit = 2000; // 만원
+  const womanLimit  = 5000;
+  const limit = womanOnly ? womanLimit : normalLimit;
+  const pct = Math.min(100, (stdAmt/limit)*100);
+  const overLimit = stdAmt > limit;
+  const overNormal = stdAmt > normalLimit;
+
+  // 에스크로 금액 분해 (표준 금액 기준 VAT포함)
+  const vatIncl = stdAmt * 10000;
+  const supply  = Math.round(vatIncl/1.1);
+  const comm    = Math.round(supply*0.05);
+  const biz     = supply-comm;
+
+  const fw = v => Math.round(v/10000).toLocaleString()+'만원';
+
+  document.getElementById('result-body').innerHTML = `
+    <div class="amount-hero">
+      <div class="ah-label">표준 예산 (VAT포함)</div>
+      <div class="ah-amount">${stdAmt.toLocaleString()}<span>만원</span></div>
+      <div class="ah-range">최소 ${minAmt.toLocaleString()} ~ 최대 ${maxAmt.toLocaleString()}만원</div>
+    </div>
+
+    <!-- 수의계약 한도 게이지 -->
+    <div class="limit-gauge">
+      <div class="lg-header">
+        <span style="font-size:12px;font-weight:600;">수의계약 한도 비교</span>
+        <span style="font-size:11px;color:${overLimit?'var(--red)':overNormal&&womanOnly?'var(--amber)':'var(--accent)'};">
+          ${overLimit?'⚠ 한도 초과 — 입찰 필요':overNormal&&!womanOnly?'⚠ 일반 한도 초과':'✓ 수의계약 가능'}
+        </span>
+      </div>
+      <div class="lg-track">
+        <div class="lg-fill" style="width:${Math.min(100,(stdAmt/limit)*100)}%;background:${overLimit?'var(--red)':'var(--accent)'}"></div>
+        ${!womanOnly?`<div class="lg-limit" style="left:${(normalLimit/womanLimit)*100}%"></div>`:''}
+      </div>
+      <div class="lg-labels">
+        <span>0</span>
+        ${!womanOnly?`<span style="color:var(--text3);">일반 2천만원</span>`:''}
+        <span style="color:${womanOnly?'#8b4a94':'var(--text3)'};">${womanOnly?'여성기업 5천만원':'여성기업 5천만원'}</span>
+      </div>
+    </div>
+
+    <!-- 여성기업 패널 -->
+    <div class="woman-panel ${womanOnly||overNormal?'show':''}">
+      <div class="wp-title">🎗 여성기업 우대 정보</div>
+      ${womanOnly
+        ? `<div class="wp-row">✓ 수의계약 한도: <strong>5,000만원</strong> (여성기업법 제9조)</div>
+           <div class="wp-row">✓ 입찰 없이 직접 계약 가능</div>
+           <div class="wp-row">✓ 플랫폼 랭킹 상단 우선 노출</div>`
+        : `<div class="wp-row">⚠ 표준 예산이 일반 수의계약 한도(2천만원)를 초과합니다</div>
+           <div class="wp-row">💡 여성기업 우선 선택 시 한도 5천만원 적용 가능</div>`
+      }
+    </div>
+
+    <!-- 금액 분해 -->
+    <div class="breakdown-box">
+      <div class="bb-title">예산 구조 (표준 기준)</div>
+      <div class="bb-row"><span class="bb-key">발주 예산 (VAT포함)</span><span class="bb-val blue">${fw(vatIncl)}</span></div>
+      <div class="bb-row"><span class="bb-key">공급가액</span><span class="bb-val">${fw(supply)}</span></div>
+      <div class="bb-row"><span class="bb-key">부가세</span><span class="bb-val">${fw(vatIncl-supply)}</span></div>
+      <div class="bb-row"><span class="bb-key">플랫폼 수수료 (5%)</span><span class="bb-val amber">-${fw(comm)}</span></div>
+      <div class="bb-row"><span class="bb-key">제작사 실수령 사업비</span><span class="bb-val accent">${fw(biz)}</span></div>
+    </div>
+
+    <!-- 납기 정보 -->
+    <div style="background:var(--surface2);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);">
+      <div style="font-weight:600;margin-bottom:4px;">납기 ${deadlineDays}일 기준</div>
+      <div>급행 계수: ${deadlineMult===1.25?'+25%':deadlineMult===1.12?'+12%':'표준'} 적용</div>
+    </div>`;
+
+  // 세션에 저장 (의뢰 시작 연결용)
+  try{
+    sessionStorage.setItem('pcm_calcResult', JSON.stringify({
+      type: t.name, quantity, unit: t.unit,
+      stdAmt, minAmt, maxAmt, deadlineDays, womanOnly
+    }));
+  }catch(e){}
+
+  document.getElementById('result-footer').style.display='flex';
+}
+
+function resetAll(){
+  selectedType=null; quantity=1; deadlineDays=21;
+  womanOnly=false; g2bOnly=false; rankTop=false;
+  document.getElementById('deadline-slider').value=21;
+  document.getElementById('deadline-val').textContent='21일';
+  renderTypeGrid();
+  renderOptions();
+  update();
+}
+
+function goQuote(){
+  try{
+    const res = JSON.parse(sessionStorage.getItem('pcm_calcResult')||'{}');
+    if(typeof PCM!=='undefined') PCM.saveTask({
+      title: res.type+' '+res.quantity+res.unit+' 제작',
+      budget: res.stdAmt * 10000,
+      deadline: new Date(Date.now()+res.deadlineDays*86400000).toLocaleDateString('ko-KR').replace(/\. /g,'.').slice(0,-1),
+      womanBiz: res.womanOnly,
+    });
+  }catch(e){}
+  nav('과업지시서_생성기_v3.html');
+}
+
+// 초기 렌더
+renderTypeGrid();
+renderOptions();
+</script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수정 요청 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.logo-role{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:2px 8px;margin-left:6px;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-danger{background:var(--red-light);color:var(--red);border:1px solid rgba(220,53,69,.2);}
+.btn-danger:hover{background:rgba(220,53,69,.15);}
+.btn-amber{background:var(--amber-light);color:var(--amber);border:1px solid rgba(180,83,9,.2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.main{max-width:800px;margin:0 auto;padding:32px 24px;}
+.page-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text2);font-weight:300;margin-bottom:24px;}
+
+/* 수정 횟수 게이지 */
+.revision-gauge{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:20px;}
+.rg-info{flex:1;}
+.rg-title{font-size:13px;font-weight:700;margin-bottom:6px;}
+.rg-dots{display:flex;gap:8px;}
+.rg-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all .2s;}
+.rg-dot.used{background:var(--red-light);border:2px solid var(--red);color:var(--red);}
+.rg-dot.avail{background:var(--accent-light);border:2px solid var(--accent);color:var(--accent);}
+.rg-dot.empty{background:var(--surface2);border:2px dashed var(--border2);color:var(--text3);}
+.rg-note{font-size:12px;color:var(--text2);margin-top:8px;}
+.rg-count{text-align:center;flex-shrink:0;}
+.rg-count-big{font-family:var(--mono);font-size:40px;font-weight:700;}
+.rg-count-label{font-size:11px;color:var(--text3);}
+
+/* 납품물 뷰어 */
+.delivery-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:16px;}
+.dc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.dc-title{font-size:14px;font-weight:700;}
+.file-preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.fp-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .15s;}
+.fp-item:hover{border-color:var(--accent);}
+.fp-icon{font-size:28px;margin-bottom:6px;}
+.fp-name{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fp-size{font-size:10px;color:var(--text3);}
+.fp-view{font-size:11px;color:var(--accent);margin-top:5px;}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.card-title{font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.card-num{width:22px;height:22px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+/* 수정 항목 */
+.revision-items{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.ri-item{border:1.5px solid var(--border);border-radius:10px;padding:14px;position:relative;}
+.ri-item.filled{border-color:var(--accent);}
+.ri-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ri-num{width:20px;height:20px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.ri-title{font-size:13px;font-weight:500;flex:1;}
+.ri-remove{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px;transition:color .13s;}
+.ri-remove:hover{color:var(--red);}
+.add-item-btn{width:100%;padding:10px;border:2px dashed var(--border2);border-radius:10px;background:transparent;color:var(--text3);font-size:13px;cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.add-item-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+
+/* FORM */
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.form-group:last-child{margin-bottom:0;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+input,select,textarea{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:9px 12px;outline:none;width:100%;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+input::placeholder,textarea::placeholder{color:var(--text3);}
+textarea{resize:vertical;min-height:80px;}
+select{cursor:pointer;}
+
+/* 우선순위 선택 */
+.priority-chips{display:flex;gap:8px;}
+.pr-chip{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border2);background:transparent;font-family:var(--sans);transition:all .15s;}
+.pr-chip.sel-high{border-color:var(--red);background:var(--red-light);color:var(--red);}
+.pr-chip.sel-mid{border-color:var(--amber);background:var(--amber-light);color:var(--amber);}
+.pr-chip.sel-low{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+.pr-chip:not([class*="sel-"]):hover{border-color:var(--accent);}
+
+/* NOTICE */
+.notice{border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:12px;}
+.notice-warn{background:var(--amber-light);border:1px solid rgba(180,83,9,.2);}
+.notice-danger{background:var(--red-light);border:1px solid rgba(220,53,69,.2);}
+.notice-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.notice-text{font-size:12px;line-height:1.65;}
+.notice-warn .notice-text{color:var(--amber);}
+.notice-danger .notice-text{color:var(--red);}
+
+/* 초과 처리 */
+.exceed-box{background:var(--red-light);border:1.5px solid rgba(220,53,69,.25);border-radius:12px;padding:22px;text-align:center;margin-bottom:20px;}
+.eb-icon{font-size:40px;margin-bottom:10px;}
+.eb-title{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--red);margin-bottom:8px;}
+.eb-sub{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:18px;}
+.eb-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.eb-option{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s;text-align:left;}
+.eb-option:hover{border-color:var(--red);}
+.eb-option-icon{font-size:22px;margin-bottom:6px;}
+.eb-option-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+.eb-option-desc{font-size:11px;color:var(--text3);line-height:1.5;}
+
+/* 이력 */
+.history-item{padding:14px 0;border-bottom:1px solid var(--border);}
+.history-item:last-child{border-bottom:none;}
+.hi-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.hi-round{font-size:11px;font-weight:700;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:2px 8px;}
+.hi-date{font-size:11px;color:var(--text3);margin-left:auto;}
+.hi-items{font-size:12px;color:var(--text2);margin-left:0;line-height:1.8;}
+.hi-item::before{content:'· ';color:var(--accent);}
+
+.nav-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:300;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* CONFIRM MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border-radius:16px;padding:28px;width:440px;max-width:90vw;transform:scale(.96);transition:transform .2s;}
+.modal-overlay.show .modal{transform:scale(1);}
+.modal-title{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:8px;}
+.modal-desc{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo" onclick="nav('마이페이지_발주처.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+      <span class="logo-role">발주처</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-primary" onclick="nav('마이페이지_발주처.html')">✓ 승인 (이상 없음)</button>
+    <button id="dark-toggle" onclick="toggleDarkMode()" title="다크모드" style="background:transparent;border:1px solid var(--border2);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:14px;">🌙</button>
+    <button class="btn btn-ghost btn-sm" onclick="nav('마이페이지_발주처.html')">← 뒤로</button>
+  </div>
+</div>
+
+<div class="main" id="main"></div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+let revItems = [
+  {id:1, category:'수치 오류', priority:'high', desc:'', filled:false},
+];
+let selectedPriority = {};
+
+const DELIVERY_FILES = [
+  {name:'탄소중립_카드뉴스_원본.psd', size:'45MB', icon:'🎨'},
+  {name:'탄소중립_카드뉴스_JPG.zip', size:'18MB', icon:'🖼'},
+  {name:'탄소중립_카드뉴스_SNS.zip', size:'8MB', icon:'📦'},
+];
+
+const HISTORY = [
+  {round:1, date:'2025.05.05 14:22', items:['최초 납품'], used:false},
+];
+
+function render() {
+  const el = document.getElementById('main');
+  if (REVISIONS_LEFT === 0) {
+    el.innerHTML = renderExceeded();
+  } else {
+    el.innerHTML = renderForm();
+  }
+}
+
+function renderForm() {
+  const dots = Array.from({length:REVISIONS_TOTAL}).map((_,i) => {
+    if (i < REVISIONS_USED) return `<div class="rg-dot used">✕</div>`;
+    return `<div class="rg-dot avail">${i+1}</div>`;
+  }).join('');
+
+  const warnClass = REVISIONS_LEFT === 1 ? 'notice-warn' : '';
+  const warnIcon = REVISIONS_LEFT === 1 ? '⚠️' : 'ℹ️';
+  const warnText = REVISIONS_LEFT === 1
+    ? `<strong>마지막 수정 기회입니다.</strong> 이 요청을 보내면 수정 기회가 소진됩니다. 그 이후 추가 수정이 필요한 경우 분쟁 처리 또는 추가 비용 협의 절차로 이관됩니다.`
+    : `수정 요청 후 제작사가 수락하면 제작이 시작됩니다. 수정 횟수가 소진되면 분쟁 처리 또는 추가 비용 협의 절차로 이관됩니다.`;
+
+  return `
+    <div class="page-title">수정 요청</div>
+    <div class="page-sub">탄소중립 SNS 카드뉴스 · ㈜ 그린스튜디오</div>
+
+    <!-- 수정 횟수 게이지 -->
+    <div class="revision-gauge">
+      <div class="rg-info">
+        <div class="rg-title">남은 수정 기회</div>
+        <div class="rg-dots">${dots}</div>
+        <div class="rg-note">${REVISIONS_USED > 0 ? `${REVISIONS_USED}회 사용됨 · ` : ''}수정 횟수 소진 시 분쟁 처리 또는 추가 비용 협의로 이관됩니다</div>
+      </div>
+      <div class="rg-count">
+        <div class="rg-count-big" style="color:${REVISIONS_LEFT===1?'var(--amber)':'var(--accent)'};">${REVISIONS_LEFT}</div>
+        <div class="rg-count-label">회 남음</div>
+      </div>
+    </div>
+
+    <!-- 경고 -->
+    <div class="notice ${warnClass || 'notice-warn'}">
+      <div class="notice-icon">${warnIcon}</div>
+      <div class="notice-text">${warnText}</div>
+    </div>
+
+    <!-- 납품물 확인 -->
+    <div class="delivery-card">
+      <div class="dc-header">
+        <div class="dc-title">📁 납품물 확인</div>
+        <span style="font-size:12px;color:var(--text3);">v1.0 최초 납품 · 2025.05.05</span>
+      </div>
+      <div class="file-preview-grid">
+        ${DELIVERY_FILES.map(f=>`
+          <div class="fp-item" onclick="showToast('실제 서비스에서 파일 미리보기가 제공됩니다')">
+            <div class="fp-icon">${f.icon}</div>
+            <div class="fp-name">${f.name}</div>
+            <div class="fp-size">${f.size}</div>
+            <div class="fp-view">↗ 보기</div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- 수정 항목 작성 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">1</div>수정 요청 항목 <span style="font-size:11px;color:var(--text3);font-weight:400;">(구체적으로 작성)</span></div>
+      <div class="revision-items">
+        ${revItems.map((item,idx)=>`
+          <div class="ri-item ${item.desc?'filled':''}">
+            <div class="ri-header">
+              <div class="ri-num">${idx+1}</div>
+              <select style="flex:1;" onchange="updateItem(${idx},'category',this.value)">
+                <option ${item.category==='수치 오류'?'selected':''}>수치 오류</option>
+                <option ${item.category==='디자인 수정'?'selected':''}>디자인 수정</option>
+                <option ${item.category==='문구 수정'?'selected':''}>문구 수정</option>
+                <option ${item.category==='색상 변경'?'selected':''}>색상 변경</option>
+                <option ${item.category==='레이아웃 변경'?'selected':''}>레이아웃 변경</option>
+                <option ${item.category==='이미지 교체'?'selected':''}>이미지 교체</option>
+                <option ${item.category==='기타'?'selected':''}>기타</option>
+              </select>
+              <div class="priority-chips">
+                ${['high','mid','low'].map(p=>`
+                  <button class="pr-chip ${(selectedPriority[idx]||item.priority)===p?`sel-${p}`:''}"
+                    onclick="setPriority(${idx},'${p}')">
+                    ${p==='high'?'🔴 필수':p==='mid'?'🟡 중요':'🟢 권장'}
+                  </button>`).join('')}
+              </div>
+              ${idx>0?`<button class="ri-remove" onclick="removeItem(${idx})">✕</button>`:''}
+            </div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label>위치 / 슬라이드</label>
+              <input type="text" placeholder="예: 3번 슬라이드, 우측 하단" oninput="updateItem(${idx},'location',this.value)" value="${item.location||''}">
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>수정 내용 <span style="color:var(--red);">*</span></label>
+              <textarea placeholder="수정 전 내용과 수정 후 원하는 내용을 구체적으로 작성해주세요.&#10;예) \'2023년\' → \'2024년\'으로 변경" oninput="updateItem(${idx},'desc',this.value)">${item.desc}</textarea>
+            </div>
+          </div>`).join('')}
+      </div>
+      <button class="add-item-btn" onclick="addItem()">+ 수정 항목 추가</button>
+    </div>
+
+    <!-- 참고 자료 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">2</div>참고 자료 첨부 <span style="font-size:11px;color:var(--text3);font-weight:400;">(선택)</span></div>
+      <div style="border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:var(--surface2);" onclick="showToast('파일 첨부 기능은 실제 서비스에서 제공됩니다')">
+        <div style="font-size:24px;opacity:.4;margin-bottom:6px;">📎</div>
+        <div style="font-size:13px;color:var(--text2);">수정 참고 이미지, 문서를 첨부하세요</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">JPG · PNG · PDF (최대 50MB)</div>
+      </div>
+    </div>
+
+    <!-- 수정 기한 -->
+    <div class="card">
+      <div class="card-title"><div class="card-num">3</div>수정 납기</div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>수정 완료 요청일</label>
+        <input type="text" value="2025.05.08" placeholder="YYYY.MM.DD">
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;">현재 계약 납기일: 2025.05.10 · 수정 납기는 계약 납기일 이내로 설정해주세요</div>
+    </div>
+
+    <!-- 수정 이력 -->
+    ${HISTORY.length > 0 ? `
+    <div class="card">
+      <div class="card-title">수정 이력</div>
+      ${HISTORY.map(h=>`
+        <div class="history-item">
+          <div class="hi-header">
+            <span class="hi-round">${h.round}차 납품</span>
+            <span class="hi-date">${h.date}</span>
+          </div>
+          <div class="hi-items">${h.items.map(i=>`<span class="hi-item">${i}</span>`).join('<br>')}</div>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <div class="nav-bottom">
+      <button class="btn btn-primary" onclick="nav('마이페이지_발주처.html')">✓ 이상 없음 — 최종 승인</button>
+      <button class="btn btn-amber" onclick="confirmRequest()">✏️ 수정 요청 발송</button>
+    </div>`;
+}
+
+function renderExceeded() {
+  return `
+    <div class="page-title">수정 요청</div>
+    <div class="page-sub">탄소중립 SNS 카드뉴스 · ㈜ 그린스튜디오</div>
+
+    <div class="revision-gauge" style="margin-bottom:20px;">
+      <div class="rg-info">
+        <div class="rg-title">수정 기회 소진</div>
+        <div class="rg-dots">
+          ${Array.from({length:REVISIONS_TOTAL}).map(()=>`<div class="rg-dot used">✕</div>`).join('')}
+        </div>
+        <div class="rg-note">계약서에 명시된 수정 ${REVISIONS_TOTAL}회가 모두 사용되었습니다</div>
+      </div>
+      <div class="rg-count">
+        <div class="rg-count-big" style="color:var(--red);">0</div>
+        <div class="rg-count-label">회 남음</div>
+      </div>
+    </div>
+
+    <div class="exceed-box">
+      <div class="eb-icon">⚠️</div>
+      <div class="eb-title">계약 내 수정 횟수가 소진되었습니다</div>
+      <div class="eb-sub">
+        추가 수정이 필요하신 경우 아래 두 가지 방법 중 선택하세요.<br>
+        <strong>최종 승인</strong>을 선택하시면 에스크로 대금이 즉시 제작사에게 지급됩니다.
+      </div>
+      <div class="eb-options">
+        <div class="eb-option" onclick="openModal('extra')">
+          <div class="eb-option-icon">💰</div>
+          <div class="eb-option-title">추가 비용 협의</div>
+          <div class="eb-option-desc">제작사와 추가 수정 비용을 협의합니다. 합의 후 추가 계약이 생성됩니다.</div>
+        </div>
+        <div class="eb-option" onclick="openModal('dispute')">
+          <div class="eb-option-icon">⚖️</div>
+          <div class="eb-option-title">분쟁 처리 신청</div>
+          <div class="eb-option-desc">플랫폼 운영자가 중재합니다. 에스크로는 분쟁 해결 시까지 동결됩니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;">수정 이력</div>
+      ${[{round:1,date:'2025.05.05',items:['최초 납품']},{round:2,date:'2025.05.07',items:['3번 슬라이드 \'2023년\' → \'2024년\' 수정','6번 슬라이드 색상 명도비 개선']}].map(h=>`
+        <div class="history-item">
+          <div class="hi-header">
+            <span class="hi-round">${h.round}차 납품</span>
+            <span class="hi-date">${h.date}</span>
+          </div>
+          <div class="hi-items">${h.items.map(i=>`<span class="hi-item">${i}</span>`).join('<br>')}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="nav-bottom">
+      <button class="btn btn-ghost" onclick="nav('마이페이지_발주처.html')">← 뒤로</button>
+      <button class="btn btn-primary" onclick="openModal('approve')">✓ 최종 승인 (에스크로 해제)</button>
+    </div>`;
+}
+
+function addItem() {
+  revItems.push({id:Date.now(), category:'기타', priority:'mid', desc:'', location:''});
+  render();
+}
+
+function removeItem(idx) {
+  revItems.splice(idx, 1);
+  render();
+}
+
+function updateItem(idx, key, val) {
+  revItems[idx][key] = val;
+}
+
+function setPriority(idx, p) {
+  selectedPriority[idx] = p;
+  render();
+}
+
+function confirmRequest() {
+  const filled = revItems.filter(i => i.desc.trim()).length;
+  if (filled === 0) { showToast('수정 내용을 1개 이상 작성해주세요'); return; }
+  openModal('send');
+}
+
+function openModal(type) {
+  const overlay = document.getElementById('modal-overlay');
+  const mc = document.getElementById('modal-content');
+
+  const configs = {
+    send: {
+      title: '수정 요청을 발송하시겠습니까?',
+      desc: `수정 항목 ${revItems.filter(i=>i.desc).length}건을 ㈜ 그린스튜디오에게 발송합니다.<br><br><strong style="color:var(--amber);">⚠️ 발송 후 남은 수정 기회: ${REVISIONS_LEFT-1}회</strong><br>수정 기회가 소진되면 추가 비용 협의 또는 분쟁 처리 절차로 이관됩니다.`,
+      actions: `<button class="btn btn-ghost" onclick="closeModal()">취소</button>
+                <button class="btn btn-amber" onclick="doSend()">수정 요청 발송</button>`
+    },
+    extra: {
+      title: '추가 비용 협의 요청',
+      desc: '제작사에게 추가 수정 비용 협의 요청을 발송합니다. 제작사가 금액을 제안하면 발주처가 수락 또는 거절할 수 있습니다. 합의 후 추가 계약이 생성되고 에스크로에 추가 예치됩니다.',
+      actions: `<button class="btn btn-ghost" onclick="closeModal()">취소</button>
+                <button class="btn btn-primary" onclick="doExtra()">협의 요청 발송</button>`
+    },
+    dispute: {
+      title: '분쟁 처리를 신청하시겠습니까?',
+      desc: '플랫폼 운영자가 양측 의견을 검토하고 중재합니다.<br><br>• 에스크로 대금은 분쟁 해결 시까지 동결됩니다<br>• 처리 기간: 보통 3~5영업일<br>• 운영자 판단에 따라 지급 또는 반환이 결정됩니다',
+      actions: `<button class="btn btn-ghost" onclick="closeModal()">취소</button>
+                <button class="btn btn-danger" onclick="doDispute()">분쟁 신청</button>`
+    },
+    approve: {
+      title: '최종 승인하시겠습니까?',
+      desc: '최종 승인 시 에스크로에 보관된 대금이 즉시 제작사에게 지급됩니다.<br><br>이 작업은 <strong>취소할 수 없습니다.</strong>',
+      actions: `<button class="btn btn-ghost" onclick="closeModal()">취소</button>
+                <button class="btn btn-primary" onclick="doApprove()">✓ 최종 승인 확정</button>`
+    }
+  };
+
+  const cfg = configs[type];
+  mc.innerHTML = `
+    <div class="modal-title">${cfg.title}</div>
+    <div class="modal-desc">${cfg.desc}</div>
+    <div class="modal-actions">${cfg.actions}</div>`;
+  overlay.classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal-overlay').classList.remove('show'); }
+
+function doSend() {
+  closeModal();
+  // 수정 요청을 메시지 시스템에 저장
+  try {
+    const filled = revItems.filter(i=>i.desc.trim());
+    const msgContent = '✏️ 수정 요청\n\n' + filled.map((item,i)=>`${i+1}. [${item.category}] ${item.desc}${item.location?' (위치: '+item.location+')':''}`).join('\n');
+    const msgs = JSON.parse(sessionStorage.getItem('pcm_msgs_r1')||'[]');
+    msgs.push({id:'rev-'+Date.now(), from:'me', text:msgContent, time:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})});
+    sessionStorage.setItem('pcm_msgs_r1', JSON.stringify(msgs));
+  } catch(e){}
+  PCM.pushNotif({icon:'✏️',title:'수정 요청 발송',sub:'제작사에게 수정 요청이 전달되었습니다.',time:'방금'}); PCM.toast('수정 요청이 발송되었습니다 ✓','success');
+  else PCM.pushNotif({icon:'✏️',title:'수정 요청 발송',sub:'제작사에게 수정 요청이 전달되었습니다.',time:'방금'}); showToast('수정 요청이 발송되었습니다 ✓');
+  setTimeout(() => nav('마이페이지_발주처.html'), 1500);
+}
+function doExtra() {
+  closeModal();
+  showToast('추가 비용 협의 요청이 발송되었습니다');
+  setTimeout(() => nav('마이페이지_발주처.html'), 1500);
+}
+function doDispute() {
+  closeModal();
+  nav('하자보수_신고.html');;
+  setTimeout(() => nav('마이페이지_발주처.html'), 2000);
+}
+function doApprove() {
+  closeModal();
+  showToast('최종 승인 완료! 에스크로 대금이 지급됩니다 ✓');
+  setTimeout(() => nav('마이페이지_발주처.html'), 2000);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+render();
+
+// 수정 횟수 소진 감지
+(function(){
+  var remaining = parseInt(sessionStorage.getItem('pcm_revRemain')||'2');
+  if(remaining <= 0){
+    var notice = document.getElementById('defect-notice');
+    if(notice) notice.style.display = 'block';
+  }
+})();
+
+</script>
+</body>
+</html>

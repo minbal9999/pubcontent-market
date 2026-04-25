@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>콘텐츠사 디렉토리 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+
+/* HEADER - 공통 */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.logo-role{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:2px 8px;margin-left:6px;}
+.nav-links{display:flex;gap:4px;}
+.nav-link{padding:7px 14px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.13s;border:none;background:transparent;font-family:var(--sans);}
+.nav-link:hover{background:var(--surface2);color:var(--text);}
+.nav-link.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.user-chip{display:flex;align-items:center;gap:7px;padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.btn-sm{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all 0.13s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
+
+/* SIDEBAR FILTER */
+.filter-panel{background:var(--surface);border-right:1px solid var(--border);padding:20px 16px;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;}
+.filter-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+.filter-section{margin-bottom:20px;}
+
+.search-box{position:relative;margin-bottom:16px;}
+.search-box input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:9px 12px 9px 34px;outline:none;width:100%;transition:border-color 0.15s;}
+.search-box input:focus{border-color:var(--accent);}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text3);}
+
+.filter-chip{display:inline-block;border:1.5px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;color:var(--text2);cursor:pointer;margin:0 4px 6px 0;transition:all 0.13s;background:var(--surface);user-select:none;}
+.filter-chip:hover{border-color:var(--accent);color:var(--text);}
+.filter-chip.on{border-color:var(--accent);background:var(--accent-light);color:var(--accent);font-weight:500;}
+
+.price-range{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.price-range input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:12px;width:80px;outline:none;color:var(--text);font-family:var(--mono);}
+.filter-reset{width:100%;padding:8px;border:1px solid var(--border2);border-radius:8px;background:transparent;color:var(--text3);font-size:12px;cursor:pointer;font-family:var(--sans);margin-top:4px;transition:all 0.13s;}
+.filter-reset:hover{background:var(--surface2);color:var(--text);}
+
+/* MAIN */
+.main{padding:24px 28px;}
+.main-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.main-title{font-family:var(--serif);font-size:20px;font-weight:700;}
+.main-meta{font-size:13px;color:var(--text2);}
+.sort-select{background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text2);cursor:pointer;outline:none;font-family:var(--sans);}
+
+/* MAKER CARDS */
+.makers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+
+.maker-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all 0.15s;position:relative;}
+.maker-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.08);transform:translateY(-2px);}
+
+.maker-card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;}
+.maker-logo{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border);}
+.maker-info{flex:1;min-width:0;}
+.maker-name{font-size:14px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.maker-type{font-size:11px;color:var(--text3);}
+
+.badges{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500;}
+.badge-woman{background:#fce8f8;color:#8b4a94;}
+.badge-g2b{background:var(--blue-light);color:var(--blue);}
+.badge-verify{background:var(--accent-light);color:var(--accent);}
+.badge-premium{background:var(--amber-light);color:var(--amber);}
+
+.services-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;}
+.service-tag{font-size:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:var(--text2);}
+
+.maker-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:14px;background:var(--surface2);border-radius:8px;padding:8px;}
+.stat-item{text-align:center;}
+.stat-val{font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text);}
+.stat-label{font-size:9px;color:var(--text3);margin-top:1px;}
+
+.maker-card-bottom{display:flex;align-items:center;justify-content:space-between;}
+.price-range-label{font-size:11px;color:var(--text2);}
+.price-val{font-size:12px;font-weight:700;font-family:var(--mono);color:var(--accent);}
+.req-btn{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:background 0.13s;}
+.req-btn:hover{background:var(--accent2);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border-radius:20px;width:640px;max-width:92vw;max-height:88vh;overflow-y:auto;transform:scale(0.96);transition:transform 0.2s;}
+.modal-overlay.show .modal{transform:scale(1);}
+
+.modal-header{padding:24px 28px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.modal-close{width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text2);}
+.modal-body{padding:20px 28px 28px;}
+
+.profile-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.profile-logo{width:64px;height:64px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;}
+.profile-info{}
+.profile-name{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:4px;}
+.profile-sub{font-size:13px;color:var(--text2);margin-bottom:8px;}
+
+.tab-nav{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.tab-btn{padding:8px 16px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.13s;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--sans);}
+.tab-btn:hover{color:var(--text2);}
+.tab-btn.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:500;}
+.tab-content{display:none;}
+.tab-content.on{display:block;}
+
+.info-row{display:flex;gap:10px;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border);}
+.info-row:last-child{border-bottom:none;}
+.info-key{color:var(--text3);min-width:100px;flex-shrink:0;}
+.info-val{color:var(--text);font-weight:500;}
+
+.portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.portfolio-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color 0.13s;}
+.portfolio-item:hover{border-color:var(--accent);}
+.pi-thumb{font-size:28px;margin-bottom:8px;}
+.pi-name{font-size:12px;font-weight:500;margin-bottom:3px;}
+.pi-meta{font-size:11px;color:var(--text3);}
+
+.review-item{padding:12px 0;border-bottom:1px solid var(--border);}
+.review-item:last-child{border-bottom:none;}
+.review-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.review-org{font-size:12px;font-weight:500;}
+.review-date{font-size:11px;color:var(--text3);margin-left:auto;}
+.stars{color:#f5a623;font-size:12px;}
+.review-text{font-size:12px;color:var(--text2);line-height:1.6;}
+
+.modal-footer{padding:0 28px 24px;display:flex;gap:10px;}
+.btn-req-full{flex:1;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);}
+.btn-req-full:hover{background:var(--accent2);}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+
+/* 멤버십 배지 */
+.mb-pro{background:#f3effe;color:#6b46c1;border:1px solid rgba(107,70,193,.2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;}
+.mb-standard{background:var(--accent-light,#e8f5ef);color:var(--accent,#1a6b4a);border:1px solid rgba(26,107,74,.2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;}
+.mb-basic{background:#f9f8f5;color:#4a5568;border:1px solid rgba(0,0,0,.1);font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;}
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:0;">
+    <div class="logo" onclick="nav('발주처_대시보드.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+      <span class="logo-role">발주처</span>
+    </div>
+    <nav class="nav-links" style="margin-left:20px;">
+      <button class="nav-link" onclick="nav('발주처_대시보드.html')">대시보드</button>
+      <button class="nav-link active">콘텐츠사 찾기</button><button class="nav-link" onclick="nav('랭킹.html')">🏆 랭킹</button>
+      <button class="nav-link" onclick="nav('과업지시서_생성기_v3.html')">의뢰 등록</button><button class="nav-link" onclick="nav('랭킹.html')">🏆 랭킹</button>
+    </nav>
+  </div>
+  <div class="header-right">
+    <div class="user-chip" onclick="nav('로그인.html')">
+      <div class="user-avatar">김</div>
+      <span style="font-size:12px;">김담당 · 환경부</span>
+    </div>
+    <button class="btn-sm btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 의뢰 등록</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- FILTER -->
+  <div class="filter-panel">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="업체명, 분야 검색" oninput="applyFilter()">
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">인증 조건</div>
+      <div>
+        <span class="filter-chip" data-group="cert" data-val="woman" onclick="toggleFilter(this)">여성기업 인증</span>
+        <span class="filter-chip" data-group="cert" data-val="g2b"   onclick="toggleFilter(this)">나라장터 등록</span>
+        <span class="filter-chip" data-group="cert" data-val="verify" onclick="toggleFilter(this)">본인 인증 완료</span>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">제작 분야</div>
+      <div id="service-chips">
+        <span class="filter-chip" data-group="service" data-val="SNS 카드뉴스"  onclick="toggleFilter(this)">SNS 카드뉴스</span>
+        <span class="filter-chip" data-group="service" data-val="홍보 영상"    onclick="toggleFilter(this)">홍보 영상</span>
+        <span class="filter-chip" data-group="service" data-val="인포그래픽"   onclick="toggleFilter(this)">인포그래픽</span>
+        <span class="filter-chip" data-group="service" data-val="인쇄 홍보물"  onclick="toggleFilter(this)">인쇄 홍보물</span>
+        <span class="filter-chip" data-group="service" data-val="SNS 채널운영" onclick="toggleFilter(this)">SNS 채널운영</span>
+        <span class="filter-chip" data-group="service" data-val="캠페인 기획"  onclick="toggleFilter(this)">캠페인 기획</span>
+        <span class="filter-chip" data-group="service" data-val="모션그래픽"   onclick="toggleFilter(this)">모션그래픽</span>
+        <span class="filter-chip" data-group="service" data-val="사진 촬영"    onclick="toggleFilter(this)">사진 촬영</span>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">공공 실적</div>
+      <div>
+        <span class="filter-chip" data-group="record" data-val="1" onclick="toggleFilter(this)">1건 이상</span>
+        <span class="filter-chip" data-group="record" data-val="5" onclick="toggleFilter(this)">5건 이상</span>
+        <span class="filter-chip" data-group="record" data-val="20" onclick="toggleFilter(this)">20건 이상</span>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <div class="filter-title">기준 단가 (만원, VAT 포함)</div>
+      <div class="price-range">
+        <input type="number" id="price-min" placeholder="최소" oninput="applyFilter()">
+        <span>~</span>
+        <input type="number" id="price-max" placeholder="최대" oninput="applyFilter()">
+      </div>
+    </div>
+
+    <button class="filter-reset" onclick="resetFilter()">필터 초기화</button>
+  </div>
+
+  <!-- MAIN -->
+  
+<!-- 여성기업 강조 배너 -->
+<div style="background:linear-gradient(135deg,rgba(180,80,180,0.1),rgba(180,80,180,0.04));border:1.5px solid rgba(180,80,180,0.25);border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="filterWoman()">
+  <div style="font-size:28px;">🎗</div>
+  <div style="flex:1;">
+    <div style="font-size:13px;font-weight:700;color:#8b4a94;margin-bottom:3px;">여성기업 우선 — 수의계약 5천만원 한도 적용</div>
+    <div style="font-size:11px;color:#4a5568;line-height:1.6;">여성기업법 제9조에 따라 여성기업 인증 제작사에게 의뢰 시 수의계약 한도가 <strong>2천만원 → 5천만원</strong>으로 확대됩니다.</div>
+  </div>
+  <div id="woman-filter-badge" style="font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600;background:rgba(180,80,180,0.15);color:#8b4a94;white-space:nowrap;">여성기업만 보기</div>
+</div>
+
+<div class="main">
+    <div class="main-header">
+      <div>
+        <div class="main-title">콘텐츠사 디렉토리</div>
+        <div class="main-meta" id="result-count">총 9개 업체</div>
+      </div>
+      <select class="sort-select" onchange="applyFilter()">
+        <option value="rating">평점 높은 순</option>
+        <option value="record">공공 실적 순</option>
+        <option value="price-asc">단가 낮은 순</option>
+        <option value="price-desc">단가 높은 순</option>
+      </select>
+    </div>
+    <div class="makers-grid" id="makers-grid"></div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+function nav(page) { window.location.href = page; }
+
+function renderCards() {
+  const grid = document.getElementById('makers-grid');
+  document.getElementById('result-count').textContent = `총 ${filtered.length}개 업체`;
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1;"><div class="empty-icon">🔍</div><div>조건에 맞는 콘텐츠사가 없습니다</div><div style="font-size:12px;margin-top:6px;">필터를 조정해보세요</div></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(m => `
+    <div class="maker-card" onclick="openModal(${m.id})">
+      <div class="maker-card-top">
+        <div class="maker-logo">${m.emoji}</div>
+        <div class="maker-info">
+          <div class="maker-name">${m.name}</div>
+          <div class="maker-type">${m.type}</div>
+        </div>
+        <div style="font-size:12px;color:#f5a623;white-space:nowrap;">★ ${m.rating}</div>
+      </div>
+      <div class="badges">
+        ${m.woman   ?'<span class="badge badge-woman">여성기업</span>':''}
+        ${m.g2b     ?'<span class="badge badge-g2b">나라장터</span>':''}
+        ${m.verify  ?'<span class="badge badge-verify">인증완료</span>':''}
+        ${m.premium ?'<span class="badge badge-premium">프리미엄</span>':''}
+      </div>
+      <div class="services-wrap">
+        ${m.services.map(s=>`<span class="service-tag">${s}</span>`).join('')}
+      </div>
+      <div class="maker-stats">
+        <div class="stat-item"><div class="stat-val">${m.record}</div><div class="stat-label">공공 실적</div></div>
+        <div class="stat-item"><div class="stat-val">${m.reviews}</div><div class="stat-label">리뷰</div></div>
+        <div class="stat-item"><div class="stat-val">${m.employees.replace('인','')}</div><div class="stat-label">직원수</div></div>
+      </div>
+      <div class="maker-card-bottom">
+        <div>
+          <div class="price-range-label">기준 단가</div>
+          <div class="price-val">${m.price.toLocaleString()}~${m.priceMax.toLocaleString()}만원</div>
+        </div>
+        <button class="req-btn" onclick="event.stopPropagation();requestQuote(${m.id})">견적 요청</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleFilter(el) {
+  el.classList.toggle('on');
+  const group = el.dataset.group;
+  const val = el.dataset.val;
+  if (el.classList.contains('on')) { activeFilters[group].push(val); }
+  else { activeFilters[group] = activeFilters[group].filter(v=>v!==val); }
+  applyFilter();
+}
+
+function applyFilter() {
+  const q = (document.getElementById('search-input').value||'').toLowerCase();
+  const minP = Number(document.getElementById('price-min').value)||0;
+  const maxP = Number(document.getElementById('price-max').value)||Infinity;
+  const sort = document.querySelector('.sort-select').value;
+
+  filtered = MAKERS.filter(m => {
+    if (q && !m.name.toLowerCase().includes(q) && !m.services.join('').toLowerCase().includes(q) && !m.type.toLowerCase().includes(q)) return false;
+    if (activeFilters.cert.includes('woman')  && !m.woman)  return false;
+    if (activeFilters.cert.includes('g2b')    && !m.g2b)    return false;
+    if (activeFilters.cert.includes('verify') && !m.verify) return false;
+    if (activeFilters.service.length && !activeFilters.service.some(s=>m.services.includes(s))) return false;
+    if (activeFilters.record.length) {
+      const minR = Math.max(...activeFilters.record.map(Number));
+      if (m.record < minR) return false;
+    }
+    if (m.price > maxP || m.priceMax < minP) return false;
+    return true;
+  });
+
+  filtered.sort((a,b)=>{
+    if (sort==='rating')    return b.rating-a.rating;
+    if (sort==='record')    return b.record-a.record;
+    if (sort==='price-asc') return a.price-b.price;
+    return b.priceMax-a.priceMax;
+  });
+
+  renderCards();
+}
+
+function resetFilter() {
+  document.getElementById('search-input').value='';
+  document.getElementById('price-min').value='';
+  document.getElementById('price-max').value='';
+  document.querySelectorAll('.filter-chip.on').forEach(c=>c.classList.remove('on'));
+  Object.keys(activeFilters).forEach(k=>activeFilters[k]=[]);
+  applyFilter();
+}
+
+let currentTab = 'info';
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('on', c.id==='tab-'+tab));
+}
+
+function openModal(id) {
+  const m = MAKERS.find(x=>x.id===id);
+  if (!m) return;
+  const modal = document.getElementById('modal-content');
+  modal.innerHTML = `
+    <div class="modal-header">
+      <div class="profile-top">
+        <div class="profile-logo">${m.emoji}</div>
+        <div class="profile-info">
+          <div class="profile-name">${m.name}</div>
+          <div class="profile-sub">${m.type} · ${m.employees} · ${m.founded}년 설립</div>
+          <div class="badges">
+            ${m.woman  ?'<span class="badge badge-woman">여성기업</span>':''}
+            ${m.g2b    ?'<span class="badge badge-g2b">나라장터</span>':''}
+            ${m.verify ?'<span class="badge badge-verify">인증완료</span>':''}
+            ${m.premium?'<span class="badge badge-premium">프리미엄</span>':''}
+          </div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="tab-nav">
+        <button class="tab-btn on" data-tab="info" onclick="switchTab('info')">기본 정보</button>
+        <button class="tab-btn" data-tab="portfolio" onclick="switchTab('portfolio')">포트폴리오</button>
+        <button class="tab-btn" data-tab="review" onclick="switchTab('review')">리뷰 (${m.reviews})</button>
+      </div>
+
+      <div class="tab-content on" id="tab-info">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">${m.intro}</div>
+        <div class="info-row"><span class="info-key">대표자</span><span class="info-val">${m.ceo}</span></div>
+        <div class="info-row"><span class="info-key">제작 분야</span><span class="info-val">${m.services.join(', ')}</span></div>
+        <div class="info-row"><span class="info-key">공공 실적</span><span class="info-val">${m.record}건</span></div>
+        <div class="info-row"><span class="info-key">평점</span><span class="info-val">★ ${m.rating} (리뷰 ${m.reviews}건)</span></div>
+        <div class="info-row"><span class="info-key">기준 단가</span><span class="info-val" style="color:var(--accent);">${m.price.toLocaleString()}~${m.priceMax.toLocaleString()}만원 (VAT 포함)</span></div>
+        <div class="info-row"><span class="info-key">사업자번호</span><span class="info-val" style="font-family:var(--mono);font-size:12px;">${m.bizNum}</span></div>
+      </div>
+
+      <div class="tab-content" id="tab-portfolio">
+        <div class="portfolio-grid">
+          ${m.portfolios.map(p=>`
+            <div class="portfolio-item">
+              <div class="pi-thumb">${p.thumb}</div>
+              <div class="pi-name">${p.name}</div>
+              <div class="pi-meta">${p.meta}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-review">
+        ${m.reviewList.map(r=>`
+          <div class="review-item">
+            <div class="review-top">
+              <span class="review-org">${r.org}</span>
+              <span class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span>
+              <span class="review-date">${r.date}</span>
+            </div>
+            <div class="review-text">${r.text}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-req-full" onclick="requestQuote(${m.id})">견적 요청하기</button>
+    </div>`;
+
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+function requestQuote(id) {
+  const m = MAKERS.find(x=>x.id===id);
+  closeModal();
+  alert(`${m.name}에 견적 요청이 전송되었습니다.\n실제 서비스에서는 과업지시서와 함께 전달됩니다.`);
+}
+
+renderCards();
+</script>
+
+<!-- 포트폴리오 뷰어 모달 -->
+<div id="portfolio-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 20px;">
+  <div style="background:var(--surface,#fff);border-radius:16px;max-width:760px;width:100%;position:relative;">
+    <div style="padding:22px 24px;border-bottom:1px solid var(--border,rgba(0,0,0,.08));display:flex;align-items:center;gap:14px;">
+      <div id="pm-icon" style="font-size:32px;"></div>
+      <div style="flex:1;">
+        <div id="pm-name" style="font-size:18px;font-weight:700;"></div>
+        <div id="pm-meta" style="font-size:12px;color:#8492a6;margin-top:3px;"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closePortfolio()" style="width:32px;height:32px;border:1px solid rgba(0,0,0,.12);background:transparent;border-radius:8px;cursor:pointer;font-size:16px;">✕</button>
+      </div>
+    </div>
+    <!-- 탭 -->
+    <div style="display:flex;border-bottom:1px solid var(--border,rgba(0,0,0,.08));padding:0 24px;">
+      <div class="pm-tab active" id="pm-tab-portfolio" onclick="switchPmTab('portfolio')" style="padding:12px 16px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid var(--accent,#1a6b4a);color:var(--accent,#1a6b4a);margin-bottom:-1px;">포트폴리오</div>
+      <div class="pm-tab" id="pm-tab-info" onclick="switchPmTab('info')" style="padding:12px 16px;font-size:13px;font-weight:500;cursor:pointer;color:#8492a6;">기업 정보</div>
+      <div class="pm-tab" id="pm-tab-review" onclick="switchPmTab('review')" style="padding:12px 16px;font-size:13px;font-weight:500;cursor:pointer;color:#8492a6;">공공 실적 & 리뷰</div>
+    </div>
+    <div id="pm-body" style="padding:24px;"></div>
+    <div style="padding:16px 24px;border-top:1px solid var(--border,rgba(0,0,0,.08));display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closePortfolio()" style="padding:9px 18px;border:1px solid rgba(0,0,0,.14);background:transparent;border-radius:8px;font-size:13px;cursor:pointer;font-family:sans-serif;">닫기</button>
+      <button id="pm-quote-btn" onclick="requestQuote()" style="padding:9px 20px;background:var(--accent,#1a6b4a);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;">📋 견적 요청</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="portfolio-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 20px;" onclick="if(event.target===this)closePortfolio()">
+  <div style="background:var(--surface,#fff);border-radius:16px;max-width:700px;width:100%;color:var(--text,#1a1f2e);">
+    <div style="padding:20px 24px;border-bottom:1px solid var(--border,rgba(0,0,0,.08));display:flex;align-items:center;gap:12px;">
+      <div id="pm-icon" style="font-size:28px;"></div>
+      <div style="flex:1;"><div id="pm-name" style="font-size:17px;font-weight:700;"></div><div id="pm-meta" style="font-size:12px;color:#8492a6;margin-top:2px;"></div></div>
+      <button onclick="closePortfolio()" style="background:transparent;border:1px solid rgba(0,0,0,.12);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div style="padding:24px;" id="pm-body"></div>
+    <div style="padding:14px 24px;border-top:1px solid var(--border,rgba(0,0,0,.08));display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closePortfolio()" style="padding:8px 16px;border:1px solid rgba(0,0,0,.14);background:transparent;border-radius:8px;font-size:13px;cursor:pointer;font-family:sans-serif;">닫기</button>
+      <button onclick="closePortfolio();nav('견적_요청비교.html')" style="padding:8px 16px;background:var(--accent,#1a6b4a);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;">📋 견적 요청</button>
+    </div>
+  </div>
+</div>
+<script>
+var PORTFOLIO_DATA = [
+  {id:0,icon:'🎬',name:'㈜ 그린스튜디오',meta:'랭킹 #1 · ★4.9 · 공공 실적 67건',works:[{title:'환경부 탄소중립 카드뉴스',org:'환경부',score:96},{title:'서울시 청년정책 인포그래픽',org:'서울시',score:94},{title:'국토부 주거복지 홍보영상',org:'국토부',score:98}]},
+  {id:1,icon:'📊',name:'비주얼팩토리',meta:'랭킹 #2 · ★4.8 · 공공 실적 54건',works:[{title:'행안부 디지털 정부 캠페인',org:'행안부',score:95},{title:'교육부 정책 인포그래픽',org:'교육부',score:91}]},
+  {id:2,icon:'🎯',name:'캠페인하우스',meta:'랭킹 #3 · ★4.7 · 공공 실적 43건',works:[{title:'보건복지부 건강증진 영상',org:'보건복지부',score:93}]},
+];
+function openPortfolio(id){
+  var d=PORTFOLIO_DATA.find(function(p){return p.id===id;})||PORTFOLIO_DATA[0];
+  document.getElementById('pm-icon').textContent=d.icon;
+  document.getElementById('pm-name').textContent=d.name;
+  document.getElementById('pm-meta').textContent=d.meta;
+  document.getElementById('pm-body').innerHTML=
+    '<div style="font-size:13px;font-weight:700;margin-bottom:12px;">공공기관 납품 실적</div>'
+    +d.works.map(function(w){return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2,#f9f8f5);border-radius:8px;margin-bottom:6px;">'
+      +'<div><div style="font-size:13px;font-weight:600;">'+w.title+'</div><div style="font-size:11px;color:#8492a6;">'+w.org+'</div></div>'
+      +'<div style="font-family:monospace;font-size:18px;font-weight:700;color:var(--accent,#1a6b4a);">'+w.score+'</div></div>';}).join('');
+  document.getElementById('portfolio-modal').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closePortfolio(){document.getElementById('portfolio-modal').style.display='none';document.body.style.overflow='';}
+</script>
+</body>
+</html>

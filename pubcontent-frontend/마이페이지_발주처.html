@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이페이지 — 발주처 · 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.nav-links{display:flex;gap:4px;margin-left:16px;}
+.nav-btn{padding:7px 14px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;border:none;background:transparent;font-family:var(--sans);transition:all .13s;}
+.nav-btn:hover{background:var(--surface2);}
+.nav-btn.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;position:sticky;top:58px;height:calc(100vh - 58px);}
+.profile-block{text-align:center;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.avatar{width:60px;height:60px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;border:2px solid rgba(26,107,74,.2);}
+.profile-name{font-size:15px;font-weight:700;margin-bottom:2px;}
+.profile-org{font-size:12px;color:var(--text3);}
+.profile-badge{display:inline-block;margin-top:6px;font-size:10px;background:var(--accent-light);color:var(--accent);border-radius:10px;padding:2px 10px;font-weight:500;}
+
+.menu-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .13s;margin-bottom:2px;}
+.menu-item:hover{background:var(--surface2);color:var(--text);}
+.menu-item.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+.menu-icon{font-size:16px;width:20px;text-align:center;}
+.menu-badge{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px;}
+
+/* MAIN */
+.main{padding:28px;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.section-title{font-family:var(--serif);font-size:20px;font-weight:700;}
+
+/* STAT CARDS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.sc-label{font-size:11px;color:var(--text3);margin-bottom:6px;}
+.sc-val{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--text);}
+.sc-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.sc-val.accent{color:var(--accent);}
+.sc-val.amber{color:var(--amber);}
+
+/* PROJECT LIST */
+.project-list{display:flex;flex-direction:column;gap:10px;}
+.project-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;cursor:pointer;transition:all .15s;}
+.project-card:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.pc-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
+.pc-icon{font-size:24px;flex-shrink:0;}
+.pc-info{flex:1;}
+.pc-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.pc-meta{font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap;}
+.pc-status{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;}
+.status-progress{background:var(--blue-light);color:var(--blue);}
+.status-review{background:var(--amber-light);color:var(--amber);}
+.status-done{background:var(--accent-light);color:var(--accent);}
+.status-wait{background:var(--surface2);color:var(--text3);border:1px solid var(--border2);}
+
+.progress-bar-wrap{margin-bottom:10px;}
+.pb-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;}
+.pb-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.pb-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+.pb-blue{background:var(--blue);}
+.pb-green{background:var(--accent);}
+.pb-amber{background:var(--amber);}
+
+.pc-bottom{display:flex;align-items:center;justify-content:space-between;}
+.pc-price{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);}
+.pc-actions{display:flex;gap:6px;}
+
+/* 3단계 검수 타임라인 */
+.check-timeline{display:flex;align-items:center;gap:0;margin:10px 0;}
+.ct-step{display:flex;align-items:center;gap:6px;font-size:11px;}
+.ct-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.ct-dot.done{background:var(--accent);color:#fff;}
+.ct-dot.active{background:var(--amber);color:#fff;}
+.ct-dot.wait{background:var(--border2);color:var(--text3);}
+.ct-line{flex:1;height:2px;background:var(--border);margin:0 4px;min-width:20px;}
+.ct-line.done{background:var(--accent);}
+.ct-label{color:var(--text3);}
+.ct-label.active{color:var(--amber);font-weight:500;}
+.ct-label.done{color:var(--accent);font-weight:500;}
+
+/* PROFILE FORM */
+.profile-form{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.pf-title{font-size:14px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg-full{grid-column:1/-1;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+input,select{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:9px 12px;outline:none;width:100%;transition:border-color .15s;}
+input:focus,select:focus{border-color:var(--accent);}
+
+/* NOTIFICATION */
+.notif-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item:hover{background:var(--surface2);margin:0 -4px;padding:14px 4px;border-radius:8px;}
+.ni-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.ni-info{flex:1;}
+.ni-title{font-size:13px;font-weight:500;margin-bottom:2px;}
+.ni-sub{font-size:12px;color:var(--text3);}
+.ni-time{font-size:11px;color:var(--text3);white-space:nowrap;}
+.ni-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px;}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo" onclick="nav('견적서_수락.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn" onclick="nav('발주처_대시보드.html')">대시보드</button>
+      <button class="nav-btn" onclick="nav('제작사_디렉토리.html')">콘텐츠사 찾기</button>
+      <button class="nav-btn" onclick="nav('랭킹.html')">🏆 랭킹</button>
+      <button class="nav-btn active">마이페이지</button>
+    </div>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="nav('메시지.html')">💬 메시지</button>
+    <button class="btn btn-primary btn-sm" onclick="nav('견적_요청비교.html')">+ 새 의뢰</button>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="profile-block">
+      <div class="avatar">김</div>
+      <div class="profile-name">김담당</div>
+      <div class="profile-org">환경부 · 홍보기획과</div>
+      <div class="profile-badge">공공기관 담당자</div>
+    </div>
+    <div class="menu-item active" id="m-projects" onclick="showSection('projects')"><span class="menu-icon">📋</span>진행 프로젝트<span class="menu-badge">2</span></div>
+    <div class="menu-item" id="m-history" onclick="showSection('history')"><span class="menu-icon">📁</span>완료 프로젝트</div>
+    <div class="menu-item" id="m-settle" onclick="showSection('settle')"><span class="menu-icon">💰</span>정산 내역</div>
+    <div class="menu-item" id="m-notif" onclick="showSection('notif')"><span class="menu-icon">🔔</span>알림<span class="menu-badge" data-notif-badge>3</span></div>
+    <div class="menu-item" id="m-profile" onclick="showSection('profile')"><span class="menu-icon">👤</span>프로필 관리</div>
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border);margin-top:16px;">
+      <div class="menu-item" onclick="PCM.logout()"><span class="menu-icon">🚪</span>로그아웃</div>
+    </div>
+  </div>
+
+  <div class="main" id="main-area"></div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+let currentSection='projects';
+
+const PROJECTS=[
+  {id:1,icon:'📊',title:'탄소중립 SNS 카드뉴스',maker:'㈜ 그린스튜디오',status:'review',statusLabel:'검수 중',budget:1800,deadline:'2025.05.10',progress:65,checkStep:2,
+   meta:'카드뉴스 10장 · 발주처 평점 기반'},
+  {id:2,icon:'🎬',title:'환경부 홍보영상 (3분)',maker:'퍼블릭크리에이티브',status:'progress',statusLabel:'제작 중',budget:5500,deadline:'2025.06.15',progress:30,checkStep:0,
+   meta:'영상 1편 · 기획·촬영·편집'},
+];
+const HISTORY=[
+  {id:3,icon:'📄',title:'환경 정책 인포그래픽',maker:'비주얼팩토리',status:'done',statusLabel:'완료',budget:700,deadline:'2025.03.20',rating:5},
+  {id:4,icon:'📱',title:'SNS 채널운영 (3개월)',maker:'소셜미디어웍스',status:'done',statusLabel:'완료',budget:1050,deadline:'2025.02.28',rating:4},
+];
+const NOTIFS=[
+  {icon:'✅',title:'검수 완료 알림',sub:'탄소중립 SNS 카드뉴스 — AI 1차 검수 통과 (94점)',time:'10분 전',unread:true},
+  {icon:'💬',title:'제작사 메시지',sub:'㈜ 그린스튜디오: 초안을 확인해주세요.',time:'1시간 전',unread:true},
+  {icon:'🔔',title:'납기 D-5 알림',sub:'환경부 홍보영상 납기일이 5일 남았습니다.',time:'3시간 전',unread:true},
+  {icon:'📋',title:'새 견적 도착',sub:'캠페인하우스에서 견적을 보냈습니다.',time:'어제',unread:false},
+];
+
+function showSection(s){
+  currentSection=s;
+  document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));
+  document.getElementById('m-'+s).classList.add('active');
+  mergeSessionProjects(); renderMain();
+
+// 메시지 뱃지 카운트
+(function(){
+  try {
+    const unread = 3; // 실제 서비스에서는 API로 가져옴
+    const notifEl = document.getElementById('m-notif');
+    if(notifEl) {
+      const badge = notifEl.querySelector('.menu-badge');
+      if(badge) badge.textContent = unread;
+    }
+  } catch(e){}
+})();
+
+}
+
+function showPwChange(){
+  const f=document.getElementById('pw-change-form');
+  if(f) f.style.display=f.style.display==='none'?'block':'none';
+}
+function changePw(){
+  const cur=document.getElementById('pw-current')?.value;
+  const nw=document.getElementById('pw-new')?.value;
+  const con=document.getElementById('pw-confirm')?.value;
+  if(!cur){if(typeof PCM!=='undefined')PCM.toast('현재 비밀번호를 입력해주세요','error');return;}
+  if(!nw||nw.length<8){if(typeof PCM!=='undefined')PCM.toast('새 비밀번호는 8자 이상이어야 합니다','error');return;}
+  if(nw!==con){if(typeof PCM!=='undefined')PCM.toast('새 비밀번호가 일치하지 않습니다','error');return;}
+  if(typeof PCM!=='undefined')PCM.toast('비밀번호가 변경되었습니다','success');
+  document.getElementById('pw-change-form').style.display='none';
+}
+
+function mergeSessionProjects(){
+  try{
+    const sp=PCM.getProjects();
+    if(!sp.length)return;
+    sp.forEach(function(p){if(!PROJECTS.find(function(x){return x.id===p.id;}))PROJECTS.unshift(p);});
+  }catch(e){}
+}
+
+function renderMain(){
+  const el=document.getElementById('main-area');
+  if(currentSection==='projects') el.innerHTML=renderProjects();
+  else if(currentSection==='history') el.innerHTML=renderHistory();
+  else if(currentSection==='settle') el.innerHTML=renderSettle();
+  else if(currentSection==='notif') el.innerHTML=renderNotif();
+  else el.innerHTML=renderProfile();
+}
+
+function renderProjects(){
+  const total=PROJECTS.reduce((s,p)=>s+p.budget,0);
+  return`
+    <div class="section-header">
+      <div class="section-title">진행 프로젝트</div>
+      <button class="btn btn-ghost btn-sm" onclick="nav('메시지.html')">💬 메시지</button>
+    <button class="btn btn-primary btn-sm" onclick="nav('견적_요청비교.html')">+ 새 의뢰</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="sc-label">진행 중</div><div class="sc-val accent">${PROJECTS.length}</div><div class="sc-sub">건</div></div>
+      <div class="stat-card"><div class="sc-label">에스크로 총액</div><div class="sc-val" style="font-size:18px;">${total.toLocaleString()}<span style="font-size:12px;">만원</span></div><div class="sc-sub">VAT 포함</div></div>
+      <div class="stat-card"><div class="sc-label">검수 대기</div><div class="sc-val amber">1</div><div class="sc-sub">최종 승인 필요</div></div>
+      <div class="stat-card"><div class="sc-label">이번 달 완료</div><div class="sc-val">2</div><div class="sc-sub">건</div></div>
+    </div>
+    <div class="project-list">
+      ${PROJECTS.map(p=>`
+        <div class="project-card">
+          <div class="pc-top">
+            <div class="pc-icon">${p.icon}</div>
+            <div class="pc-info">
+              <div class="pc-title">${p.title}</div>
+              <div class="pc-meta">
+                <span>${p.maker}</span>
+                <span>📅 ${p.deadline}</span>
+                <span>${p.meta}</span>
+              </div>
+            </div>
+            <span class="pc-status status-${p.status}">${p.statusLabel}</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="pb-label"><span>진행률</span><span>${p.progress}%</span></div>
+            <div class="pb-track"><div class="pb-fill ${p.status==='review'?'pb-amber':'pb-blue'}" style="width:${p.progress}%"></div></div>
+          </div>
+          <div class="check-timeline">
+            ${['AI 자동검수','전문가 검수','최종 승인'].map((label,i)=>`
+              <div class="ct-step">
+                <div class="ct-dot ${i<p.checkStep?'done':i===p.checkStep?'active':'wait'}">${i<p.checkStep?'✓':(i+1)}</div>
+                <span class="ct-label ${i<p.checkStep?'done':i===p.checkStep?'active':''}">${label}</span>
+              </div>
+              ${i<2?`<div class="ct-line ${i<p.checkStep?'done':''}"></div>`:''}`).join('')}
+          </div>
+          <div class="pc-bottom">
+            <div class="pc-price">${p.budget.toLocaleString()}만원 <span style="font-size:11px;color:var(--text3);">에스크로 보관 중</span></div>
+            <div class="pc-actions">
+              ${p.checkStep>=2?`<button class="btn btn-amber btn-sm" onclick="nav('수정_요청.html');void(${p.id})">✓ 최종 승인</button>`:''}
+              <button class="btn btn-ghost btn-sm" onclick="nav('검수_결과.html')">검수 결과</button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderHistory(){
+  return`
+    <div class="section-header">
+      <div class="section-title">완료 프로젝트</div>
+    </div>
+    <div class="project-list">
+      ${HISTORY.map(p=>`
+        <div class="project-card">
+          <div class="pc-top">
+            <div class="pc-icon">${p.icon}</div>
+            <div class="pc-info">
+              <div class="pc-title">${p.title}</div>
+              <div class="pc-meta"><span>${p.maker}</span><span>완료일 ${p.deadline}</span></div>
+            </div>
+            <span class="pc-status status-done">완료</span>
+          </div>
+          <div class="pc-bottom">
+            <div class="pc-price">${p.budget.toLocaleString()}만원</div>
+            <div class="pc-actions">
+              <div style="color:#f5a623;font-size:14px;">${'★'.repeat(p.rating)}${'☆'.repeat(5-p.rating)}</div>
+              <button class="btn btn-ghost btn-sm">재의뢰</button><button class="btn btn-ghost btn-sm" onclick="nav('하자보수_신고.html')" style="color:var(--red);border-color:rgba(220,53,69,.3);">⚠️ 하자보수</button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderSettle(){
+  return`
+    <div class="section-header">
+      <div class="section-title">정산 내역</div>
+      <button class="btn btn-ghost btn-sm" onclick="nav('정산_내역.html')">상세 보기 →</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card"><div class="sc-label">총 발주 금액</div><div class="sc-val" style="font-size:18px;">8,050<span style="font-size:12px;">만원</span></div><div class="sc-sub">VAT 포함 누계</div></div>
+      <div class="stat-card"><div class="sc-label">에스크로 보관</div><div class="sc-val accent" style="font-size:18px;">7,300<span style="font-size:12px;">만원</span></div><div class="sc-sub">진행 중</div></div>
+      <div class="stat-card"><div class="sc-label">정산 완료</div><div class="sc-val" style="font-size:18px;">1,750<span style="font-size:12px;">만원</span></div><div class="sc-sub">완료 건</div></div>
+      <div class="stat-card"><div class="sc-label">플랫폼 수수료</div><div class="sc-val amber" style="font-size:18px;">159<span style="font-size:12px;">만원</span></div><div class="sc-sub">공급가 10%</div></div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:var(--surface2);">
+          <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);">과업명</th>
+          <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);">제작사</th>
+          <th style="padding:10px 14px;text-align:right;font-size:11px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);">발주금액</th>
+          <th style="padding:10px 14px;text-align:center;font-size:11px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);">상태</th>
+        </tr></thead>
+        <tbody>
+          ${[...PROJECTS,...HISTORY].map(p=>`
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:12px 14px;font-size:13px;font-weight:500;">${p.title}</td>
+              <td style="padding:12px 14px;font-size:12px;color:var(--text2);">${p.maker}</td>
+              <td style="padding:12px 14px;text-align:right;font-family:var(--mono);font-size:13px;font-weight:600;">${p.budget.toLocaleString()}만원</td>
+              <td style="padding:12px 14px;text-align:center;"><span class="pc-status status-${p.status}">${p.statusLabel}</span></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+
+function renderNotifsFromSession(){
+  const notifs = PCM.getNotifs();
+  if(!notifs.length) return;
+  const container = document.querySelector('#notif-list-area');
+  if(!container) return;
+  container.innerHTML = notifs.slice(0,10).map(function(n){
+    return '<div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="PCM.markRead()">'+
+      '<div style="font-size:20px;">'+n.icon+'</div>'+
+      '<div style="flex:1;"><div style="font-size:13px;font-weight:500;margin-bottom:2px;">'+n.title+'</div><div style="font-size:12px;color:var(--text3);">'+n.sub+'</div></div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;"><span style="font-size:11px;color:var(--text3);">'+n.time+'</span>'+(n.unread?'<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);"></div>':'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderNotif_orig(){
+  return`
+    <div class="section-header">
+      <div class="section-title">알림</div>
+      <button class="btn btn-ghost btn-sm">모두 읽음 처리</button>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px 16px;">
+      ${NOTIFS.map(n=>`
+        <div class="notif-item">
+          <div class="ni-icon">${n.icon}</div>
+          <div class="ni-info">
+            <div class="ni-title">${n.title}</div>
+            <div class="ni-sub">${n.sub}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div class="ni-time">${n.time}</div>
+            ${n.unread?'<div class="ni-dot"></div>':''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderProfile(){
+  return`
+    <div class="section-header"><div class="section-title">프로필 관리</div></div>
+    <div class="profile-form">
+      <div class="pf-title">기관 정보</div>
+      <div class="form-grid">
+        <div class="form-group"><label>기관 유형</label><select><option>중앙부처</option></select></div>
+        <div class="form-group"><label>기관명</label><input type="text" value="환경부"></div>
+        <div class="form-group"><label>부서명</label><input type="text" value="홍보기획과"></div>
+        <div class="form-group"><label>직책</label><input type="text" value="주무관"></div>
+      </div>
+    </div>
+    <div class="profile-form">
+      <div class="pf-title">담당자 정보</div>
+      <div class="form-grid">
+        <div class="form-group"><label>이름</label><input type="text" value="김담당"></div>
+        <div class="form-group"><label>이메일</label><input type="email" value="kim@moenv.go.kr"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+  <button class="btn btn-primary" onclick="if(typeof PCM!=='undefined')PCM.toast('변경 사항이 저장되었습니다','success')">변경 사항 저장</button>
+  <button class="btn btn-ghost" onclick="showPwChange()">🔑 비밀번호 변경</button>
+</div>
+<div id="pw-change-form" style="display:none;margin-top:14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+  <div style="font-size:13px;font-weight:700;margin-bottom:12px;">비밀번호 변경</div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">현재 비밀번호</label><input type="password" id="pw-current" placeholder="현재 비밀번호" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;width:100%;outline:none;"></div>
+    <div><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">새 비밀번호</label><input type="password" id="pw-new" placeholder="8자 이상 영문+숫자+특수문자" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;width:100%;outline:none;"></div>
+    <div><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px;">새 비밀번호 확인</label><input type="password" id="pw-confirm" placeholder="새 비밀번호 재입력" style="background:var(--surface);border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;width:100%;outline:none;"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="changePw()">변경 확정</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pw-change-form').style.display='none'">취소</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function approveProject(id){
+  alert('최종 승인이 완료되었습니다.\n에스크로 대금이 제작사에게 지급됩니다.');
+}
+
+renderMain();
+
+// 메시지 뱃지 카운트
+(function(){
+  try {
+    const unread = 3; // 실제 서비스에서는 API로 가져옴
+    const notifEl = document.getElementById('m-notif');
+    if(notifEl) {
+      const badge = notifEl.querySelector('.menu-badge');
+      if(badge) badge.textContent = unread;
+    }
+  } catch(e){}
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공공기관 사전등록 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --red:#dc3545;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-blue:hover{background:#1347c0;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.main{max-width:840px;margin:0 auto;padding:36px 24px 60px;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--blue-light),rgba(26,86,219,0.04));border:1.5px solid rgba(26,86,219,0.15);border-radius:16px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:24px;}
+.hero-icon{font-size:52px;flex-shrink:0;}
+.hero-title{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:6px;}
+.hero-sub{font-size:13px;color:var(--text2);line-height:1.7;}
+
+/* 검색 */
+.search-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px;}
+.sb-title{font-size:14px;font-weight:700;margin-bottom:14px;}
+.search-row{display:flex;gap:8px;}
+.search-input-wrap{flex:1;position:relative;}
+.search-input{background:var(--surface2);border:1.5px solid var(--border2);border-radius:10px;color:var(--text);font-family:var(--sans);font-size:14px;padding:12px 44px 12px 16px;outline:none;width:100%;transition:border-color .15s;}
+.search-input:focus{border-color:var(--blue);background:var(--surface);}
+.search-input::placeholder{color:var(--text3);}
+.search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;}
+.search-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.search-tag{font-size:11px;padding:4px 11px;border-radius:20px;background:var(--blue-light);color:var(--blue);cursor:pointer;transition:all .13s;}
+.search-tag:hover{background:var(--blue);color:#fff;}
+
+/* 결과 */
+.result-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.result-count{font-size:12px;color:var(--text3);}
+.result-count strong{color:var(--blue);font-weight:700;}
+
+/* 기관 카드 */
+.org-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.org-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s;position:relative;}
+.org-card:hover{border-color:var(--blue);}
+.org-card.selected{border-color:var(--accent);background:var(--accent-light);}
+.oc-icon{font-size:26px;flex-shrink:0;}
+.oc-info{flex:1;}
+.oc-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+.oc-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap;}
+.oc-badges{display:flex;gap:5px;margin-top:5px;}
+.oc-badge{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;}
+.ob-g2b{background:var(--blue-light);color:var(--blue);}
+.ob-verified{background:var(--accent-light);color:var(--accent);}
+.ob-center{background:var(--amber-light);color:var(--amber);}
+.oc-check{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center;flex-shrink:0;}
+.org-card.selected .oc-check{display:flex;}
+
+/* 선택된 기관 확인 패널 */
+.confirm-panel{background:var(--accent-light);border:1.5px solid rgba(26,107,74,.2);border-radius:12px;padding:20px;margin-bottom:20px;display:none;}
+.confirm-panel.show{display:block;}
+.cp-title{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.cp-row{display:flex;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid rgba(26,107,74,.1);}
+.cp-row:last-child{border-bottom:none;}
+.cp-key{color:var(--text3);min-width:80px;}
+.cp-val{font-weight:500;}
+
+/* 담당자 정보 폼 */
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:16px;}
+.fc-title{font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg-full{grid-column:1/-1;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+.req{color:var(--red);margin-left:2px;}
+input,select{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:10px 12px;outline:none;width:100%;transition:border-color .15s;}
+input:focus,select:focus{border-color:var(--accent);}
+input::placeholder{color:var(--text3);}
+
+/* 공문 업로드 */
+.doc-upload{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surface2);margin-top:8px;}
+.doc-upload:hover{border-color:var(--accent);background:var(--accent-light);}
+.doc-upload.uploaded{border-color:var(--accent);background:var(--accent-light);border-style:solid;}
+
+/* 인증 방법 선택 */
+.verify-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.vm-item{border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;text-align:center;}
+.vm-item:hover{border-color:var(--accent);}
+.vm-item.selected{border-color:var(--accent);background:var(--accent-light);}
+.vmi-icon{font-size:24px;margin-bottom:6px;}
+.vmi-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.vmi-desc{font-size:11px;color:var(--text3);}
+
+/* 성공 */
+.success-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;}
+.sc-anim{font-size:56px;margin-bottom:14px;display:block;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+@media(max-width:768px){.hero{flex-direction:column;text-align:center;}.form-grid{grid-template-columns:1fr;}.verify-methods{grid-template-columns:1fr;}}
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="nav('회원가입_v2.html')">← 회원가입으로</button>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+let query = '';
+let selectedOrg = null;
+let verifyMethod = 'email';
+let docUploaded = false;
+let submitted = false;
+
+const ORGS = [
+  {id:1,icon:'🌿',name:'환경부',dept:'홍보기획과',type:'중앙부처',code:'1741000',g2b:true,email:'go.kr'},
+  {id:2,icon:'🏗',name:'국토교통부',dept:'소통협력관',type:'중앙부처',code:'1613000',g2b:true,email:'go.kr'},
+  {id:3,icon:'🏙',name:'서울특별시',dept:'디지털소통담당관',type:'광역자치단체',code:'6110000',g2b:true,email:'seoul.go.kr'},
+  {id:4,icon:'🏛',name:'행정안전부',dept:'홍보담당관',type:'중앙부처',code:'1741010',g2b:true,email:'go.kr'},
+  {id:5,icon:'📚',name:'교육부',dept:'홍보담당관',type:'중앙부처',code:'1741020',g2b:true,email:'go.kr'},
+  {id:6,icon:'🔬',name:'과학기술정보통신부',dept:'소통기획담당관',type:'중앙부처',code:'1741030',g2b:true,email:'go.kr'},
+  {id:7,icon:'💼',name:'고용노동부',dept:'홍보기획과',type:'중앙부처',code:'1492000',g2b:true,email:'go.kr'},
+  {id:8,icon:'🏥',name:'보건복지부',dept:'정책홍보담당관',type:'중앙부처',code:'1352000',g2b:true,email:'go.kr'},
+  {id:9,icon:'🌾',name:'농림축산식품부',dept:'홍보담당관',type:'중앙부처',code:'1320000',g2b:true,email:'go.kr'},
+  {id:10,icon:'🐟',name:'해양수산부',dept:'소통홍보담당관',type:'중앙부처',code:'1192000',g2b:true,email:'go.kr'},
+  {id:11,icon:'⚖',name:'법무부',dept:'홍보담당관',type:'중앙부처',code:'1220000',g2b:true,email:'go.kr'},
+  {id:12,icon:'🌍',name:'외교부',dept:'홍보문화외교과',type:'중앙부처',code:'1262000',g2b:true,email:'go.kr'},
+  {id:13,icon:'🏘',name:'부산광역시',dept:'소통기획관',type:'광역자치단체',code:'6260000',g2b:true,email:'busan.go.kr'},
+  {id:14,icon:'🏙',name:'인천광역시',dept:'소통담당관',type:'광역자치단체',code:'6280000',g2b:true,email:'incheon.go.kr'},
+  {id:15,icon:'🏘',name:'경기도',dept:'홍보기획과',type:'광역자치단체',code:'6410000',g2b:true,email:'gg.go.kr'},
+  {id:16,icon:'🌊',name:'제주특별자치도',dept:'소통협력과',type:'광역자치단체',code:'6500000',g2b:true,email:'jeju.go.kr'},
+  {id:17,icon:'🏭',name:'한국환경공단',dept:'홍보실',type:'공공기관',code:'',g2b:false,email:'keco.or.kr'},
+  {id:18,icon:'🚇',name:'한국철도공사(KORAIL)',dept:'홍보처',type:'공공기관',code:'',g2b:false,email:'korail.com'},
+];
+
+function getFiltered(){
+  if(!query) return ORGS;
+  const q = query.toLowerCase();
+  return ORGS.filter(o=>
+    o.name.includes(query)||o.dept.includes(query)||o.type.includes(query)
+  );
+}
+
+function render(){
+  document.getElementById('main').innerHTML = submitted ? renderSuccess() : renderForm();
+}
+
+function renderForm(){
+  const filtered = getFiltered();
+  return `
+    <div class="hero">
+      <div class="hero-icon">🏛</div>
+      <div>
+        <div class="hero-title">공공기관 사전등록 및 인증</div>
+        <div class="hero-sub">
+          기관명을 검색하여 소속 기관을 선택하고, 담당자 인증을 완료하면<br>
+          수의계약 의뢰 등록이 가능합니다. 인증은 <strong>기관 이메일</strong> 또는 <strong>공문 제출</strong>로 완료됩니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- 기관 검색 -->
+    <div class="search-box">
+      <div class="sb-title">🔍 소속 기관 검색</div>
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <input type="text" class="search-input" id="search-input"
+            placeholder="기관명, 부서명으로 검색 (예: 환경부, 서울시)"
+            value="${query}" oninput="query=this.value;render()">
+          <span class="search-icon">🔍</span>
+        </div>
+        <button class="btn btn-blue" onclick="query='';render()">초기화</button>
+      </div>
+      <div class="search-tags">
+        ${['중앙부처','광역자치단체','공공기관','환경부','서울시','경기도'].map(t=>`
+          <span class="search-tag" onclick="query='${t}';render()">${t}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- 검색 결과 -->
+    <div class="result-header">
+      <div class="result-count">검색 결과 <strong>${filtered.length}</strong>개 기관</div>
+      ${selectedOrg?`<span style="font-size:12px;color:var(--accent);font-weight:600;">✓ ${selectedOrg.name} 선택됨</span>`:''}
+    </div>
+    <div class="org-list">
+      ${filtered.slice(0,8).map(o=>`
+        <div class="org-card ${selectedOrg?.id===o.id?'selected':''}" onclick="selectOrg(${o.id})">
+          <div class="oc-icon">${o.icon}</div>
+          <div class="oc-info">
+            <div class="oc-name">${o.name}</div>
+            <div class="oc-meta">
+              <span>${o.type}</span>
+              <span>기관코드: ${o.code||'—'}</span>
+              <span>@${o.email}</span>
+            </div>
+            <div class="oc-badges">
+              ${o.g2b?'<span class="oc-badge ob-g2b">나라장터</span>':''}
+              <span class="oc-badge ob-verified">정부기관 인증</span>
+            </div>
+          </div>
+          <div class="oc-check">✓</div>
+        </div>`).join('')}
+      ${filtered.length>8?`<div style="text-align:center;font-size:12px;color:var(--text3);padding:10px;">... ${filtered.length-8}개 더 있습니다. 검색어를 좁혀주세요.</div>`:''}
+      ${filtered.length===0?`<div style="text-align:center;padding:32px;color:var(--text3);">
+        <div style="font-size:32px;margin-bottom:10px;">🔍</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px;">검색 결과가 없습니다</div>
+        <div style="font-size:12px;">기관명이 목록에 없으면 아래 직접 입력을 이용해주세요.</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="showManual()">기관 직접 입력</button>
+      </div>`:''}
+    </div>
+
+    <!-- 선택 기관 확인 -->
+    <div class="confirm-panel ${selectedOrg?'show':''}" id="confirm-panel">
+      ${selectedOrg?`
+        <div class="cp-title">✓ 선택된 기관</div>
+        <div class="cp-row"><span class="cp-key">기관명</span><span class="cp-val">${selectedOrg.name}</span></div>
+        <div class="cp-row"><span class="cp-key">기관 유형</span><span class="cp-val">${selectedOrg.type}</span></div>
+        <div class="cp-row"><span class="cp-key">공식 이메일</span><span class="cp-val">@${selectedOrg.email}</span></div>
+        <div class="cp-row"><span class="cp-key">나라장터</span><span class="cp-val">${selectedOrg.g2b?'✓ 등록됨':'미등록'}</span></div>
+      `:''}
+    </div>
+
+    <!-- 담당자 정보 -->
+    ${selectedOrg?`
+    <div class="form-card">
+      <div class="fc-title">담당자 정보 입력</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>담당자 이름<span class="req">*</span></label>
+          <input type="text" id="mgr-name" placeholder="홍길동">
+        </div>
+        <div class="form-group">
+          <label>직책/직급</label>
+          <input type="text" id="mgr-title" placeholder="주무관, 팀장 등">
+        </div>
+        <div class="form-group">
+          <label>부서명<span class="req">*</span></label>
+          <input type="text" id="mgr-dept" placeholder="홍보기획과" value="${selectedOrg.dept}">
+        </div>
+        <div class="form-group">
+          <label>기관 이메일<span class="req">*</span></label>
+          <input type="email" id="mgr-email" placeholder="hong@${selectedOrg.email}">
+        </div>
+        <div class="form-group">
+          <label>직통 연락처</label>
+          <input type="text" id="mgr-phone" placeholder="02-0000-0000">
+        </div>
+        <div class="form-group">
+          <label>연간 예상 발주 규모</label>
+          <select id="mgr-budget">
+            <option>500만원 미만</option>
+            <option>500만~2천만원</option>
+            <option>2천만~5천만원</option>
+            <option>5천만원 이상</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- 인증 방법 -->
+    <div class="form-card">
+      <div class="fc-title">기관 담당자 인증</div>
+      <div class="verify-methods">
+        <div class="vm-item ${verifyMethod==='email'?'selected':''}" onclick="verifyMethod='email';render()">
+          <div class="vmi-icon">📧</div>
+          <div class="vmi-name">기관 이메일 인증</div>
+          <div class="vmi-desc">@${selectedOrg.email} 계정으로 인증코드 발송</div>
+        </div>
+        <div class="vm-item ${verifyMethod==='doc'?'selected':''}" onclick="verifyMethod='doc';render()">
+          <div class="vmi-icon">📄</div>
+          <div class="vmi-name">공문 제출 인증</div>
+          <div class="vmi-desc">기관 공문 업로드 후 운영자 확인</div>
+        </div>
+      </div>
+      ${verifyMethod==='email'?`
+        <div style="background:var(--blue-light);border-radius:8px;padding:14px;font-size:12px;color:var(--blue);">
+          📧 기관 이메일(${selectedOrg.email})로 6자리 인증코드가 발송됩니다.<br>
+          <strong>가입 완료 후 이메일 인증을 진행해주세요.</strong>
+        </div>
+      `:`
+        <div class="doc-upload ${docUploaded?'uploaded':''}" onclick="docUploaded=!docUploaded;render()">
+          <div style="font-size:${docUploaded?'28':'22'}px;margin-bottom:6px;">${docUploaded?'✅':'📎'}</div>
+          <div style="font-size:13px;font-weight:500;color:${docUploaded?'var(--accent)':'var(--text2)'};">${docUploaded?'공문 업로드 완료':'기관 공문 업로드'}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:3px;">담당자 명의 공문 (PDF · 최대 10MB)</div>
+        </div>
+      `}
+    </div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-ghost" onclick="nav('회원가입_v2.html')">← 취소</button>
+      <button class="btn btn-primary" style="padding:10px 28px;" onclick="submitReg()">🏛 기관 등록 신청</button>
+    </div>
+    `:''}`;
+}
+
+function renderSuccess(){
+  return `
+    <div class="success-card">
+      <span class="sc-anim">🏛</span>
+      <div style="font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:8px;">기관 등록 신청 완료!</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;">
+        <strong>${selectedOrg?.name}</strong> 담당자 인증 신청이 접수되었습니다.<br>
+        ${verifyMethod==='email'
+          ? '기관 이메일로 인증코드를 발송했습니다. 이메일을 확인해주세요.'
+          : '제출하신 공문을 검토 후 1~2영업일 내 승인 결과를 안내드립니다.'}
+      </div>
+      <div style="background:var(--accent-light);border-radius:10px;padding:16px;margin-bottom:20px;font-size:12px;text-align:left;">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:8px;">인증 완료 후 이용 가능한 기능</div>
+        ${['수의계약 기반 콘텐츠 의뢰 등록','콘텐츠사 직접 견적 요청 (최대 3개사)','에스크로 기반 안전 결제','AI + 전문가 2단계 검수 서비스'].map(f=>`
+          <div style="display:flex;align-items:center;gap:8px;padding:4px 0;color:var(--text2);">
+            <span style="color:var(--accent);">✓</span><span>${f}</span>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;" onclick="nav('로그인.html')">
+        로그인하기 →
+      </button>
+    </div>`;
+}
+
+function selectOrg(id){
+  selectedOrg = ORGS.find(o=>o.id===id);
+  render();
+  setTimeout(()=>document.getElementById('confirm-panel')?.scrollIntoView({behavior:'smooth'}),100);
+}
+
+function showManual(){
+  alert('기관 직접 입력 기능은 실제 서비스에서 제공됩니다.\n운영자에게 이메일(admin@pubcontent.kr)로 문의해주세요.');
+}
+
+function submitReg(){
+  const name = document.getElementById('mgr-name')?.value.trim();
+  const email = document.getElementById('mgr-email')?.value.trim();
+  const dept  = document.getElementById('mgr-dept')?.value.trim();
+  if(!name||!email||!dept){ alert('담당자 이름, 이메일, 부서명은 필수입니다.'); return; }
+  if(verifyMethod==='doc'&&!docUploaded){ alert('인증 공문을 업로드해주세요.'); return; }
+  try{
+    sessionStorage.setItem('pcm_orgReg', JSON.stringify({org:selectedOrg?.name, mgr:name, email, dept}));
+    if(typeof PCM!=='undefined') PCM.pushNotif({icon:'🏛',title:'기관 등록 신청 완료',sub:selectedOrg?.name+' 담당자 인증이 신청되었습니다.',time:'방금'});
+  }catch(e){}
+  submitted = true;
+  render();
+  window.scrollTo(0,0);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공공콘텐츠마켓 — 발주처 대시보드</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #ffffff;
+  --surface2: #f9f8f5;
+  --border: rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text: #1a1f2e;
+  --text2: #4a5568;
+  --text3: #8492a6;
+  --accent: #1a6b4a;
+  --accent2: #2d9e72;
+  --accent-light: #e8f5ef;
+  --red: #d93025;
+  --red-light: #fce8e6;
+  --amber: #b45309;
+  --amber-light: #fef3c7;
+  --blue: #1a56db;
+  --blue-light: #e8f0fe;
+  --serif: 'Noto Serif KR', serif;
+  --sans: 'Noto Sans KR', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark {
+  width: 30px; height: 30px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-weight: 700; font-size: 13px; color: #fff;
+}
+.logo-name { font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--text); }
+.logo-role { font-size: 11px; color: var(--text3); margin-left: 8px; padding: 2px 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+.user-info { display: flex; align-items: center; gap: 8px; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--accent); }
+.user-name { font-size: 13px; font-weight: 500; }
+.user-dept { font-size: 11px; color: var(--text3); }
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: var(--sans);
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { background: var(--surface2); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* LAYOUT */
+.layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); }
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--accent-light); color: var(--accent); border-left-color: var(--accent); font-weight: 500; }
+.nav-icon { width: 16px; text-align: center; font-size: 14px; }
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 16px 20px 6px;
+}
+
+/* MAIN */
+.main { padding: 28px; overflow-y: auto; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--text); }
+.page-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.stat-label { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+.stat-val { font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; }
+.stat-val span { font-size: 14px; color: var(--text3); font-family: var(--sans); font-weight: 400; }
+.stat-change { font-size: 11px; margin-top: 6px; }
+.sc-up { color: var(--accent); }
+.sc-down { color: var(--red); }
+
+/* PROJECTS */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-title-sm {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr 120px;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr 120px;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.1s;
+  cursor: pointer;
+}
+.table-row:last-child { border-bottom: none; }
+.table-row:hover { background: var(--surface2); }
+
+.proj-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.proj-maker { font-size: 11px; color: var(--text3); }
+
+.budget-val { font-size: 13px; font-weight: 500; font-family: var(--mono); }
+.deadline-val { font-size: 12px; color: var(--text2); }
+
+.status-pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 10px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.sp-review { background: var(--amber-light); color: var(--amber); }
+.sp-ai { background: var(--blue-light); color: var(--blue); }
+.sp-done { background: var(--accent-light); color: var(--accent); }
+.sp-wait { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+.sp-revision { background: var(--red-light); color: var(--red); }
+
+/* DETAIL PANEL */
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+}
+
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.detail-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.detail-meta { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+
+/* REVIEW PROGRESS */
+.review-track {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.review-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.rstep {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rstep-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  border: 2px solid var(--border2);
+  background: var(--surface);
+  color: var(--text3);
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s;
+}
+
+.rstep-circle.done { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.rstep-circle.active { background: var(--blue-light); border-color: var(--blue); color: var(--blue); box-shadow: 0 0 0 4px rgba(26,86,219,0.1); }
+
+.rstep-label { font-size: 11px; color: var(--text3); margin-top: 8px; text-align: center; font-weight: 500; }
+.rstep-label.done { color: var(--accent); }
+.rstep-label.active { color: var(--blue); }
+.rstep-line { flex: 1; height: 2px; background: var(--border2); margin-top: -20px; }
+.rstep-line.done { background: var(--accent); }
+
+/* AI REPORT */
+.ai-report {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.ai-report-head {
+  background: var(--blue-light);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-report-title { font-size: 12px; font-weight: 700; color: var(--blue); display: flex; align-items: center; gap: 6px; }
+.ai-score-badge {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: var(--surface);
+}
+.asb-good { color: var(--accent); }
+.asb-warn { color: var(--amber); }
+
+.ai-report-body { padding: 14px 16px; }
+.ai-check-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 12px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+}
+.ai-check-item:last-child { border-bottom: none; }
+.aci-icon {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+.aci-pass { background: var(--accent-light); color: var(--accent); }
+.aci-warn { background: var(--amber-light); color: var(--amber); }
+.aci-fail { background: var(--red-light); color: var(--red); }
+
+/* EXPERT REPORT */
+.expert-report {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.expert-report-head {
+  background: var(--amber-light);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.expert-report-title { font-size: 12px; font-weight: 700; color: var(--amber); display: flex; align-items: center; gap: 6px; }
+
+.expert-report-body { padding: 14px 16px; }
+.expert-comment-text { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
+.expert-reviewer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text3);
+}
+.er-avatar {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--amber-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--amber);
+}
+
+/* ACTION PANEL */
+.action-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  height: fit-content;
+}
+
+.action-title { font-size: 13px; font-weight: 700; margin-bottom: 16px; color: var(--text); }
+
+.action-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.action-info-row:last-of-type { border-bottom: none; margin-bottom: 16px; }
+.air-label { color: var(--text3); }
+.air-val { font-weight: 500; color: var(--text); }
+
+.action-btns { display: flex; flex-direction: column; gap: 8px; }
+.btn-approve { background: var(--accent); color: #fff; width: 100%; justify-content: center; padding: 12px; font-size: 14px; border-radius: 10px; }
+.btn-approve:hover { background: var(--accent2); }
+.btn-request { background: var(--red-light); color: var(--red); border: 1px solid rgba(217,48,37,0.2); width: 100%; justify-content: center; padding: 10px; border-radius: 10px; }
+.btn-request:hover { background: rgba(217,48,37,0.15); }
+
+.escrow-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.escrow-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.escrow-val { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--text); }
+.escrow-note { font-size: 11px; color: var(--accent); margin-top: 2px; }
+
+/* REQUEST MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px;
+  width: 460px;
+  max-width: 90vw;
+  transform: scale(0.96);
+  transition: transform 0.2s;
+}
+.modal-overlay.show .modal { transform: scale(1); }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+textarea, input[type="text"] {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 12px;
+  outline: none;
+  margin-bottom: 10px;
+}
+textarea { resize: vertical; min-height: 100px; }
+textarea:focus, input:focus { border-color: var(--accent); }
+textarea::placeholder, input::placeholder { color: var(--text3); }
+
+label { font-size: 12px; font-weight: 500; color: var(--text2); display: block; margin-bottom: 4px; }
+
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--text);
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  transform: translateY(60px); opacity: 0;
+  transition: all 0.3s; z-index: 300;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.tab-bar { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+.tab { padding: 8px 16px; font-size: 13px; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--sans); }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+.new-request-form { display: flex; flex-direction: column; gap: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+
+select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 10px 12px;
+  outline: none;
+  cursor: pointer;
+}
+select:focus { border-color: var(--accent); }
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')" style="cursor:pointer;">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+    <span class="logo-role">발주처</span>
+  </div>
+  <div class="header-right">
+    <div class="user-info">
+      <div class="user-avatar">김</div>
+      <div>
+        <div class="user-name" style="cursor:pointer;" onclick="PCM.logout()">김담당 (로그아웃)</div>
+        <div class="user-dept">환경부 홍보기획과</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="nav-section-label">메뉴</div>
+    <div class="nav-item active" onclick="showPage('dashboard')" data-page="dashboard">
+      <span class="nav-icon">📊</span> 대시보드
+    </div>
+    <div class="nav-item" onclick="showPage('projects')" data-page="projects">
+      <span class="nav-icon">📋</span> 프로젝트 목록
+    </div>
+    <div class="nav-item" onclick="nav('과업지시서_생성기_v3.html')">
+      <span class="nav-icon">+</span> 새 의뢰 등록
+    </div>
+    <div class="nav-section-label">관리</div>
+    <div class="nav-item" onclick="nav('제작사_디렉토리.html')">
+      <span class="nav-icon">🏢</span> 제작사 찾기
+    </div>
+    <div class="nav-item" onclick="nav('견적_요청비교.html')">
+      <span class="nav-icon">📊</span> 견적 비교
+    </div>
+    <div class="nav-item" onclick="nav('메시지.html')" style="position:relative;">
+      <span class="nav-icon">💬</span> 메시지
+      <span id="msg-badge" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:var(--accent);color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 7px;display:none;" data-notif-badge></span>
+    </div>
+    <div class="nav-item" onclick="showPage('contracts')" data-page="contracts">
+      <span class="nav-icon">📄</span> 계약서 관리
+    </div>
+  </div>
+
+  <div class="main" id="main-area"></div>
+</div>
+
+<div class="modal-overlay" id="approveModal">
+  <div class="modal">
+    <div class="modal-title">최종 승인 확인</div>
+    <div class="modal-sub">검수 리포트를 확인하셨나요? 승인하시면 에스크로 대금이 제작사에 자동 지급됩니다.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('approveModal')">취소</button>
+      <button class="btn btn-primary" onclick="confirmApprove()">승인 및 지급</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="requestModal">
+  <div class="modal">
+    <div class="modal-title">수정 요청</div>
+    <div class="modal-sub">제작사에게 수정 요청을 보냅니다. 수정 횟수 1회가 차감됩니다.</div>
+    <label>수정 요청 사항</label>
+    <textarea id="requestText" placeholder="예: 3번 카드뉴스의 통계 수치를 2024년 기준으로 업데이트 해주세요. 글자 크기도 전체적으로 키워주세요."></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('requestModal')">취소</button>
+      <button class="btn" style="background:var(--red);color:#fff;" onclick="confirmRequest()">수정 요청 보내기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<script>
+
+
+
+/* ── 발주처 대시보드 앱 코드 ── */
+
+// ── 전역 상태 ──
+function fmtW(n){ return n ? Math.round(n/10000).toLocaleString()+'만원' : '0원'; }
+
+let currentPage = 'dashboard';  // ← 초기값 명시
+
+// ── 샘플 프로젝트 데이터 ──
+const PROJECTS = [
+  { id:1, icon:'🌿', title:'탄소중립 SNS 카드뉴스 제작', org:'환경부 홍보기획과',
+    maker:'㈜ 그린스튜디오', status:'review', statusLabel:'검수 중',
+    budgetVAT:18000000, deadline:'2025.05.10', revisions:2, progress:75, aiScore:94,
+    escrow:'18,000,000', checkStep:2 },
+  { id:2, icon:'📊', title:'환경정책 인포그래픽 5종', org:'환경부 정책기획과',
+    maker:'비주얼팩토리', status:'done', statusLabel:'정산 완료',
+    budgetVAT:8800000, deadline:'2025.04.28', revisions:1, progress:100, aiScore:98,
+    escrow:'8,800,000', checkStep:3 },
+  { id:3, icon:'📣', title:'청년 주거복지 캠페인 기획', org:'국토부 주거복지기획과',
+    maker:'캠페인하우스', status:'making', statusLabel:'제작 중',
+    budgetVAT:25000000, deadline:'2025.07.01', revisions:0, progress:30, aiScore:null,
+    escrow:'25,000,000', checkStep:0 },
+];
+
+// 세션 프로젝트와 병합
+function mergeSessionProjects() {
+  try {
+    const sp = PCM.getProjects();
+    sp.forEach(p => { if (!PROJECTS.find(x => x.id === p.id)) PROJECTS.unshift(p); });
+  } catch(e) {}
+}
+
+// ── 페이지 전환 ──
+function showPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active',
+      ['dashboard','projects','new','makers','contracts'][i] === page);
+  });
+  render();
+}
+
+// ── 메인 렌더 ──
+function render() {
+  const area = document.getElementById('main-area');
+  if (!area) return;
+  if (currentPage === 'dashboard')  area.innerHTML = renderDashboard();
+  else if (currentPage === 'projects') area.innerHTML = renderProjects();
+  else if (currentPage === 'new')   area.innerHTML = renderNew();
+  else if (currentPage === 'makers') area.innerHTML = `
+    <div class="page-header"><div><div class="page-title">제작사 찾기</div>
+    <div class="page-sub">랭킹 기반 추천 제작사</div></div>
+    <button class="btn btn-primary" onclick="nav('제작사_디렉토리.html')">전체 디렉토리 →</button></div>
+    <div style="text-align:center;padding:48px;color:var(--text3);">
+      <div style="font-size:44px;margin-bottom:12px;">🎬</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px;">제작사 디렉토리</div>
+      <button class="btn btn-primary" onclick="nav('제작사_디렉토리.html')">제작사 찾기 →</button>
+    </div>`;
+  else if (currentPage === 'contracts') area.innerHTML = `
+    <div class="page-header"><div><div class="page-title">계약서 관리</div></div></div>
+    <div style="text-align:center;padding:48px;color:var(--text3);">
+      <div style="font-size:44px;margin-bottom:12px;">📄</div>
+      <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px;">계약서 목록</div>
+      <button class="btn btn-ghost" onclick="nav('계약서.html')">최근 계약서 보기</button>
+    </div>`;
+}
+
+function renderDashboard() {
+  const projects = PROJECTS;
+  return `
+    <div class="page-header">
+      <div>
+        <div class="page-title">대시보드</div>
+        <div class="page-sub">환경부 홍보기획과 · 2025년 2분기</div>
+      </div>
+      <button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">진행 중 프로젝트</div>
+        <div class="stat-val">3<span>건</span></div>
+        <div class="stat-change sc-up">▲ 이번 분기</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">집행 예산</div>
+        <div class="stat-val">59.5<span>백만원</span></div>
+        <div class="stat-change" style="color:var(--text3);">예산 한도 내</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">납품 완료</div>
+        <div class="stat-val">1<span>건</span></div>
+        <div class="stat-change sc-up">전문가 검수 통과</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">에스크로 보관 중</div>
+        <div class="stat-val">75<span>백만원</span></div>
+        <div class="stat-change" style="color:var(--accent);">안전 보관 중</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div class="section-title-sm">진행 중인 프로젝트</div>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('projects')" data-page="projects">전체 보기</button>
+    </div>
+
+    <div class="card">
+      <div class="table-header">
+        <span>프로젝트</span>
+        <span>예산</span>
+        <span>납기</span>
+        <span>검수 상태</span>
+        <span>AI 점수</span>
+        <span></span>
+      </div>
+      ${projects.map(p => `
+        <div class="table-row" onclick="showDetail(${p.id})">
+          <div>
+            <div class="proj-name">${p.title}</div>
+            <div class="proj-maker">${p.maker}</div>
+          </div>
+          <div class="budget-val">${p.budgetVAT.slice(0,-4)}<span style="font-size:11px;color:var(--text3);">만원</span></div>
+          <div class="deadline-val">${p.deadline}</div>
+          <span class="status-pill ${statusClass(p.status)}">${p.statusLabel}</span>
+          <div style="font-size:13px;font-family:var(--mono);color:${scoreColor(p.aiScore)};">${p.aiScore ? p.aiScore + '/100' : '—'}</div>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showDetail(${p.id})">상세 보기</button>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderProjects() {
+  const projects = PROJECTS;
+  return `
+    <div class="page-header">
+      <div>
+        <div class="page-title">프로젝트 목록</div>
+        <div class="page-sub">전체 ${projects.length}건</div>
+      </div>
+      <button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button>
+    </div>
+    <div class="card">
+      <div class="table-header">
+        <span>프로젝트</span>
+        <span>예산</span>
+        <span>납기</span>
+        <span>검수 상태</span>
+        <span>AI 점수</span>
+        <span></span>
+      </div>
+      ${projects.map(p => `
+        <div class="table-row" onclick="showDetail(${p.id})">
+          <div>
+            <div class="proj-name">${p.title}</div>
+            <div class="proj-maker">${p.maker}</div>
+          </div>
+          <div class="budget-val">${p.budgetVAT.slice(0,-4)}<span style="font-size:11px;color:var(--text3);">만원</span></div>
+          <div class="deadline-val">${p.deadline}</div>
+          <span class="status-pill ${statusClass(p.status)}">${p.statusLabel}</span>
+          <div style="font-size:13px;font-family:var(--mono);color:${scoreColor(p.aiScore)};">${p.aiScore ? p.aiScore + '/100' : '—'}</div>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showDetail(${p.id})">상세 보기</button>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderNew() {
+  return `
+    <div class="page-header">
+      <div>
+        <div class="page-title">새 의뢰 등록</div>
+        <div class="page-sub">조건을 입력하면 적합한 제작사를 자동으로 추천합니다</div>
+      </div>
+    </div>
+    <div class="card" style="padding:28px;max-width:680px;">
+      <div class="new-request-form">
+        <div class="form-group">
+          <label>프로젝트명 *</label>
+          <input type="text" placeholder="예: 환경부 탄소중립 SNS 카드뉴스 제작">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>콘텐츠 종류 *</label>
+            <select>
+              <option value="">선택하세요</option>
+              <option>SNS 카드뉴스</option>
+              <option>홍보 영상</option>
+              <option>인포그래픽</option>
+              <option>브로슈어·인쇄물</option>
+              <option>웹 배너</option>
+              <option>SNS 채널 운영</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>수량</label>
+            <input type="text" placeholder="예: 10장, 3분 영상 1편">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>예산 (원) *</label>
+            <input type="text" placeholder="예: 18,000,000">
+          </div>
+          <div class="form-group">
+            <label>납기일 *</label>
+            <input type="text" placeholder="2025.05.10">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>제작사 조건</label>
+          <select>
+            <option>여성기업 인증 제작사 우선</option>
+            <option>여성기업 인증 필수</option>
+            <option>조건 없음</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>상세 요청 사항</label>
+          <textarea placeholder="제작 방향, 참고 자료, 특이 사항 등을 자유롭게 입력해주세요."></textarea>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
+          <button class="btn btn-ghost" onclick="showPage('dashboard')" data-page="dashboard">취소</button>
+          <button class="btn btn-primary" onclick="submitNew()">의뢰 등록 →</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function showDetail(id) {
+  currentPage = 'detail_' + id;
+  const p = projects[id];
+  const area = document.getElementById('main-area');
+
+  area.innerHTML = `
+    <div class="page-header">
+      <div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('projects')" data-page="projects" style="margin-bottom:8px;">← 목록으로</button>
+        <div class="page-title">${p.title}</div>
+        <div class="page-sub">${p.maker} · 납기 ${p.deadline}</div>
+      </div>
+      <span class="status-pill ${statusClass(p.status)}" style="font-size:13px;padding:6px 14px;">${p.statusLabel}</span>
+    </div>
+
+    <div class="detail-layout">
+      <div>
+        <div class="detail-card" style="margin-bottom:16px;">
+          <div class="review-track">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;font-weight:500;">검수 진행 현황</div>
+            <div class="review-steps">
+              <div class="rstep">
+                <div class="rstep-circle done">↑</div>
+                <div class="rstep-label done">납품</div>
+              </div>
+              <div class="rstep-line done"></div>
+              <div class="rstep">
+                <div class="rstep-circle done">AI</div>
+                <div class="rstep-label done">AI 검수</div>
+              </div>
+              <div class="rstep-line ${p.status === 'review' || p.status === 'done' ? 'done' : ''}"></div>
+              <div class="rstep">
+                <div class="rstep-circle ${p.status === 'review' ? 'active' : p.status === 'done' ? 'done' : ''}">전</div>
+                <div class="rstep-label ${p.status === 'review' ? 'active' : p.status === 'done' ? 'done' : ''}">전문가</div>
+              </div>
+              <div class="rstep-line ${p.status === 'done' ? 'done' : ''}"></div>
+              <div class="rstep">
+                <div class="rstep-circle ${p.status === 'done' ? 'done' : ''}">발</div>
+                <div class="rstep-label ${p.status === 'done' ? 'done' : ''}">발주처</div>
+              </div>
+              <div class="rstep-line ${p.status === 'done' ? 'done' : ''}"></div>
+              <div class="rstep">
+                <div class="rstep-circle ${p.status === 'done' ? 'done' : ''}">✓</div>
+                <div class="rstep-label ${p.status === 'done' ? 'done' : ''}">완료</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        ${p.aiScore ? `
+        <div class="ai-report">
+          <div class="ai-report-head">
+            <div class="ai-report-title">🤖 AI 1차 검수 결과</div>
+            <div class="ai-score-badge ${p.aiScore >= 85 ? 'asb-good' : 'asb-warn'}">${p.aiScore}/100 — ${p.aiScore >= 85 ? '통과' : '보완 권고'}</div>
+          </div>
+          <div class="ai-report-body">
+            <div class="ai-check-item"><div class="aci-icon aci-pass">✓</div>파일 포맷 및 해상도 — 적합</div>
+            <div class="ai-check-item"><div class="aci-icon aci-pass">✓</div>공공언어 가이드라인 — 준수</div>
+            <div class="ai-check-item"><div class="aci-icon aci-warn">!</div>"넷제로" 표현 → "탄소중립" 교체 권고</div>
+            <div class="ai-check-item"><div class="aci-icon aci-warn">!</div>3번 카드 글자 크기 기준 미달 의심</div>
+            <div class="ai-check-item"><div class="aci-icon aci-pass">✓</div>저작권 위반 의심 문구 — 없음</div>
+          </div>
+        </div>` : ''}
+
+        ${p.status === 'review' || p.status === 'done' ? `
+        <div class="expert-report">
+          <div class="expert-report-head">
+            <div class="expert-report-title">👩‍💼 전문가 2차 검수 의견</div>
+            <span style="font-size:11px;color:var(--amber);">2025.04.23 완료</span>
+          </div>
+          <div class="expert-report-body">
+            <div class="expert-comment-text">전반적으로 메시지 전달력은 좋습니다. 다만 6번 카드의 통계 수치(2024년 기준)가 발주처 요청 기준(2023년)과 상이합니다. AI가 지적한 "넷제로" 표현도 수정이 필요합니다. 나머지 항목은 납품 가능 수준으로 판단합니다.</div>
+            <div class="expert-reviewer">
+              <div class="er-avatar">김</div>
+              <span>김민정 · 공공마케팅 전문가 10년 경력</span>
+            </div>
+          </div>
+        </div>` : `
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;color:var(--text3);">
+          <div style="font-size:20px;margin-bottom:8px;">⏳</div>
+          <div style="font-size:13px;">전문가 검수 진행 중</div>
+          <div style="font-size:11px;margin-top:4px;">48시간 내 완료 예정</div>
+        </div>`}
+      </div>
+
+      <div>
+        <div class="action-panel">
+          <div class="action-title">프로젝트 정보</div>
+          <div class="action-info-row"><span class="air-label">제작사</span><span class="air-val">${p.maker}</span></div>
+          <div class="action-info-row"><span class="air-label">계약 예산</span><span class="air-val">${p.budgetVAT.slice(0,-4)}만원</span></div>
+          <div class="action-info-row"><span class="air-label">납기일</span><span class="air-val">${p.deadline}</span></div>
+          <div class="action-info-row"><span class="air-label">수정 가능 횟수</span><span class="air-val" style="color:var(--accent);">2회 남음</span></div>
+
+          <div class="escrow-box">
+            <div class="escrow-label">에스크로 보관 대금</div>
+            <div class="escrow-val">${p.budgetVAT.slice(0,-4)}<span style="font-size:14px;color:var(--text3);">만원</span></div>
+            <div class="escrow-note">최종 승인 후 자동 지급</div>
+          </div>
+
+          ${p.status === 'review' || p.status === 'done' ? `
+          <div class="action-btns">
+            <button class="btn btn-approve" onclick="openModal('approveModal')">✓ 최종 승인 및 대금 지급</button>
+            <button class="btn btn-request" onclick="openModal('requestModal')">수정 요청 보내기</button>
+          </div>` : `
+          <div style="text-align:center;font-size:12px;color:var(--text3);padding:12px;">검수 완료 후 승인 버튼이 활성화됩니다</div>`}
+        </div>
+      </div>
+    </div>`;
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function confirmApprove() {
+  closeModal('approveModal');
+  showToast('최종 승인 완료! 에스크로 대금이 제작사에 지급됩니다.', '✓');
+  const p = projects.find(x => currentPage.includes(x.id));
+  if (p) p.status = 'done';
+}
+
+function confirmRequest() {
+  closeModal('requestModal');
+  showToast('수정 요청이 제작사에 전달되었습니다.', '📩');
+}
+
+function submitNew() {
+  showToast('의뢰가 등록되었습니다. 제작사 매칭을 시작합니다.', '✓');
+  setTimeout(() => showPage('projects'), 1000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+
+function scoreColor(score) {
+  if (!score) return 'var(--text3)';
+  if (score >= 85) return 'var(--accent)';
+  if (score >= 70) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function statusClass(s) {
+  return { review: 'sp-review', ai: 'sp-ai', done: 'sp-done', wait: 'sp-wait', revision: 'sp-revision' }[s] || 'sp-wait';
+}
+
+function showToast(msg, icon) {
+  const toast = document.getElementById('toast');
+  if (!toast) { PCM.toast(msg, 'info'); return; }
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon || 'ℹ️';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ── 초기화 ──
+mergeSessionProjects();
+render();
+/* ── END 발주처 대시보드 ── */
+
+
+
+</script>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+// 대시보드 로드 시 sessionStorage 프로젝트 확인
+(function() {
+  const projects = JSON.parse(sessionStorage.getItem('pcm_projects')||'[]');
+  if (projects.length === 0) {
+    // 빈 상태 처리 — 페이지 로드 후 실행
+    window.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function(){
+        const containers = document.querySelectorAll('.project-list, .project-cards, [class*="projects"]');
+        containers.forEach(function(el){
+          if(el && el.children.length === 0) {
+            el.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--text3);"><div style="font-size:44px;margin-bottom:14px;">📋</div><div style="font-size:17px;font-weight:700;color:var(--text2);margin-bottom:8px;">아직 진행 중인 의뢰가 없어요</div><div style="font-size:13px;line-height:1.7;margin-bottom:22px;">첫 의뢰를 등록하고 콘텐츠 제작을 시작해보세요.<br>AI+전문가 검수와 에스크로 대금 보호가 제공됩니다.</div><button onclick="nav('과업지시서_생성기_v3.html')" style="padding:12px 28px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);">+ 첫 의뢰 등록하기</button></div>';
+          }
+        });
+      }, 100);
+    });
+  }
+})();
+
+
+// 빈 상태 체크
+function checkEmptyState(container) {
+  if (!container) return;
+  const hasProjects = container.querySelectorAll('.project-card, .order-card, [class*="card"]').length > 0;
+  if (!hasProjects) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px 24px;color:var(--text3);">
+        <div style="font-size:48px;margin-bottom:16px;">📋</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text2);margin-bottom:8px;">아직 진행 중인 의뢰가 없어요</div>
+        <div style="font-size:13px;margin-bottom:24px;line-height:1.7;">첫 의뢰를 등록하고 콘텐츠 제작을 시작해보세요.<br>AI+전문가 검수와 에스크로 대금 보호가 제공됩니다.</div>
+        <button onclick="nav('과업지시서_생성기_v3.html')" style="padding:12px 28px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);">+ 첫 의뢰 등록하기</button>
+      </div>`;
+  }
+}
+
+</script>
+
+<script>
+
+// 페이지 초기화 완료 후 뱃지 갱신
+document.addEventListener('DOMContentLoaded', function(){
+  try { PCM._updateBadge(); } catch(e){}
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>검수 모니터링 — 제작사 대시보드</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c26;
+    --surface2: #1e2335;
+    --border: #2a3050;
+    --border2: #3a4266;
+    --text: #e8eaf2;
+    --text2: #8b92b3;
+    --text3: #525a7a;
+    --accent: #4f7cff;
+    --accent2: #7c5cfc;
+    --teal: #1dd9a0;
+    --amber: #f5a623;
+    --red: #ff4d6a;
+    --green: #1dd9a0;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Noto Sans KR', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+
+  .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; color: var(--text2); font-weight: 300; margin-top: 1px; }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+  .badge-firm {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 61px);
+  }
+
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+  }
+
+  .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding: 0 4px;
+  }
+
+  .project-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 2px;
+    border: 1px solid transparent;
+  }
+
+  .project-item:hover { background: var(--surface2); }
+  .project-item.active {
+    background: var(--surface2);
+    border-color: var(--border);
+  }
+
+  .project-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .project-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .project-date { font-size: 11px; color: var(--text3); }
+
+  .status-pill {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .s-ai { background: rgba(79,124,255,0.15); color: #7ca4ff; }
+  .s-expert { background: rgba(245,166,35,0.15); color: #f5a623; }
+  .s-client { background: rgba(124,92,252,0.15); color: #a07cfc; }
+  .s-done { background: rgba(29,217,160,0.15); color: var(--teal); }
+  .s-revision { background: rgba(255,77,106,0.15); color: var(--red); }
+  .s-pending { background: rgba(139,146,179,0.15); color: var(--text2); }
+
+  .main { padding: 28px 32px; overflow-y: auto; }
+
+  .main-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    gap: 16px;
+  }
+
+  .project-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .project-desc { font-size: 13px; color: var(--text2); }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: var(--sans);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #3d6aee; }
+
+  .btn-danger {
+    background: rgba(255,77,106,0.12);
+    color: var(--red);
+    border: 1px solid rgba(255,77,106,0.3);
+  }
+  .btn-danger:hover { background: rgba(255,77,106,0.2); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .progress-track {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .progress-title {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+  }
+
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .step-connector {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    right: -50%;
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  .step-connector.done { background: var(--teal); }
+  .step-connector.active { background: var(--accent); }
+
+  .step-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    transition: all 0.3s;
+    font-family: var(--mono);
+  }
+
+  .step-circle.done {
+    background: rgba(29,217,160,0.15);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+
+  .step-circle.active {
+    background: rgba(79,124,255,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(79,124,255,0.1);
+  }
+
+  .step-circle.pending {
+    color: var(--text3);
+  }
+
+  .step-circle.revision {
+    background: rgba(255,77,106,0.15);
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .step-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .step-sublabel {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 2px;
+    text-align: center;
+  }
+
+  .step-label.active { color: var(--accent); }
+  .step-label.done { color: var(--teal); }
+  .step-label.revision { color: var(--red); }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .ai-result {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .ai-result-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .ai-score {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: var(--mono);
+    color: var(--teal);
+  }
+
+  .ai-score.warn { color: var(--amber); }
+  .ai-score.fail { color: var(--red); }
+
+  .check-list { list-style: none; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .check-item:last-child { border-bottom: none; }
+
+  .check-icon {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .ci-pass { background: rgba(29,217,160,0.15); color: var(--teal); }
+  .ci-warn { background: rgba(245,166,35,0.15); color: var(--amber); }
+  .ci-fail { background: rgba(255,77,106,0.15); color: var(--red); }
+
+  .check-text { color: var(--text2); }
+  .check-text.issue { color: var(--text); }
+
+  .expert-comment {
+    background: var(--surface2);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+
+  .expert-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .expert-avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--amber), #f07c23);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+  }
+
+  .expert-name { font-size: 12px; font-weight: 500; }
+  .expert-role { font-size: 11px; color: var(--text3); margin-left: auto; }
+  .expert-body { font-size: 12px; color: var(--text2); line-height: 1.7; }
+
+  .revision-box {
+    background: rgba(255,77,106,0.07);
+    border: 1px solid rgba(255,77,106,0.25);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .revision-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .revision-count {
+    background: rgba(255,77,106,0.15);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  .revision-list { list-style: none; }
+  .revision-list li {
+    font-size: 12px;
+    color: var(--text2);
+    padding: 4px 0;
+    padding-left: 14px;
+    position: relative;
+  }
+  .revision-list li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: var(--red);
+  }
+
+  .action-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-top: 8px;
+  }
+
+  .action-label {
+    font-size: 12px;
+    color: var(--text2);
+    flex: 1;
+  }
+
+  .timeline {
+    list-style: none;
+  }
+
+  .tl-item {
+    display: flex;
+    gap: 14px;
+    padding-bottom: 16px;
+    position: relative;
+  }
+
+  .tl-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 24px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .tl-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .tl-content { flex: 1; }
+  .tl-title { font-size: 12px; font-weight: 500; margin-bottom: 2px; }
+  .tl-time { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+
+  .upload-zone {
+    border: 2px dashed var(--border2);
+    border-radius: 10px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface2);
+  }
+
+  .upload-zone:hover {
+    border-color: var(--accent);
+    background: rgba(79,124,255,0.05);
+  }
+
+  .upload-icon { font-size: 28px; margin-bottom: 10px; opacity: 0.5; }
+  .upload-text { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+  .upload-sub { font-size: 11px; color: var(--text3); }
+
+  .notify-bar {
+    background: rgba(29,217,160,0.08);
+    border: 1px solid rgba(29,217,160,0.2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+  }
+
+  .tab {
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+    font-family: var(--sans);
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 100;
+    max-width: 320px;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 16px; }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px;
+    width: 420px;
+    max-width: 90vw;
+    transform: scale(0.95);
+    transition: transform 0.2s;
+  }
+
+  .modal-overlay.show .modal { transform: scale(1); }
+
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    padding: 12px;
+    resize: vertical;
+    min-height: 90px;
+    margin-bottom: 16px;
+    outline: none;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--text3); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .pulsing { animation: pulse 1.5s ease-in-out infinite; }
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo" onclick="nav('랜딩페이지.html')" style="cursor:pointer;">
+    <div class="logo-mark">공</div>
+    <div>
+      <div class="logo-text">공공콘텐츠마켓</div>
+      <div class="logo-sub">제작사 대시보드</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="badge-firm">㈜ 크리에이티브랩</div> <span style="font-size:11px;color:rgba(139,146,179,0.7);cursor:pointer;" onclick="PCM.logout()">[로그아웃]</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">진행 중인 프로젝트</div>
+
+      <div class="project-item active" onclick="selectProject(0)">
+        <div class="project-title">환경부 SNS 카드뉴스 제작</div>
+        <div class="project-meta">
+          <span class="project-date">2025.04.22</span>
+          <span class="status-pill s-expert">2차 검수 중</span>
+        </div>
+      </div>
+
+      <div class="project-item" onclick="selectProject(1)">
+        <div class="project-title">서울시 유튜브 홍보영상</div>
+        <div class="project-meta">
+          <span class="project-date">2025.04.18</span>
+          <span class="status-pill s-revision">수정 요청</span>
+        </div>
+      </div>
+
+      <div class="project-item" onclick="selectProject(2)">
+        <div class="project-title">국토부 인포그래픽 제작</div>
+        <div class="project-meta">
+          <span class="project-date">2025.04.15</span>
+          <span class="status-pill s-done">납품 완료</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">대기 중</div>
+      <div class="project-item" onclick="selectProject(3)">
+        <div class="project-title">행안부 캠페인 기획</div>
+        <div class="project-meta">
+          <span class="project-date">2025.04.25</span>
+          <span class="status-pill s-pending">파일 업로드 대기</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main" id="main-content">
+  </div>
+</div>
+
+<div class="modal-overlay" id="cancelModal">
+  <div class="modal">
+    <div class="modal-title">납품 취소 및 재제출</div>
+    <div class="modal-desc">현재 검수 중인 파일을 취소하고 수정본을 재제출할 수 있습니다. 취소 사유를 간략히 입력해주세요.</div>
+    <textarea id="cancelReason" placeholder="예: 클라이언트 방향 변경으로 인한 콘텐츠 수정이 필요합니다."></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">취소</button>
+      <button class="btn btn-danger" onclick="confirmCancel()">납품 취소 후 재제출</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✓</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+function render() {
+  const p = projects[currentProject];
+  const main = document.getElementById('main-content');
+
+  const stageLabels = {
+    'pending': '납품 대기',
+    'ai': 'AI 검수 중',
+    'expert': '전문가 검수 중',
+    'client': '발주처 검토 중',
+    'revision': '수정 요청',
+    'done': '납품 완료'
+  };
+
+  let html = `
+    <div class="main-header">
+      <div>
+        <div class="project-name">${p.name}</div>
+        <div class="project-desc">${p.desc}</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span class="status-pill ${stageClass(p.stage)}" style="font-size:12px;padding:5px 14px;">${stageLabels[p.stage]}</span>
+        ${p.stage !== 'done' && p.stage !== 'pending' ? `<button class="btn btn-danger" onclick="openCancelModal()">납품 취소 · 재제출</button>` : ''}
+      </div>
+    </div>`;
+
+  html += `
+    <div class="progress-track">
+      <div class="progress-title">검수 진행 현황</div>
+      <div class="steps">
+        ${renderStep('↑', '납품', '파일 업로드', p.stage, ['pending'], ['ai','expert','client','revision','done'])}
+        ${renderConnector(p.stage, ['ai','expert','client','revision','done'])}
+        ${renderStep('AI', '1차 검수', 'Claude AI', p.stage, ['ai'], ['expert','client','revision','done'])}
+        ${renderConnector(p.stage, ['expert','client','revision','done'])}
+        ${renderStep('전', '2차 검수', '전문가', p.stage, ['expert'], ['client','done'])}
+        ${renderConnector(p.stage, ['client','done'])}
+        ${renderStep('발', '3차 승인', '발주처', p.stage, ['client'], ['done'])}
+        ${renderConnector(p.stage, ['done'])}
+        ${renderStep('✓', '완료', '정산', p.stage, [], ['done'])}
+      </div>
+      <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;color:var(--text3);">수정 가능 횟수</span>
+        ${[0,1].map(i => `<div style="width:24px;height:8px;border-radius:4px;background:${i < p.revisionLeft ? 'var(--accent)' : 'var(--border)'};"></div>`).join('')}
+        <span style="font-size:12px;color:${p.revisionLeft > 0 ? 'var(--accent)' : 'var(--red)'};">${p.revisionLeft}회 남음</span>
+      </div>
+    </div>`;
+
+  html += `
+    <div class="tab-bar">
+      <button class="tab ${selectedTab==='status'?'active':''}" onclick="switchTab('status')">검수 현황</button>
+      <button class="tab ${selectedTab==='timeline'?'active':''}" onclick="switchTab('timeline')">타임라인</button>
+      ${p.stage === 'pending' ? `<button class="tab ${selectedTab==='upload'?'active':''}" onclick="switchTab('upload')">파일 업로드</button>` : ''}
+    </div>`;
+
+  if (selectedTab === 'status') {
+    html += renderStatus(p);
+  } else if (selectedTab === 'timeline') {
+    html += renderTimeline(p);
+  } else if (selectedTab === 'upload') {
+    html += renderUpload(p);
+  }
+
+  main.innerHTML = html;
+}
+
+function renderStep(icon, label, sub, stage, activeStages, doneStages) {
+  let cls = 'pending';
+  let labelCls = '';
+  if (doneStages.includes(stage)) { cls = 'done'; labelCls = 'done'; }
+  else if (activeStages.includes(stage)) { cls = 'active'; labelCls = 'active'; }
+  else if (stage === 'revision' && activeStages.length === 0) { cls = 'revision'; labelCls = 'revision'; }
+  return `
+    <div class="step">
+      <div class="step-circle ${cls}">${icon}</div>
+      <div class="step-label ${labelCls}">${label}</div>
+      <div class="step-sublabel">${sub}</div>
+    </div>`;
+}
+
+function renderConnector(stage, doneStages) {
+  const isDone = doneStages.includes(stage);
+  return `<div style="flex:1;height:2px;margin-top:18px;background:${isDone?'var(--teal)':'var(--border)'};transition:background 0.3s;"></div>`;
+}
+
+function renderStatus(p) {
+  if (p.stage === 'pending') return `<div style="text-align:center;padding:40px;color:var(--text2);">파일 업로드 탭에서 납품 파일을 업로드해주세요.</div>`;
+  if (p.stage === 'done') {
+    return `<div class="notify-bar">✓ 납품이 완료되었습니다. 정산이 처리 중입니다.</div>`;
+  }
+
+  let html = '';
+
+  if (p.stage === 'revision' && p.revisionRequests) {
+    html += `
+      <div class="revision-box">
+        <div class="revision-title">수정 요청 사항 <span class="revision-count">${p.revisionRequests.length}건</span></div>
+        <ul class="revision-list">
+          ${p.revisionRequests.map(r => `<li>${r}</li>`).join('')}
+        </ul>
+      </div>`;
+  }
+
+  html += `<div class="grid2">`;
+
+  html += `
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--accent)"></div>
+        1차 — AI 자동 검수
+      </div>
+      <div class="ai-result">
+        <div class="ai-result-head">
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:2px;">검수 점수</div>
+            <div class="ai-score ${p.ai.status === 'warn' ? 'warn' : p.ai.status === 'fail' ? 'fail' : ''}">${p.ai.score}<span style="font-size:14px;opacity:0.5">/100</span></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">판정</div>
+            ${p.ai.status === 'pass' ? '<span class="status-pill s-done">통과</span>' : p.ai.status === 'warn' ? '<span class="status-pill s-expert">보완 권고</span>' : '<span class="status-pill s-revision">재작업 필요</span>'}
+          </div>
+        </div>
+      </div>
+      <ul class="check-list">
+        ${p.ai.items.map(item => `
+          <li class="check-item">
+            <div class="check-icon ${item.status === 'pass' ? 'ci-pass' : item.status === 'warn' ? 'ci-warn' : 'ci-fail'}">
+              ${item.status === 'pass' ? '✓' : item.status === 'warn' ? '!' : '✕'}
+            </div>
+            <span class="check-text ${item.status !== 'pass' ? 'issue' : ''}">${item.text}</span>
+          </li>`).join('')}
+      </ul>
+    </div>`;
+
+  html += `
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--amber)"></div>
+        2차 — 전문가 검수
+      </div>
+      ${p.stage === 'expert' && p.id !== 1 ? `
+        <div style="text-align:center;padding:20px;color:var(--text3);">
+          <div class="pulsing" style="font-size:24px;margin-bottom:8px;">⏳</div>
+          <div style="font-size:13px;">검수 진행 중</div>
+          <div style="font-size:11px;margin-top:4px;">48시간 내 완료 예정</div>
+        </div>` :
+        `<div class="expert-comment">
+          <div class="expert-head">
+            <div class="expert-avatar">${p.expert.name[0]}</div>
+            <span class="expert-name">${p.expert.name}</span>
+            <span class="expert-role">${p.expert.role}</span>
+          </div>
+          <div class="expert-body">${p.expert.comment}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);text-align:right;">완료 ${p.expert.completedAt}</div>`}
+    </div>`;
+
+  html += `</div>`;
+
+  html += `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--text3)"></div>
+        제출된 파일 정보
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;background:var(--surface2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">📁</div>
+        <div>
+          <div style="font-size:13px;font-weight:500;font-family:var(--mono);">${p.file}</div>
+          <div style="font-size:11px;color:var(--text3);">크기: ${p.fileSize} · 제출: ${p.submittedAt}</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;">미리보기</button>
+          ${p.stage !== 'done' ? `<button class="btn btn-danger" style="font-size:12px;padding:6px 12px;" onclick="openCancelModal()">취소 · 재제출</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  return html;
+}
+
+function renderTimeline(p) {
+  return `
+    <div class="card">
+      <ul class="timeline">
+        ${p.timeline.map(t => `
+          <li class="tl-item">
+            <div class="tl-dot" style="background:${t.bg};color:${t.color};font-size:${t.dot.length>1?'8px':'12px'};font-weight:700;">${t.dot}</div>
+            <div class="tl-content">
+              <div class="tl-title">${t.title}</div>
+              <div class="tl-time">${t.time}</div>
+            </div>
+          </li>`).join('')}
+      </ul>
+    </div>`;
+}
+
+function renderUpload(p) {
+  return `
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-dot" style="background:var(--accent)"></div>
+        납품 파일 업로드
+      </div>
+      <div class="upload-zone" onclick="simulateUpload()">
+        <div class="upload-icon">⬆</div>
+        <div class="upload-text">파일을 드래그하거나 클릭하여 업로드</div>
+        <div class="upload-sub">ZIP, MP4, PDF, PNG 지원 · 최대 5GB</div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text3);">업로드 즉시 AI 1차 검수가 자동으로 시작됩니다.</div>
+    </div>`;
+}
+
+function stageClass(stage) {
+  const map = {
+    'pending': 's-pending',
+    'ai': 's-ai',
+    'expert': 's-expert',
+    'client': 's-client',
+    'revision': 's-revision',
+    'done': 's-done'
+  };
+  return map[stage] || 's-pending';
+}
+
+function switchTab(tab) {
+  selectedTab = tab;
+  render();
+}
+
+function openCancelModal() {
+  document.getElementById('cancelModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('cancelModal').classList.remove('show');
+}
+
+function confirmCancel() {
+  closeModal();
+  showToast('납품이 취소되었습니다. 파일 업로드 탭에서 수정본을 제출해주세요.', '↩');
+  const p = projects[currentProject];
+  p.stage = 'pending';
+  p.revisionLeft = Math.max(0, p.revisionLeft - 1);
+  selectedTab = 'upload';
+  setTimeout(render, 300);
+}
+
+function simulateUpload() {
+  showToast('파일 업로드 중... AI 검수가 시작됩니다.', '⬆');
+  const p = projects[currentProject];
+  p.stage = 'ai';
+  p.file = '수정본_v2.zip';
+  p.fileSize = '52.1 MB';
+  p.submittedAt = '2025.04.25 지금';
+  selectedTab = 'status';
+  setTimeout(() => {
+    render();
+    setTimeout(() => {
+      p.stage = 'expert';
+      render();
+      showToast('AI 검수 완료! 전문가 2차 검수가 시작됩니다.', '✓');
+    }, 2000);
+  }, 1000);
+}
+
+function showToast(msg, icon = '✓') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+render();
+</script>
+
+<script>
+function nav(p){window.location.href=p;}
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+</script>
+</body>
+</html>

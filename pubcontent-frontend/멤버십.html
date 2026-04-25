@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>멤버십 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --purple:#6b46c1;--purple-light:#f3effe;
+  --red:#dc3545;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+/* 히어로 */
+.hero{background:linear-gradient(135deg,var(--text) 0%,#2d3561 100%);color:#fff;padding:52px 24px 40px;text-align:center;}
+.hero-badge{display:inline-block;background:rgba(29,217,160,.15);color:#1dd9a0;border:1px solid rgba(29,217,160,.3);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:600;margin-bottom:16px;}
+.hero-title{font-family:var(--serif);font-size:30px;font-weight:900;margin-bottom:8px;line-height:1.3;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.7);line-height:1.8;margin-bottom:24px;}
+
+/* 결제 주기 토글 */
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px;}
+.bt-label{font-size:13px;color:rgba(255,255,255,.7);}
+.bt-label.active{color:#fff;font-weight:600;}
+.toggle-track{width:44px;height:24px;background:rgba(255,255,255,.2);border-radius:12px;cursor:pointer;position:relative;transition:background .2s;}
+.toggle-track.on{background:var(--accent2);}
+.toggle-thumb{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s;}
+.toggle-track.on .toggle-thumb{left:22px;}
+.annual-badge{background:rgba(29,217,160,.2);color:#1dd9a0;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;}
+
+/* 플랜 카드 */
+.plans-wrap{max-width:980px;margin:-20px auto 0;padding:0 24px 60px;position:relative;}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+
+.plan-card{background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:28px 24px;position:relative;transition:all .2s;display:flex;flex-direction:column;}
+.plan-card:hover{box-shadow:0 8px 32px rgba(0,0,0,.1);}
+.plan-card.featured{border-color:var(--accent);box-shadow:0 8px 32px rgba(26,107,74,.15);}
+.plan-card.popular-badge::before{content:'가장 인기';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:4px 16px;border-radius:20px;white-space:nowrap;}
+
+.plan-icon{font-size:32px;margin-bottom:12px;}
+.plan-name{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:4px;}
+.plan-desc{font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.5;}
+.plan-price{margin-bottom:6px;}
+.plan-price-num{font-family:var(--mono);font-size:36px;font-weight:700;line-height:1;}
+.plan-price-unit{font-size:13px;color:var(--text3);margin-left:2px;}
+.plan-price-annual{font-size:11px;color:var(--accent);margin-top:4px;height:16px;}
+
+.plan-divider{height:1px;background:var(--border);margin:16px 0;}
+
+.plan-features{flex:1;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.pf-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;}
+.pf-icon{flex-shrink:0;margin-top:1px;}
+.pf-icon.ok{color:var(--accent);}
+.pf-icon.lock{color:var(--text3);}
+.pf-text{color:var(--text2);line-height:1.4;}
+.pf-text.locked{color:var(--text3);}
+
+/* 수익 시뮬레이터 */
+.sim-box{background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:16px;}
+.sim-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.sim-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;}
+.sim-key{color:var(--text3);}
+.sim-val{font-family:var(--mono);font-weight:600;}
+.sim-val.accent{color:var(--accent);}
+.sim-val.amber{color:var(--amber);}
+.sim-slider{width:100%;accent-color:var(--accent);margin:6px 0;}
+
+.plan-cta{width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;}
+.cta-basic{background:var(--surface2);border:1.5px solid var(--border2);color:var(--text);}
+.cta-basic:hover{background:var(--border2);}
+.cta-standard{background:var(--accent);color:#fff;}
+.cta-standard:hover{background:var(--accent2);}
+.cta-pro{background:linear-gradient(135deg,var(--purple),#9b59b6);color:#fff;}
+.cta-pro:hover{opacity:.9;}
+.current-badge{width:100%;padding:10px;border-radius:10px;font-size:12px;font-weight:600;background:var(--surface2);color:var(--text3);text-align:center;border:1.5px dashed var(--border2);}
+
+/* 기능 비교 테이블 */
+.compare-section{max-width:860px;margin:0 auto;padding:0 24px 60px;}
+.section-title{font-family:var(--serif);font-size:22px;font-weight:700;text-align:center;margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:28px;}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+th{background:var(--text);color:#fff;padding:12px 16px;font-size:12px;font-weight:600;text-align:center;}
+th:first-child{text-align:left;}
+td{padding:11px 16px;font-size:12px;border-bottom:1px solid var(--border);text-align:center;}
+td:first-child{text-align:left;font-weight:500;color:var(--text2);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface2);}
+.check{color:var(--accent);font-size:14px;}
+.dash{color:var(--text3);}
+.partial{color:var(--amber);}
+
+/* FAQ */
+.faq-section{max-width:680px;margin:0 auto;padding:0 24px 80px;}
+.faq-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.faq-q{padding:14px 16px;font-size:13px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;}
+.faq-q:hover{background:var(--surface2);}
+.faq-a{padding:0 16px;font-size:12px;color:var(--text2);line-height:1.7;max-height:0;overflow:hidden;transition:all .25s;}
+.faq-a.open{padding:12px 16px;max-height:200px;}
+
+/* 성공 모달 */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--surface);border-radius:16px;padding:36px;max-width:400px;width:90%;text-align:center;}
+.modal-icon{font-size:52px;margin-bottom:14px;display:block;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes pop{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+@media(max-width:768px){
+  .plans-grid{grid-template-columns:1fr;}
+  table{font-size:11px;}
+  th,td{padding:8px 10px;}
+}
+</style>
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+<script src="api.js"></script>
+</head>
+<body>
+<div class="header">
+  <div class="logo" onclick="nav('마이페이지_콘텐츠사.html')">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="nav('마이페이지_콘텐츠사.html')">← 마이페이지</button>
+</div>
+
+<div class="hero">
+  <div class="hero-badge">💼 콘텐츠사 멤버십</div>
+  <div class="hero-title">더 많이 벌려면<br>더 많이 제안하세요</div>
+  <div class="hero-sub">공공기관 콘텐츠 수주 시장에서<br>멤버십 등급이 수익을 결정합니다</div>
+  <div class="billing-toggle">
+    <span class="bt-label" id="lbl-monthly" style="color:#fff;font-weight:600;">월간</span>
+    <div class="toggle-track" id="billing-toggle" onclick="toggleBilling()">
+      <div class="toggle-thumb"></div>
+    </div>
+    <span class="bt-label" id="lbl-annual">연간</span>
+    <span class="annual-badge">2개월 무료</span>
+  </div>
+</div>
+
+<div class="plans-wrap">
+  <div class="plans-grid" id="plans-grid"></div>
+</div>
+
+<!-- 기능 비교 -->
+<div class="compare-section">
+  <div class="section-title">플랜별 기능 비교</div>
+  <div class="section-sub">멤버십 등급에 따라 사용 가능한 기능이 달라집니다</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:35%;">기능</th>
+        <th>베이직<br><span style="font-weight:400;font-size:10px;">1만원</span></th>
+        <th style="background:#1a6b4a;">스탠다드<br><span style="font-weight:400;font-size:10px;">3만원</span></th>
+        <th style="background:#6b46c1;">프로<br><span style="font-weight:400;font-size:10px;">5만원</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>플랫폼 등록 및 프로필 노출</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>랭킹 노출 (하위)</td><td class="check">✓</td><td class="dash">—</td><td class="dash">—</td></tr>
+      <tr><td>랭킹 노출 (우선순위)</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>고객사 의뢰 확인</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>견적서 제출</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>월 견적 제안 횟수</td><td class="dash">—</td><td class="partial">월 5건</td><td class="check">무제한</td></tr>
+      <tr><td>발주처 선제안 DM</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓ 월 10건</td></tr>
+      <tr><td>포트폴리오 등록</td><td class="partial">3건</td><td class="partial">10건</td><td class="check">무제한</td></tr>
+      <tr><td>검수 결과 상세 리포트</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>정산 내역 엑셀 다운로드</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>여성기업 우대 필터 우선 노출</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>나라장터 수의계약 대행 신청</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓ (출시 예정)</td></tr>
+      <tr><td>수수료 할인</td><td class="dash">5%</td><td class="partial">4.5%</td><td class="check">4%</td></tr>
+      <tr><td>전담 CS 지원</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="section-title">자주 묻는 질문</div>
+  <div style="margin-bottom:20px;"></div>
+  <div id="faq-list"></div>
+</div>
+
+<!-- 성공 모달 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <span class="modal-icon" id="modal-icon">🎉</span>
+    <div style="font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:8px;" id="modal-title"></div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;" id="modal-desc"></div>
+    <button class="btn" style="width:100%;justify-content:center;padding:12px;background:var(--accent);color:#fff;" onclick="closeModal()">확인</button>
+  </div>
+</div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+// 현재 멤버십 (세션에서 읽기)
+var currentPlan = 'none';
+try { currentPlan = sessionStorage.getItem('pcm_membership') || 'none'; } catch(e){}
+
+var isAnnual = false;
+
+const PLANS = [
+  {
+    id: 'basic',
+    icon: '🌱',
+    name: '베이직',
+    desc: '공공 콘텐츠 시장에 첫 발을 내딛는 제작사',
+    monthlyPrice: 10000,
+    color: 'var(--text)',
+    ctaClass: 'cta-basic',
+    ctaText: '베이직 시작',
+    features: [
+      {ok:true,  text:'플랫폼 프로필 등록 및 노출'},
+      {ok:true,  text:'랭킹 하위 노출'},
+      {ok:true,  text:'포트폴리오 3건 등록'},
+      {ok:false, text:'고객사 의뢰 확인 (잠금)', locked:true},
+      {ok:false, text:'견적서 제출 (잠금)', locked:true},
+      {ok:false, text:'선제안 DM (잠금)', locked:true},
+    ],
+    sim: {
+      label: '월 수주 예상',
+      desc: '노출만으로 인바운드 기대',
+      avgDeal: 800,
+      dealRange: [0, 3],
+      defaultDeals: 1,
+    },
+  },
+  {
+    id: 'standard',
+    icon: '🚀',
+    name: '스탠다드',
+    desc: '공공기관 의뢰에 적극 참여하고 싶은 제작사',
+    monthlyPrice: 30000,
+    color: 'var(--accent)',
+    ctaClass: 'cta-standard',
+    ctaText: '스탠다드 시작',
+    featured: true,
+    popular: true,
+    features: [
+      {ok:true,  text:'베이직의 모든 기능'},
+      {ok:true,  text:'고객사 의뢰 확인'},
+      {ok:true,  text:'견적서 제출 (월 5건)'},
+      {ok:true,  text:'랭킹 우선순위 노출'},
+      {ok:true,  text:'검수 결과 상세 리포트'},
+      {ok:true,  text:'수수료 4.5% (0.5% 할인)'},
+      {ok:false, text:'선제안 DM (잠금)', locked:true},
+    ],
+    sim: {
+      label: '월 수주 예상',
+      desc: '월 5건 견적 제안 기준',
+      avgDeal: 1200,
+      dealRange: [1, 5],
+      defaultDeals: 3,
+    },
+  },
+  {
+    id: 'pro',
+    icon: '👑',
+    name: '프로',
+    desc: '공공 시장에서 선도적으로 영업하는 제작사',
+    monthlyPrice: 50000,
+    color: 'var(--purple)',
+    ctaClass: 'cta-pro',
+    ctaText: '프로 시작',
+    features: [
+      {ok:true, text:'스탠다드의 모든 기능'},
+      {ok:true, text:'발주처 선제안 DM 월 10건'},
+      {ok:true, text:'견적 제안 무제한'},
+      {ok:true, text:'포트폴리오 무제한 등록'},
+      {ok:true, text:'수수료 4% (1% 할인)'},
+      {ok:true, text:'나라장터 수의계약 대행 신청'},
+      {ok:true, text:'전담 CS 지원'},
+    ],
+    sim: {
+      label: '월 수주 예상',
+      desc: '선제안 DM 포함 적극 영업 기준',
+      avgDeal: 1800,
+      dealRange: [3, 15],
+      defaultDeals: 7,
+    },
+  },
+];
+
+const FAQS = [
+  {q:'멤버십을 중도 해지하면 어떻게 되나요?', a:'월 단위로 결제되므로 다음 결제일 전에 해지하면 추가 결제가 없습니다. 해지 후에도 해당 월 말까지 기능을 사용할 수 있습니다.'},
+  {q:'연간 결제 시 중간에 변경이 가능한가요?', a:'연간 결제 후 플랜 업그레이드는 언제든 가능합니다. 다운그레이드는 다음 연간 결제 시점에 적용됩니다.'},
+  {q:'수수료 할인은 어떻게 적용되나요?', a:'멤버십 등급에 따라 기본 5%에서 스탠다드 4.5%, 프로 4%로 할인됩니다. 할인된 수수료는 계약 체결 시 자동으로 적용됩니다.'},
+  {q:'선제안 DM은 어떻게 보내나요?', a:'프로 멤버십 구독 시 제작사 디렉토리에서 발주처에게 직접 제안서를 발송할 수 있습니다. 월 10건 한도이며 스팸성 DM 발송 시 계정이 제한될 수 있습니다.'},
+  {q:'여성기업 인증이 있으면 혜택이 있나요?', a:'여성기업 인증 제작사는 베이직 플랜에서도 스탠다드 수준의 랭킹 노출 혜택이 적용됩니다.'},
+];
+
+function toggleBilling(){
+  isAnnual = !isAnnual;
+  const track = document.getElementById('billing-toggle');
+  track.classList.toggle('on', isAnnual);
+  document.getElementById('lbl-monthly').style.fontWeight = isAnnual ? '400' : '600';
+  document.getElementById('lbl-monthly').style.color = isAnnual ? 'rgba(255,255,255,.7)' : '#fff';
+  document.getElementById('lbl-annual').style.fontWeight = isAnnual ? '600' : '400';
+  document.getElementById('lbl-annual').style.color = isAnnual ? '#fff' : 'rgba(255,255,255,.7)';
+  renderPlans();
+}
+
+function renderPlans(){
+  const grid = document.getElementById('plans-grid');
+  grid.innerHTML = PLANS.map(p => {
+    const price = isAnnual ? Math.round(p.monthlyPrice * 10 / 1000) * 1000 : p.monthlyPrice;
+    const annualSaving = p.monthlyPrice * 2;
+    const isCurrent = currentPlan === p.id;
+    const sim = p.sim;
+
+    return `
+      <div class="plan-card ${p.featured?'featured':''} ${p.popular?'popular-badge':''}"
+           style="${p.featured?'border-color:'+p.color:''}" >
+        <div class="plan-icon">${p.icon}</div>
+        <div class="plan-name" style="${p.featured?'color:'+p.color:''}">${p.name}</div>
+        <div class="plan-desc">${p.desc}</div>
+        <div class="plan-price">
+          <span class="plan-price-num" style="${p.featured?'color:'+p.color:''}">${(price/10000).toLocaleString()}만</span>
+          <span class="plan-price-unit">원 / 월</span>
+        </div>
+        <div class="plan-price-annual">
+          ${isAnnual ? `연간 결제 시 <strong>${annualSaving.toLocaleString()}원</strong> 절약` : ''}
+        </div>
+        <div class="plan-divider"></div>
+
+        <!-- 수익 시뮬레이터 -->
+        <div class="sim-box">
+          <div class="sim-title">💰 수익 시뮬레이터</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">${sim.desc}</div>
+          <input type="range" class="sim-slider" min="${sim.dealRange[0]}" max="${sim.dealRange[1]}"
+            value="${sim.defaultDeals}" oninput="updateSim(this,'sim-${p.id}',${sim.avgDeal},${price})">
+          <div id="sim-${p.id}">
+            ${calcSim(sim.defaultDeals, sim.avgDeal, price)}
+          </div>
+        </div>
+
+        <div class="plan-features">
+          ${p.features.map(f=>`
+            <div class="pf-item">
+              <span class="pf-icon ${f.ok?'ok':'lock'}">${f.ok?'✓':'🔒'}</span>
+              <span class="pf-text ${f.locked?'locked':''}">${f.text}</span>
+            </div>`).join('')}
+        </div>
+
+        ${isCurrent
+          ? `<div class="current-badge">✓ 현재 플랜</div>`
+          : `<button class="plan-cta ${p.ctaClass}" onclick="selectPlan('${p.id}','${p.name}',${price})">${p.ctaText}</button>`
+        }
+      </div>`;
+  }).join('');
+}
+
+function calcSim(deals, avgDeal, monthlyFee){
+  const revenue = deals * avgDeal * 10000;
+  const commRate = avgDeal >= 1800 ? 0.04 : avgDeal >= 1200 ? 0.045 : 0.05;
+  const net = Math.round(revenue * (1 - commRate));
+  const profit = net - monthlyFee;
+  return `
+    <div class="sim-row"><span class="sim-key">월 수주 건수</span><span class="sim-val">${deals}건</span></div>
+    <div class="sim-row"><span class="sim-key">예상 매출</span><span class="sim-val">${(revenue/10000).toLocaleString()}만원</span></div>
+    <div class="sim-row"><span class="sim-key">수수료 차감</span><span class="sim-val amber">-${Math.round(revenue*commRate/10000).toLocaleString()}만원</span></div>
+    <div class="sim-row"><span class="sim-key">멤버십 비용</span><span class="sim-val amber">-${(monthlyFee/10000).toLocaleString()}만원</span></div>
+    <div class="sim-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px;font-weight:700;">
+      <span class="sim-key">순수익</span><span class="sim-val accent">${(profit/10000).toLocaleString()}만원</span>
+    </div>`;
+}
+
+function updateSim(slider, simId, avgDeal, monthlyFee){
+  const el = document.getElementById(simId);
+  if(el) el.innerHTML = calcSim(parseInt(slider.value), avgDeal, monthlyFee);
+}
+
+async function selectPlan(planId, planName, price){
+  // API 연동: 멤버십 신청
+  if (API.isLoggedIn()) {
+    const tier = planId.toUpperCase();
+    const cycle = isAnnual ? 'annual' : 'monthly';
+    const res = await API.memberships.subscribe(tier, cycle);
+    if (res?.success) {
+      // 입금 안내 표시
+      const info = res.data?.bankInfo;
+      if (info) {
+        setTimeout(() => {
+          alert([
+            '멤버십 신청이 완료되었습니다!',
+            '',
+            '📌 입금 안내',
+            `은행: ${info.bankName}`,
+            `계좌: ${info.accountNumber}`,
+            `예금주: ${info.accountHolder}`,
+            `금액: ${info.amount.toLocaleString()}원`,
+            `입금 코드: ${info.depositCode}`,
+            '',
+            info.notice,
+          ].join('\n'));
+        }, 500);
+      }
+    }
+  }
+  // 기존 세션 저장 + 모달 표시는 그대로
+
+  // 세션에 저장
+  try {
+    sessionStorage.setItem('pcm_membership', planId);
+    sessionStorage.setItem('pcm_membership_name', planName);
+    sessionStorage.setItem('pcm_membership_price', price);
+    if(typeof PCM !== 'undefined'){
+      PCM.set('membership', planId);
+      PCM.toast(planName + ' 플랜이 활성화되었습니다!', 'success');
+    PCM.pushNotif({icon:'💼',title:'멤버십 업그레이드',sub:planName+' 플랜이 활성화되었습니다.',time:'방금'});
+    }
+  }catch(e){}
+  currentPlan = planId;
+
+  // 결제 모달
+  const icons = {basic:'🌱', standard:'🚀', pro:'👑'};
+  const descs = {
+    basic:'베이직 플랜이 활성화되었습니다. 프로필을 완성하고 첫 노출을 시작하세요!',
+    standard:'스탠다드 플랜이 활성화되었습니다. 지금 바로 고객사 의뢰를 확인하고 견적을 제안하세요!',
+    pro:'프로 플랜이 활성화되었습니다. 선제안 DM으로 공공기관에 직접 영업하세요!'
+  };
+  document.getElementById('modal-icon').textContent = icons[planId];
+  document.getElementById('modal-title').textContent = planName + ' 플랜 시작!';
+  document.getElementById('modal-desc').textContent = descs[planId];
+  document.getElementById('modal').classList.add('show');
+  renderPlans();
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('show');
+  if(currentPlan !== 'none') nav('마이페이지_콘텐츠사.html');
+}
+
+function renderFaq(){
+  document.getElementById('faq-list').innerHTML = FAQS.map((f,i)=>`
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(${i})">
+        <span>Q. ${f.q}</span>
+        <span id="fa-${i}" style="color:var(--text3);font-size:12px;transition:transform .2s;">▼</span>
+      </div>
+      <div class="faq-a" id="faq-a-${i}">A. ${f.a}</div>
+    </div>`).join('');
+}
+
+function toggleFaq(i){
+  document.querySelectorAll('.faq-a').forEach((el,j)=>{
+    el.classList.toggle('open', j===i && !el.classList.contains('open'));
+  });
+  document.querySelectorAll('[id^="fa-"]').forEach((el,j)=>{
+    el.style.transform = (j===i && document.getElementById('faq-a-'+i).classList.contains('open'))
+      ? 'rotate(180deg)' : '';
+  });
+}
+
+renderPlans();
+renderFaq();
+</script>
+</body>
+</html>

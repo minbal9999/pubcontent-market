@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과업지시서 생성기 v3 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f4f2ed;
+  --surface: #fff;
+  --surface2: #f9f8f5;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #1a1f2e;
+  --text2: #4a5568;
+  --text3: #8492a6;
+  --accent: #1a6b4a;
+  --accent2: #2d9e72;
+  --accent-light: #e8f5ef;
+  --red: #dc3545;
+  --red-light: #fce8e6;
+  --amber: #b45309;
+  --amber-light: #fef3c7;
+  --serif: 'Noto Serif KR', serif;
+  --sans: 'Noto Sans KR', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 700; font-size: 12px; color: #fff; }
+.logo-name { font-family: var(--serif); font-size: 14px; font-weight: 700; }
+.logo-sep { color: var(--text3); margin: 0 6px; }
+.logo-page { font-size: 13px; color: var(--text2); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: var(--sans); transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { background: var(--surface2); }
+.btn-danger { background: rgba(220,53,69,0.08); border: 1px solid rgba(220,53,69,0.2); color: var(--red); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-xs { padding: 3px 9px; font-size: 11px; border-radius: 6px; }
+
+/* PRICE TAB BUTTON */
+.price-tab-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  color: var(--text2); font-family: var(--sans);
+  transition: all 0.15s; position: relative;
+}
+.price-tab-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.price-tab-btn .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* LAYOUT */
+.main-layout { display: grid; grid-template-columns: 1fr 420px; min-height: calc(100vh - 58px); }
+
+/* LEFT */
+.left-panel { padding: 28px 32px; border-right: 1px solid var(--border); overflow-y: auto; }
+
+/* BUDGET HERO */
+.budget-hero {
+  background: var(--text);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.budget-hero::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 160px; height: 160px; border-radius: 50%;
+  background: rgba(26,107,74,0.15);
+}
+.budget-hero-label { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.budget-input-wrap { display: flex; align-items: center; gap: 0; margin-bottom: 14px; }
+.budget-input {
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 10px 0 0 10px;
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  padding: 12px 16px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.budget-input:focus { border-color: var(--accent2); }
+.budget-input::placeholder { color: rgba(255,255,255,0.25); font-size: 18px; }
+.budget-unit { background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.15); border-left: none; border-radius: 0 10px 10px 0 ; padding: 12px 16px; color: rgba(255,255,255,0.5); font-size: 14px; white-space: nowrap; }
+.budget-confirm-btn {
+  margin-left: 8px;
+  padding: 12px 18px;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--sans);
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.budget-confirm-btn:hover { background: var(--accent2); }
+.budget-set-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(29,217,160,0.15);
+  border: 1px solid rgba(29,217,160,0.3);
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: #1dd9a0;
+  font-weight: 500;
+  cursor: pointer;
+}
+.budget-set-badge:hover { background: rgba(29,217,160,0.22); }
+
+.budget-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.budget-preset {
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: transparent; color: rgba(255,255,255,0.6);
+  font-size: 11px; font-weight: 500; cursor: pointer;
+  font-family: var(--sans); transition: all 0.15s;
+}
+.budget-preset:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.4); }
+.budget-preset.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* BUDGET METER */
+.budget-meter { margin-top: 16px; }
+.budget-meter-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.budget-meter-label { font-size: 11px; color: rgba(255,255,255,0.5); }
+.budget-meter-val { font-size: 12px; font-weight: 700; font-family: var(--mono); }
+.budget-meter-val.ok { color: var(--accent2); }
+.budget-meter-val.warn { color: #f5a623; }
+.budget-meter-val.over { color: #ff6b6b; }
+.budget-bar-track { background: rgba(255,255,255,0.1); border-radius: 4px; height: 6px; overflow: hidden; }
+.budget-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease, background 0.3s; }
+
+/* RECOMMEND BANNER */
+.recommend-banner {
+  background: var(--accent-light);
+  border: 1.5px solid rgba(26,107,74,0.2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.recommend-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+.recommend-text { font-size: 13px; color: var(--accent); line-height: 1.6; }
+.recommend-text strong { font-weight: 700; }
+
+/* SECTION */
+.section-label { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.section-badge { background: var(--accent-light); color: var(--accent); font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 700; }
+.section-badge-amber { background: var(--amber-light); color: var(--amber); font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 700; }
+
+/* TYPE GRID */
+.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.type-card {
+  border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 14px 10px; cursor: pointer; transition: all 0.15s;
+  text-align: center; background: var(--surface); position: relative;
+}
+.type-card.affordable { border-color: var(--border); }
+.type-card.affordable:hover { border-color: var(--accent); background: var(--accent-light); }
+.type-card.selected { border-color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 3px rgba(26,107,74,0.1); }
+.type-card.unaffordable { opacity: 0.38; cursor: not-allowed; filter: grayscale(0.4); }
+.type-card.unaffordable:hover { border-color: var(--border); background: var(--surface); }
+
+.selected-badge { position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; display: none; align-items: center; justify-content: center; }
+.type-card.selected .selected-badge { display: flex; }
+
+.type-icon { font-size: 22px; margin-bottom: 6px; }
+.type-name { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+.type-price { font-size: 10px; color: var(--accent); font-family: var(--mono); font-weight: 500; }
+.type-price.over { color: var(--red); }
+
+/* SELECTED ITEMS */
+.selected-items { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.item-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color 0.15s; }
+.item-card.expanded { border-color: var(--accent); }
+.item-header { display: flex; align-items: center; gap: 12px; padding: 13px 16px; cursor: pointer; transition: background 0.13s; }
+.item-header:hover { background: var(--surface2); }
+.item-icon { font-size: 18px; flex-shrink: 0; }
+.item-info { flex: 1; }
+.item-title { font-size: 13px; font-weight: 700; }
+.item-summary { font-size: 11px; color: var(--text3); }
+.item-cost { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.item-cost.over { color: var(--red); }
+.expand-arrow { font-size: 11px; color: var(--text3); transition: transform 0.2s; margin-left: 6px; }
+.item-card.expanded .expand-arrow { transform: rotate(180deg); }
+.item-body { padding: 0 16px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; border-top: 0px solid var(--border); }
+.item-card.expanded .item-body { max-height: 500px; padding: 16px; border-top: 1px solid var(--border); }
+
+/* QUANTITY ADJUSTER */
+.qty-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.qty-label { font-size: 12px; color: var(--text2); flex: 1; }
+.qty-ctrl { display: flex; align-items: center; gap: 0; }
+.qty-btn { width: 30px; height: 30px; border: 1.5px solid var(--border2); background: var(--surface2); color: var(--text2); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.12s; font-family: var(--sans); }
+.qty-btn:first-child { border-radius: 7px 0 0 7px; }
+.qty-btn:last-child { border-radius: 0 7px 7px 0; border-left: none; }
+.qty-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+.qty-display { min-width: 52px; height: 30px; border: 1.5px solid var(--border2); border-left: none; border-right: none; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; font-family: var(--mono); background: var(--surface); }
+.qty-unit { font-size: 12px; color: var(--text3); }
+.qty-cost { font-size: 12px; font-family: var(--mono); color: var(--text2); background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+
+.size-select { width: 100%; }
+.mini-checks { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+.mini-check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); cursor: pointer; padding: 6px 10px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--surface); transition: all 0.12s; }
+.mini-check:hover { border-color: var(--accent); }
+.mini-check.on { border-color: var(--accent); background: var(--accent-light); color: var(--text); font-weight: 500; }
+.mini-check-box { width: 15px; height: 15px; border-radius: 4px; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; }
+.mini-check.on .mini-check-box { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+input[type="text"], select, textarea {
+  background: var(--surface2); border: 1.5px solid var(--border2);
+  border-radius: 8px; color: var(--text); font-family: var(--sans);
+  font-size: 13px; padding: 8px 11px; outline: none; width: 100%;
+  transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input::placeholder, textarea::placeholder { color: var(--text3); }
+textarea { resize: vertical; min-height: 60px; }
+.form-label { font-size: 11px; font-weight: 500; color: var(--text3); margin-bottom: 4px; display: block; }
+
+.common-section { margin-top: 24px; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+.spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.opts-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt-chip { border: 1.5px solid var(--border); border-radius: 20px; padding: 5px 13px; font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.12s; background: var(--surface); }
+.opt-chip:hover { border-color: var(--accent); color: var(--text); }
+.opt-chip.on { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 500; }
+
+.add-type-hint { border: 2px dashed var(--border2); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; color: var(--text3); font-size: 13px; transition: all 0.15s; }
+.add-type-hint:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+.wizard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+/* RIGHT PREVIEW */
+.preview-panel {
+  background: var(--surface); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  height: calc(100vh - 58px); position: sticky; top: 58px;
+}
+.preview-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.preview-tab { flex: 1; padding: 12px; font-size: 12px; font-weight: 600; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; color: var(--text3); background: none; border-top: none; border-left: none; border-right: none; font-family: var(--sans); }
+.preview-tab:hover { color: var(--text2); }
+.preview-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.preview-body { flex: 1; overflow-y: auto; padding: 18px 22px; }
+.preview-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 7px; }
+
+/* DOC PREVIEW */
+.doc-title-block { text-align: center; padding-bottom: 12px; border-bottom: 2px solid var(--text); margin-bottom: 14px; }
+.doc-main-title { font-family: var(--serif); font-size: 16px; font-weight: 700; }
+.doc-sub-info { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.doc-section { margin-bottom: 14px; }
+.doc-sec-title { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.07em; padding-bottom: 5px; border-bottom: 1px solid var(--accent-light); margin-bottom: 8px; }
+.doc-row { display: flex; gap: 10px; padding: 4px 0; font-size: 12px; border-bottom: 1px solid var(--border); }
+.doc-row:last-child { border-bottom: none; }
+.doc-key { color: var(--text3); min-width: 80px; flex-shrink: 0; }
+.doc-val { color: var(--text); font-weight: 500; }
+.doc-ph { color: var(--text3); font-style: italic; font-weight: 400; }
+.doc-item-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 13px; margin-bottom: 7px; }
+.doc-item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.doc-item-name { font-size: 12px; font-weight: 700; flex: 1; }
+.doc-item-price { font-size: 11px; font-family: var(--mono); color: var(--accent); font-weight: 600; }
+.doc-item-rows { font-size: 11px; color: var(--text2); }
+.doc-item-row { display: flex; gap: 8px; padding: 2px 0; }
+.doc-item-key { color: var(--text3); min-width: 52px; }
+
+/* PRICE TABLE */
+.price-header { padding: 16px 22px 12px; border-bottom: 1px solid var(--border); }
+.price-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.price-header-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.price-updated { font-size: 11px; color: var(--text3); }
+.price-notice { font-size: 11px; color: var(--amber); background: var(--amber-light); padding: 6px 10px; border-radius: 6px; margin-top: 8px; line-height: 1.5; }
+
+.price-category { margin-bottom: 16px; }
+.price-cat-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.price-cat-icon { font-size: 13px; }
+
+.price-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.price-table th { text-align: left; padding: 6px 10px; background: var(--surface2); border-bottom: 1px solid var(--border2); color: var(--text3); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.price-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.price-table tr:last-child td { border-bottom: none; }
+.price-table tr:hover td { background: var(--surface2); }
+
+.price-item-name { font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.price-item-desc { font-size: 10px; color: var(--text3); }
+.price-range { font-family: var(--mono); font-weight: 600; color: var(--text); white-space: nowrap; }
+.price-unit-tag { font-size: 10px; color: var(--text3); }
+.price-standard { font-size: 11px; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+.price-tag { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 600; white-space: nowrap; }
+.tag-low { background: var(--accent-light); color: var(--accent); }
+.tag-mid { background: var(--amber-light); color: var(--amber); }
+.tag-high { background: #fce8e6; color: var(--red); }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; border-radius: 10px; padding: 11px 16px; font-size: 13px; display: flex; align-items: center; gap: 8px; transform: translateY(60px); opacity: 0; transition: all 0.3s; z-index: 300; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.2s ease both; }
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+<script src="api.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo" onclick="nav('발주처_대시보드.html')" style="cursor:pointer;">
+    <div class="logo-mark">공</div>
+    <div class="logo-name">공공콘텐츠마켓</div>
+    <span class="logo-sep">/</span>
+    <span class="logo-page"><span style="color:var(--text3);cursor:pointer;" onclick="nav('발주처_대시보드.html')">대시보드</span> / 과업지시서 생성기</span>
+  </div>
+  <div class="header-right">
+    <button class="price-tab-btn" onclick="openPriceTab()">
+      <div class="live-dot"></div>
+      용역 표준단가 조회
+    </button>
+    <button class="btn btn-ghost btn-sm" onclick="resetAll()">초기화</button>
+    <button class="btn btn-primary btn-sm" onclick="exportDoc()">완성 및 의뢰 등록 →</button>
+  </div>
+</div>
+
+<div class="main-layout">
+  <div class="left-panel" id="left-panel"></div>
+  <div class="preview-panel" id="preview-panel">
+    <div class="preview-tabs">
+      <button class="preview-tab active" id="tab-doc" onclick="switchTab('doc')">📄 과업지시서</button>
+      <button class="preview-tab" id="tab-price" onclick="switchTab('price')">📊 표준단가</button>
+    </div>
+    <div class="preview-body" id="preview-body"></div>
+    <div class="preview-footer" id="preview-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="exportDoc()">완성 및 의뢰 등록 →</button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="copyDoc()">텍스트 복사</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function render() { renderLeft(); renderRight(); }
+
+function renderLeft() {
+  const p = document.getElementById('left-panel');
+  let html = '';
+
+  // STEP NAV
+  const stepLabels = ['예산 설정','콘텐츠 선택·사양','공통 정보'];
+  html += `<div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;">
+    ${stepLabels.map((l,i) => `
+      <button style="padding:7px 18px;border-radius:7px;font-size:12px;font-weight:${state.step===i?700:500};cursor:pointer;border:none;font-family:var(--sans);color:${state.step===i?'var(--accent)':'var(--text3)'};background:${state.step===i?'var(--surface)':'transparent'};transition:all 0.2s;display:flex;align-items:center;gap:6px;${state.step===i?'box-shadow:0 1px 4px rgba(0,0,0,0.08);':''}" onclick="goStep(${i})">
+        <div style="width:18px;height:18px;border-radius:50%;background:${state.step===i?'var(--accent)':state.step>i?'var(--accent-light)':'var(--border2)'};color:${state.step===i?'#fff':state.step>i?'var(--accent)':'var(--text3)'};font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700;">${state.step>i?'✓':(i+1)}</div>
+        ${l}
+      </button>`).join('')}
+  </div>`;
+
+  if (state.step === 0) html += renderStep0();
+  else if (state.step === 1) html += renderStep1();
+  else html += renderStep2();
+
+  // NAV
+  html += `<div class="wizard-nav">`;
+  if (state.step > 0) html += `<button class="btn btn-ghost" onclick="goStep(${state.step-1})">← 이전</button>`;
+  else html += `<div></div>`;
+  if (state.step < 2) {
+    const dis = (state.step===0&&!state.budgetConfirmed)||(state.step===1&&state.items.length===0);
+    html += `<button class="btn btn-primary" onclick="goStep(${state.step+1})" ${dis?'disabled':''}>다음 →</button>`;
+  } else {
+    html += `<button class="btn btn-primary" onclick="exportDoc()">완성 및 등록 →</button>`;
+  }
+  html += `</div>`;
+  p.innerHTML = html;
+}
+
+function renderStep0() {
+  const b = state.budget;
+  const pct = budgetPct();
+  const barColor = pct > 100 ? '#ff6b6b' : pct > 80 ? '#f5a623' : 'var(--accent2)';
+
+  return `
+    <div class="budget-hero fade-in">
+      <div class="budget-hero-label">총 예산을 입력하세요 (VAT 포함)</div>
+
+    ${state.budgetConfirmed ? `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:#fff;">${fmtWon(b)}</div>
+      <div class="budget-set-badge" onclick="resetBudget()">✓ 설정됨 &nbsp;·&nbsp; 변경</div>
+    </div>
+    <div class="budget-presets">
+      ${PRESETS.map(v=>`<button class="budget-preset ${b===v?'active':''}" onclick="setPreset(${v})">${v>=10000?(v/10000)+'억':v+'만'}원</button>`).join('')}
+    </div>` : `
+    <div class="budget-input-wrap">
+      <input class="budget-input" id="budget-raw" type="text" placeholder="예: 18,000,000"
+        value="${b ? (b*10000).toLocaleString() : ''}"
+        onkeydown="handleBudgetKey(event)">
+      <div class="budget-unit">원</div>
+      <button class="budget-confirm-btn" onclick="confirmBudget()">확인 →</button>
+    </div>
+    <div class="budget-presets">
+      ${PRESETS.map(v=>`<button class="budget-preset" onclick="quickPreset(${v})">${v>=10000?(v/10000)+'억':v+'만'}원</button>`).join('')}
+    </div>`}
+      ${b > 0 ? `
+      <div class="budget-meter" style="margin-top:14px;">
+        <div class="budget-meter-row">
+          <span class="budget-meter-label">사용 예산 (VAT 포함)</span>
+          <span class="budget-meter-val ${pct>100?'over':pct>80?'warn':'ok'}">${fmtMoney(totalVAT())} / ${fmtMoney(b)}</span>
+        </div>
+        <div class="budget-bar-track">
+          <div class="budget-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor};"></div>
+        </div>
+      </div>` : ''}
+    </div>
+
+    ${b > 0 ? `
+    <div class="recommend-banner fade-in">
+      <div class="recommend-icon">💡</div>
+      <div class="recommend-text">
+        <strong>${fmtMoney(b)} 예산 (VAT 포함)</strong> 기준으로 가능한 항목이 표시됩니다.<br>
+        흐린 항목은 기준가가 예산을 초과합니다.
+      </div>
+    </div>
+    <div class="section-label">다음 단계에서 선택 가능한 콘텐츠 유형</div>
+    <div class="type-grid">
+      ${TYPES.map(t => {
+        const ok = typeAffordable(t);
+        return `
+          <div class="type-card ${ok?'affordable':'unaffordable'}" ${ok?`onclick="quickSelect('${t.id}')"`:''}>
+            <div class="type-icon">${t.icon}</div>
+            <div class="type-name">${t.name}</div>
+            <div class="type-price ${!ok?'over':''}">${ok?'기준가 '+t.basePrice.toLocaleString()+'만원':'예산 초과'}</div>
+          </div>`;
+      }).join('')}
+    </div>
+    <div style="text-align:center;margin-top:4px;">
+      <button class="btn btn-ghost btn-sm" onclick="goStep(1)">전체 유형 보기 →</button>
+    </div>` : `
+    <div style="text-align:center;padding:40px 20px;color:var(--text3);">
+      <div style="font-size:32px;margin-bottom:12px;">💰</div>
+      <div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px;">예산을 입력하면</div>
+      <div style="font-size:12px;">가능한 콘텐츠 유형이 자동으로 추천됩니다</div>
+    </div>`}`;
+}
+
+function renderStep1() {
+  const b = state.budget;
+  const used = totalVAT();
+  const remain = b - used;
+  const pct = budgetPct();
+  const barColor = pct > 100 ? '#ff6b6b' : pct > 80 ? '#f5a623' : 'var(--accent2)';
+  const bd = breakdown(used);
+
+  let html = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;color:var(--text2);font-weight:500;">예산 사용 현황 <span style="font-size:10px;color:var(--text3);font-weight:400;">(VAT 포함 기준)</span></span>
+        <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:${pct>100?'var(--red)':pct>80?'var(--amber)':'var(--accent)'};">${fmtWon(used)} / ${fmtWon(b)}</span>
+      </div>
+      <div class="budget-bar-track" style="height:8px;">
+        <div class="budget-bar-fill" style="width:${Math.min(pct,100)}%;background:${barColor};height:100%;border-radius:4px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <span style="font-size:11px;color:var(--text3);">${pct>100?'⚠ 예산 초과':'잔여 '+fmtWon(Math.max(0,remain))}</span>
+        <span style="font-size:11px;color:var(--text3);">${pct}% 사용</span>
+      </div>
+      ${used > 0 ? `
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;">
+        <div>
+          <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">발주 예산</div>
+          <div style="font-size:12px;font-weight:700;font-family:var(--mono);">${fmtWon(used)}</div>
+          <div style="font-size:9px;color:var(--text3);">VAT 포함</div>
+        </div>
+        <div style="border-left:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">공급가액</div>
+          <div style="font-size:12px;font-weight:700;font-family:var(--mono);">${fmtWon(bd.supply)}</div>
+          <div style="font-size:9px;color:var(--text3);">÷ 1.1</div>
+        </div>
+        <div style="border-left:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">수수료(5%)</div>
+          <div style="font-size:12px;font-weight:700;font-family:var(--mono);color:var(--amber);">${fmtWon(bd.comm)}</div>
+          <div style="font-size:9px;color:var(--text3);">플랫폼</div>
+        </div>
+        <div style="border-left:1px solid var(--border);">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">사업비</div>
+          <div style="font-size:12px;font-weight:700;font-family:var(--mono);color:var(--accent);">${fmtWon(bd.biz)}</div>
+          <div style="font-size:9px;color:var(--text3);">제작사 실수령</div>
+        </div>
+      </div>` : ''}
+    </div>
+
+    <div class="section-label" style="margin-bottom:10px;">
+      콘텐츠 유형 선택
+      <span class="section-badge">복수 선택 가능</span>
+      ${!b?'':'<span class="section-badge-amber">예산 초과 항목은 흐리게 표시</span>'}
+    </div>
+    <div class="type-grid" style="margin-bottom:20px;">
+      ${TYPES.map(t => {
+        const ok = !b || typeAffordable(t);
+        const sel = state.items.some(i=>i.typeId===t.id);
+        return `
+          <div class="type-card ${sel?'selected':ok?'affordable':'unaffordable'}" onclick="${ok||sel?`toggleType('${t.id}')`:''}" title="${!ok?'예산 초과 — 다른 항목을 줄이거나 예산을 늘려주세요':''}">
+            <div class="selected-badge">✓</div>
+            <div class="type-icon">${t.icon}</div>
+            <div class="type-name">${t.name}</div>
+            <div class="type-price ${!ok&&!sel?'over':''}">${ok||sel?'기준 '+t.basePrice.toLocaleString()+'만원':'예산 초과'}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+
+  if (state.items.length > 0) {
+    html += `<div class="section-label" style="margin-bottom:10px;">선택된 항목 — 수량 및 사양 설정</div>
+    <div class="selected-items">`;
+    state.items.forEach((item, idx) => {
+      const t = TYPES.find(x=>x.id===item.typeId);
+      if (!t) return;
+      const cost = calcItemCostVAT(item);
+      const isOver = b && cost > b;
+      html += `
+        <div class="item-card ${item.expanded?'expanded':''} fade-in">
+          <div class="item-header" onclick="toggleExpand(${idx})">
+            <div class="item-icon">${t.icon}</div>
+            <div class="item-info">
+              <div class="item-title">${t.name}</div>
+              <div class="item-summary">${item.qty}${t.unit} ${item.size?'· '+item.size:''}</div>
+            </div>
+            <div class="item-cost ${isOver?'over':''}">${fmtWon(cost)}<span style="font-size:9px;font-weight:400;color:var(--text3);"> VAT포함</span></div>
+            <button class="btn btn-danger btn-xs" onclick="event.stopPropagation();removeItem(${idx})">삭제</button>
+            <span class="expand-arrow">▼</span>
+          </div>
+          <div class="item-body">
+            <div class="qty-row">
+              <span class="qty-label">수량</span>
+              <div class="qty-ctrl">
+                <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+                <div class="qty-display">${item.qty}</div>
+                <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+              </div>
+              <span class="qty-unit">${t.unit}</span>
+              <span class="qty-cost">기준가 ≈ ${fmtWon(Math.round(t.basePrice * (t.sizeMul[t.sizes.indexOf(item.size)]||1)))} (VAT포함)</span>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+              <label class="form-label">규모·형태</label>
+              <select class="size-select" onchange="updateItem(${idx},'size',this.value)">
+                <option value="">선택하세요</option>
+                ${t.sizes.map((s,si)=>`<option value="${s}" ${item.size===s?'selected':''}>${s} (×${t.sizeMul[si].toFixed(1)})</option>`).join('')}
+              </select>
+            </div>
+            <label class="form-label">납품물 (복수 선택)</label>
+            <div class="mini-checks" style="margin-bottom:12px;">
+              ${t.deliverables.map(d=>`
+                <div class="mini-check ${item.deliverables.includes(d)?'on':''}" onclick="toggleItemArr(${idx},'deliverables','${d}')">
+                  <div class="mini-check-box">${item.deliverables.includes(d)?'✓':''}</div>
+                  <span>${d}</span>
+                </div>`).join('')}
+            </div>
+            <label class="form-label">AI 검수 기준</label>
+            <div class="mini-checks">
+              ${t.checks.map(c=>`
+                <div class="mini-check ${item.checks.includes(c)?'on':''}" onclick="toggleItemArr(${idx},'checks','${c}')">
+                  <div class="mini-check-box">${item.checks.includes(c)?'✓':''}</div>
+                  <span>${c}</span>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+    html += `<div class="add-type-hint" onclick="goStep(0)">+ 예산 변경 또는 유형 추가</div>`;
+  }
+  return html;
+}
+
+function renderStep2() {
+  const c = state.common;
+  return `
+    <div class="section-label">공통 정보</div>
+    <div class="spec-grid" style="margin-bottom:14px;">
+      <div class="form-group">
+        <label class="form-label">기관명</label>
+        <input type="text" value="${c.orgName}" placeholder="예: 환경부" oninput="updateCommon('orgName',this.value)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">담당 부서</label>
+        <input type="text" value="${c.deptName}" placeholder="예: 홍보기획과" oninput="updateCommon('deptName',this.value)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">납기일</label>
+        <input type="text" value="${c.deadline}" placeholder="2025.05.10" oninput="updateCommon('deadline',this.value)">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="section-label" style="margin-bottom:10px;">제작 목적 <span class="section-badge">복수</span></div>
+    <div class="opts-wrap" style="margin-bottom:16px;">
+      ${PURPOSES.map(p=>`<div class="opt-chip ${c.purpose.includes(p)?'on':''}" onclick="toggleCommonArr('purpose','${p}')">${p}</div>`).join('')}
+    </div>
+    <div class="section-label" style="margin-bottom:10px;">주요 타깃 <span class="section-badge">복수</span></div>
+    <div class="opts-wrap" style="margin-bottom:16px;">
+      ${TARGETS.map(t=>`<div class="opt-chip ${c.targets.includes(t)?'on':''}" onclick="toggleCommonArr('targets','${t}')">${t}</div>`).join('')}
+    </div>
+    <div class="divider"></div>
+    <div class="section-label" style="margin-bottom:8px;">여성기업 우선 배정</div>
+    <div class="mini-check ${c.womanBiz?'on':''}" onclick="toggleCommonBool('womanBiz')" style="margin-bottom:16px;">
+      <div class="mini-check-box">${c.womanBiz?'✓':''}</div>
+      <div>
+        <div>여성기업 인증 제작사 우선 배정 요청</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px;">수의계약 한도 5천만원 · 법적 우선구매 이행</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">추가 요청사항</label>
+      <textarea placeholder="참고 자료, 특이 사항 등..." oninput="updateCommon('notes',this.value)">${c.notes}</textarea>
+    </div>`;
+}
+
+// ── RIGHT PANEL ────────────────────────────────────────
+function renderRight() {
+  if (state.previewTab === 'doc') {
+    renderDocPreview();
+    document.getElementById('preview-footer').style.display = 'flex';
+  } else {
+    renderPriceTable();
+    document.getElementById('preview-footer').style.display = 'none';
+  }
+}
+
+function renderDocPreview() {
+  const { items, common: c, budget: b } = state;
+  const body = document.getElementById('preview-body');
+  const today = new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\.\s*/g,'.').slice(0,-1);
+  const used = totalVAT();
+  const pct = b ? Math.round(used/b*100) : 0;
+  const bd = breakdown(used);
+  const ph = (v, t='미입력') => v ? `<span class="doc-val">${v}</span>` : `<span class="doc-ph">${t}</span>`;
+
+  body.innerHTML = `
+    <div class="doc-title-block">
+      <div class="doc-main-title">과업지시서</div>
+      <div class="doc-sub-info">공공콘텐츠마켓 · ${today}</div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-sec-title">1. 발주 기관</div>
+      <div class="doc-row"><span class="doc-key">기관명</span>${ph(c.orgName,'기관명 미입력')}</div>
+      <div class="doc-row"><span class="doc-key">담당 부서</span>${ph(c.deptName)}</div>
+      <div class="doc-row"><span class="doc-key">여성기업</span>${ph(c.womanBiz?'여성기업 인증 제작사 우선 배정':'조건 없음')}</div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-sec-title">2. 예산 및 계약</div>
+      <div class="doc-row"><span class="doc-key">발주 예산</span>${ph(b?fmtWon(b)+' (VAT 포함)':null,'미입력')}</div>
+      <div class="doc-row"><span class="doc-key">공급가액</span>${ph(used?fmtWon(bd.supply):null,'항목 미선택')}</div>
+      <div class="doc-row"><span class="doc-key">부가세(10%)</span>${ph(used?fmtWon(bd.vat):null,'—')}</div>
+      <div class="doc-row" style="background:var(--amber-light);border-radius:4px;padding:4px 6px;margin:2px 0;">
+        <span class="doc-key" style="color:var(--amber);">플랫폼 수수료</span>
+        <span class="doc-val" style="color:var(--amber);">${used?fmtWon(bd.comm)+' (공급가 10%)':'—'}</span>
+      </div>
+      <div class="doc-row" style="background:var(--accent-light);border-radius:4px;padding:4px 6px;margin:2px 0;">
+        <span class="doc-key" style="color:var(--accent);">사업비 (제작사)</span>
+        <span class="doc-val" style="color:var(--accent);font-size:13px;">${used?fmtWon(bd.biz):'—'}</span>
+      </div>
+      <div class="doc-row"><span class="doc-key">납기일</span>${ph(c.deadline)}</div>
+      <div class="doc-row"><span class="doc-key">계약 방식</span><span class="doc-val">수의계약</span></div>
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-sec-title">3. 콘텐츠별 세부 사양</div>
+      ${items.length === 0 ? `<span class="doc-ph">콘텐츠 유형을 선택하세요</span>` :
+        items.map(item => {
+          const t = TYPES.find(x=>x.id===item.typeId);
+          const costVAT = calcItemCostVAT(item);
+          const itemBd = breakdown(costVAT);
+          return `
+            <div class="doc-item-block">
+              <div class="doc-item-head">
+                <span>${t.icon}</span>
+                <span class="doc-item-name">${t.name}</span>
+                <span class="doc-item-price">${fmtWon(costVAT)} <span style="font-size:9px;color:var(--text3);font-weight:400;">VAT포함</span></span>
+              </div>
+              <div class="doc-item-rows">
+                <div class="doc-item-row"><span class="doc-item-key">수량</span><span>${item.qty}${t.unit}${item.size?' · '+item.size:''}</span></div>
+                <div class="doc-item-row"><span class="doc-item-key">공급가액</span><span>${fmtWon(itemBd.supply)}</span></div>
+                <div class="doc-item-row"><span class="doc-item-key" style="color:var(--amber);">수수료</span><span style="color:var(--amber);">${fmtWon(itemBd.comm)}</span></div>
+                <div class="doc-item-row"><span class="doc-item-key" style="color:var(--accent);">사업비</span><span style="color:var(--accent);font-weight:600;">${fmtWon(itemBd.biz)}</span></div>
+                ${item.deliverables.length?`<div class="doc-item-row"><span class="doc-item-key">납품물</span><span>${item.deliverables.join(', ')}</span></div>`:''}
+                ${item.checks.length?`<div class="doc-item-row"><span class="doc-item-key">검수기준</span><span>${item.checks.join(', ')}</span></div>`:''}
+              </div>
+            </div>`; }).join('')}
+    </div>
+
+    <div class="doc-section">
+      <div class="doc-sec-title">4. 과업 개요</div>
+      <div class="doc-row"><span class="doc-key">제작 목적</span>${ph(c.purpose.length?c.purpose.join(', '):null,'미선택')}</div>
+      <div class="doc-row"><span class="doc-key">주요 타깃</span>${ph(c.targets.length?c.targets.join(', '):null,'미선택')}</div>
+      ${c.notes?`<div class="doc-row"><span class="doc-key">특이사항</span><span class="doc-val">${c.notes}</span></div>`:''}
+    </div>
+
+    <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);text-align:center;">
+      본 과업지시서는 공공콘텐츠마켓에서 자동 생성되었습니다.
+    </div>`;
+}
+
+function renderPriceTable() {
+  const body = document.getElementById('preview-body');
+  let html = `
+    <div class="price-header">
+      <div class="price-header-top">
+        <div class="price-header-title">
+          <span style="font-size:16px;">📊</span> 용역 표준단가
+        </div>
+        <div class="price-updated">2025년 2분기 기준</div>
+      </div>
+      <div class="price-notice">
+        ⚠ 본 단가는 <strong>VAT 포함 기준</strong> 참고 단가입니다. 실제 사업비(제작사 수령액)는 공급가액에서 플랫폼 수수료(5%)를 제외한 금액입니다. 공식 원가계산 기준은 조달청 나라장터를 참고하세요.
+      </div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text2);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
+        <div><div style="color:var(--text3);margin-bottom:2px;">표시 단가</div><div style="font-weight:700;">VAT 포함</div></div>
+        <div style="border-left:1px solid var(--border);border-right:1px solid var(--border);">
+          <div style="color:var(--text3);margin-bottom:2px;">플랫폼 수수료</div><div style="font-weight:700;color:var(--amber);">공급가×10%</div>
+        </div>
+        <div><div style="color:var(--text3);margin-bottom:2px;">제작사 사업비</div><div style="font-weight:700;color:var(--accent);">공급가×90%</div></div>
+      </div>
+    </div>
+    <div style="padding:16px 22px;">`;
+
+  PRICE_DATA.forEach(cat => {
+    html += `
+      <div class="price-category">
+        <div class="price-cat-title">
+          <span class="price-cat-icon">${cat.icon}</span>
+          ${cat.category}
+        </div>
+        <table class="price-table">
+          <thead>
+            <tr>
+              <th style="width:40%">항목</th>
+              <th>범위 (VAT포함)</th>
+              <th>표준단가</th>
+              <th>수준</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cat.items.map(item => `
+              <tr>
+                <td>
+                  <div class="price-item-name">${item.name}</div>
+                  <div class="price-item-desc">${item.desc}</div>
+                </td>
+                <td>
+                  <div class="price-range">${item.min.toLocaleString()}~${item.max.toLocaleString()}</div>
+                  <div class="price-unit-tag">${item.unit}</div>
+                </td>
+                <td><div class="price-standard">${item.standard.toLocaleString()}</div></td>
+                <td><span class="price-tag tag-${item.level}">${item.level==='low'?'소규모':item.level==='mid'?'중규모':'대규모'}</span></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  });
+
+  html += `</div>`;
+  body.innerHTML = html;
+}
+
+// ── ACTIONS ────────────────────────────────────────────
+function confirmBudget() {
+  const raw = document.getElementById('budget-raw');
+  if (!raw) return;
+  const num = parseInt(raw.value.replace(/[^0-9]/g,''), 10);
+  if (isNaN(num) || num === 0) { showToast('예산을 입력해주세요'); return; }
+  state.budget = num >= 10000 ? Math.round(num / 10000) : num;
+  state.budgetConfirmed = true;
+  renderLeft(); renderRight();
+}
+
+function handleBudgetKey(e) {
+  if (e.key === 'Enter') confirmBudget();
+}
+
+function resetBudget() {
+  state.budgetConfirmed = false;
+  renderLeft(); renderRight();
+}
+
+function quickPreset(v) {
+  state.budget = v;
+  state.budgetConfirmed = true;
+  renderLeft(); renderRight();
+}
+
+function setPreset(v) {
+  state.budget = v;
+  state.budgetConfirmed = true;
+  renderLeft(); renderRight();
+}
+
+function quickSelect(id) {
+  if (!state.items.find(i=>i.typeId===id)) {
+    const t = TYPES.find(x=>x.id===id);
+    state.items.push({ typeId:id, qty:1, size:'', deliverables:t.deliverables.slice(0,2), checks:t.checks.slice(0,3), expanded:true });
+  }
+  goStep(1);
+}
+
+function goStep(n) {
+  if (n===1 && !state.budgetConfirmed) return;
+  if (n===2 && state.items.length===0) return;
+  state.step = n;
+  if (n===1 && state.items.length>0) state.items[0].expanded = true;
+  render(); window.scrollTo(0,0);
+}
+
+function toggleType(id) {
+  const idx = state.items.findIndex(i=>i.typeId===id);
+  if (idx>=0) { state.items.splice(idx,1); }
+  else {
+    const t = TYPES.find(x=>x.id===id);
+    state.items.push({ typeId:id, qty:1, size:t.sizes[1]||t.sizes[0], deliverables:t.deliverables.slice(0,2), checks:t.checks.slice(0,3), expanded:false });
+  }
+  render();
+}
+
+function toggleExpand(idx) { state.items[idx].expanded = !state.items[idx].expanded; render(); }
+function removeItem(idx) { state.items.splice(idx,1); if (!state.items.length) state.step=1; render(); showToast('삭제되었습니다'); }
+
+function changeQty(idx, delta) {
+  state.items[idx].qty = Math.max(1, (parseInt(state.items[idx].qty)||1) + delta);
+  render();
+}
+
+function updateItem(idx, key, val) { state.items[idx][key]=val; render(); }
+function toggleItemArr(idx, key, val) { const a=state.items[idx][key]; const i=a.indexOf(val); i>=0?a.splice(i,1):a.push(val); render(); }
+function updateCommon(key, val) { state.common[key]=val; renderRight(); }
+function toggleCommonArr(key, val) { const a=state.common[key]; const i=a.indexOf(val); i>=0?a.splice(i,1):a.push(val); render(); }
+function toggleCommonBool(key) { state.common[key]=!state.common[key]; render(); }
+
+function switchTab(tab) {
+  state.previewTab = tab;
+  document.getElementById('tab-doc').classList.toggle('active', tab==='doc');
+  document.getElementById('tab-price').classList.toggle('active', tab==='price');
+  renderRight();
+}
+
+function openPriceTab() { switchTab('price'); }
+
+function resetAll() {
+  state.budget=0; state.budgetConfirmed=false; state.step=0; state.items=[];
+  state.common={orgName:'',deptName:'',purpose:[],targets:[],deadline:'',womanBiz:false,notes:''};
+  state.previewTab='doc';
+  document.getElementById('tab-doc').classList.add('active');
+  document.getElementById('tab-price').classList.remove('active');
+  render();
+}
+
+function printDoc() {
+  // 인쇄용 스타일 적용 후 출력
+  var style = document.createElement('style');
+  style.id = 'print-style';
+  style.textContent = '@media print{.left-panel,.header,.step-bar,.export-bar{display:none!important;}.right-panel{position:static;width:100%;height:auto;border:none;padding:0;}.preview-body{padding:20px;}@page{margin:15mm;size:A4;}}';
+  document.head.appendChild(style);
+  window.print();
+  setTimeout(function(){ var s=document.getElementById('print-style'); if(s) s.remove(); }, 1000);
+}
+function exportDoc() {
+  if (!state.budget) { showToast('예산을 먼저 입력해주세요'); return; }
+  if (!state.items.length) { showToast('콘텐츠 유형을 선택해주세요'); return; }
+  const task={
+    title: state.common.orgName ? state.common.orgName+' '+state.items.map(i=>TYPES.find(t=>t.id===i.typeId)?.name).join('+') : '과업지시서',
+    org: state.common.orgName,
+    dept: state.common.deptName,
+    budget: state.budget * 10000,
+    deadline: state.common.deadline,
+    purpose: state.common.purpose,
+    targets: state.common.targets,
+    items: state.items,
+    womanBiz: state.common.womanBiz,
+    createdAt: new Date().toISOString()
+  };
+  if(typeof PCM!=='undefined') PCM.saveTask(task);
+  // 프로젝트로도 저장 (대시보드 반영)
+  try {
+    const proj = {
+      id: 'TRX-'+Date.now(),
+      icon: state.items[0] ? TYPES.find(t=>t.id===state.items[0].typeId)?.icon||'📋' : '📋',
+      title: task.title,
+      org: task.org||'발주처',
+      maker: '매칭 대기',
+      status: 'wait',
+      statusLabel: '제작사 매칭 중',
+      budgetVAT: state.budget,
+      checkStep: 0,
+      deadline: task.deadline,
+      revisions: 2,
+      progress: 0
+    };
+    const list = JSON.parse(sessionStorage.getItem('pcm_projects')||'[]');
+    list.unshift(proj);
+    sessionStorage.setItem('pcm_projects', JSON.stringify(list));
+  } catch(e) {}
+  showToast('과업지시서 완성! 의뢰 등록으로 이동합니다 ✓');
+  setTimeout(()=>nav('발주처_대시보드.html'),1500);
+}
+
+function copyDoc() {
+  navigator.clipboard.writeText(document.getElementById('preview-body').innerText)
+    .then(()=>showToast('클립보드에 복사되었습니다 ✓'));
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+render();
+</script>
+
+<script>
+function nav(p){window.location.href=p;}
+
+async function submitToAPI(taskData) {
+  // 로그인 확인
+  if (!API.isLoggedIn()) {
+    PCM.toast('로그인 후 이용하실 수 있습니다.', 'error');
+    setTimeout(() => nav('로그인.html'), 1200);
+    return false;
+  }
+
+  try {
+    const res = await API.projects.create({
+      title:          taskData.title,
+      contentType:    taskData.contentType || taskData.type,
+      description:    taskData.description || taskData.background,
+      quantity:       parseInt(taskData.quantity) || 1,
+      unit:           taskData.unit || '건',
+      purpose:        taskData.purpose,
+      targetAudience: taskData.target,
+      budgetVAT:      parseInt(taskData.budget),
+      deadline:       taskData.deadline,
+      contractType:   taskData.contractType || 'ESCROW',
+      preferWomanBiz: taskData.womanBiz || false,
+    });
+
+    if (res && res.success) {
+      // 세션에도 저장 (기존 흐름 유지)
+      PCM.saveTask({ ...taskData, projectId: res.data.id });
+      return res.data;
+    } else if (res === null) {
+      // 서버 없음 → 세션만 저장
+      PCM.saveTask(taskData);
+      return taskData;
+    }
+  } catch(e) {
+    PCM.saveTask(taskData);
+    return taskData;
+  }
+}
+
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+</script>
+</body>
+</html>

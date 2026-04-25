@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>납품물 열람 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#f4f2ed;--surface:#fff;--surface2:#f9f8f5;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1a1f2e;--text2:#4a5568;--text3:#8492a6;
+  --accent:#1a6b4a;--accent2:#2d9e72;--accent-light:#e8f5ef;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --blue:#1a56db;--blue-light:#e8f0fe;
+  --red:#dc3545;--red-light:#fce8e6;
+  --serif:'Noto Serif KR',serif;--sans:'Noto Sans KR',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:12px;color:#fff;}
+.logo-name{font-family:var(--serif);font-size:14px;font-weight:700;}
+.logo-role{font-size:11px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:2px 8px;margin-left:6px;}
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent2);}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{background:var(--surface2);}
+.btn-amber{background:var(--amber-light);color:var(--amber);border:1px solid rgba(180,83,9,.2);}
+.btn-amber:hover{background:rgba(180,83,9,.15);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.layout{display:grid;grid-template-columns:1fr 360px;min-height:calc(100vh - 58px);}
+
+/* 왼쪽 — 뷰어 */
+.viewer-panel{padding:0;background:#2a2a2a;display:flex;flex-direction:column;}
+.viewer-toolbar{background:#1a1a1a;padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);}
+.vt-filename{font-size:13px;color:rgba(255,255,255,.8);font-weight:500;}
+.vt-meta{font-size:11px;color:rgba(255,255,255,.4);}
+.vt-tabs{display:flex;gap:0;margin-left:auto;}
+.vt-tab{padding:6px 14px;font-size:12px;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:transparent;font-family:var(--sans);border-bottom:2px solid transparent;transition:all .15s;}
+.vt-tab.active{color:#fff;border-bottom-color:#1dd9a0;}
+.vt-zoom{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.5);margin-left:12px;}
+.vt-zoom button{background:rgba(255,255,255,.1);border:none;color:#fff;width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:14px;}
+
+.viewer-area{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;min-height:500px;}
+
+/* 카드뉴스 시뮬레이션 */
+.card-preview{width:400px;aspect-ratio:1;background:linear-gradient(135deg,#1a3a2a,#0d2a1a);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.cp-watermark{position:absolute;top:12px;right:12px;font-size:10px;color:rgba(255,255,255,.3);font-weight:500;}
+.cp-logo{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:24px;}
+.cp-main{font-family:var(--serif);font-size:32px;font-weight:700;color:#fff;text-align:center;line-height:1.3;margin-bottom:16px;padding:0 24px;}
+.cp-main span{color:#1dd9a0;}
+.cp-sub{font-size:14px;color:rgba(255,255,255,.7);text-align:center;padding:0 24px;line-height:1.6;}
+.cp-footer{position:absolute;bottom:16px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.3);}
+.cp-num{position:absolute;bottom:16px;right:16px;font-size:11px;color:rgba(255,255,255,.4);font-family:var(--mono);}
+
+.slide-nav{display:flex;align-items:center;gap:12px;margin-top:16px;}
+.sn-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;}
+.sn-btn:hover{background:rgba(255,255,255,.2);}
+.sn-info{font-size:12px;color:rgba(255,255,255,.6);font-family:var(--mono);}
+.sn-dots{display:flex;gap:5px;}
+.sn-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .15s;}
+.sn-dot.active{background:#1dd9a0;width:16px;border-radius:3px;}
+
+/* 오른쪽 — 검토 패널 */
+.review-panel{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;height:calc(100vh - 58px);position:sticky;top:58px;}
+.rp-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);}
+.rp-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.rp-sub{font-size:12px;color:var(--text3);}
+
+.rp-body{flex:1;overflow-y:auto;padding:16px 22px;}
+
+/* 파일 목록 */
+.file-list{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.file-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;}
+.file-item:hover{border-color:var(--accent);}
+.file-item.active{border-color:var(--accent);background:var(--accent-light);}
+.fi-icon{font-size:18px;flex-shrink:0;}
+.fi-info{flex:1;min-width:0;}
+.fi-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-size{font-size:10px;color:var(--text3);}
+.fi-dl{color:var(--text3);font-size:13px;cursor:pointer;flex-shrink:0;}
+.fi-dl:hover{color:var(--accent);}
+
+/* 검수 결과 요약 */
+.check-summary{background:var(--accent-light);border:1px solid rgba(26,107,74,.2);border-radius:10px;padding:14px;margin-bottom:16px;}
+.cs-title{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.cs-score{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent);}
+.cs-items{display:flex;flex-direction:column;gap:5px;}
+.cs-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text2);}
+.cs-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.cs-dot-pass{background:var(--accent);}
+.cs-dot-warn{background:var(--amber);}
+
+/* 코멘트 */
+.comment-box{margin-bottom:16px;}
+.cb-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;}
+textarea{background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;padding:10px 12px;outline:none;width:100%;transition:border-color .15s;resize:vertical;min-height:90px;}
+textarea:focus{border-color:var(--accent);}
+textarea::placeholder{color:var(--text3);}
+
+/* 수정 횟수 */
+.revision-info{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;font-size:12px;}
+.ri-label{color:var(--text2);}
+.ri-dots{display:flex;gap:5px;}
+.ri-dot{width:14px;height:14px;border-radius:50%;}
+.rid-avail{background:var(--accent);}
+.rid-empty{background:var(--border2);}
+
+.rp-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+
+/* RATING */
+.rating-section{margin-bottom:14px;}
+.rs-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px;}
+.stars-select{display:flex;gap:6px;}
+.star-btn{font-size:24px;cursor:pointer;opacity:.3;transition:all .15s;border:none;background:none;}
+.star-btn.on{opacity:1;}
+.star-btn:hover{opacity:.8;transform:scale(1.1);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.show{opacity:1;pointer-events:all;}
+.modal{background:var(--surface);border-radius:16px;padding:28px;width:440px;max-width:92vw;transform:scale(.96);transition:transform .2s;}
+.modal-overlay.show .modal{transform:scale(1);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:300;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+<script src="api.js"></script>
+</head>
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;">
+    <div class="logo" onclick="nav('마이페이지_발주처.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+      <span class="logo-role">발주처</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-ghost btn-sm" onclick="nav('마이페이지_발주처.html')">← 마이페이지</button>
+    <button class="btn btn-ghost btn-sm" onclick="nav('검수_결과.html')">검수 결과 보기</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- 뷰어 -->
+  <div class="viewer-panel">
+    <div class="viewer-toolbar">
+      <div>
+        <div class="vt-filename" id="current-filename">탄소중립_카드뉴스_JPG_300dpi.zip</div>
+        <div class="vt-meta">㈜ 그린스튜디오 · v1.0 납품 · 2025.05.05</div>
+      </div>
+      <div class="vt-tabs">
+        <button class="vt-tab active" onclick="switchView('preview')">미리보기</button>
+        <button class="vt-tab" onclick="switchView('info')">파일 정보</button>
+      </div>
+      <div class="vt-zoom">
+        <button onclick="changeSlide(-1)">‹</button>
+        <span id="slide-num" style="font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.5);">1 / 10</span>
+        <button onclick="changeSlide(1)">›</button>
+      </div>
+    </div>
+
+    <div class="viewer-area" id="viewer-area">
+      <!-- 카드뉴스 미리보기 시뮬레이션 -->
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="card-preview" id="card-preview">
+          <div class="cp-watermark">미리보기</div>
+          <div class="cp-logo">환경부</div>
+          <div class="cp-main">탄소중립,<br><span>지금 시작하세요</span></div>
+          <div class="cp-sub">2030년까지 온실가스 40% 감축<br>우리 모두의 작은 실천이 큰 변화를 만듭니다</div>
+          <div class="cp-footer">환경부 공식 SNS @moenv_kr</div>
+          <div class="cp-num" id="slide-indicator">1/10</div>
+        </div>
+        <div class="slide-nav">
+          <button class="sn-btn" onclick="changeSlide(-1)">‹</button>
+          <div class="sn-dots" id="sn-dots"></div>
+          <button class="sn-btn" onclick="changeSlide(1)">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 검토 패널 -->
+  <div class="review-panel">
+    <div class="rp-header">
+      <div class="rp-title">납품물 검토</div>
+      <div class="rp-sub">탄소중립 SNS 카드뉴스 · v1.0</div>
+    </div>
+
+    <div class="rp-body">
+      <!-- 파일 목록 -->
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">납품 파일 (3개)</div>
+      <div class="file-list">
+        <div class="file-item active" onclick="selectFile(0,this)">
+          <div class="fi-icon">🖼</div>
+          <div class="fi-info">
+            <div class="fi-name">탄소중립_카드뉴스_JPG_300dpi.zip</div>
+            <div class="fi-size">18MB · JPG 10장</div>
+          </div>
+          <div class="fi-dl" onclick="event.stopPropagation();showToast('다운로드됩니다')">↓</div>
+        </div>
+        <div class="file-item" onclick="selectFile(1,this)">
+          <div class="fi-icon">🎨</div>
+          <div class="fi-info">
+            <div class="fi-name">탄소중립_카드뉴스_원본.psd</div>
+            <div class="fi-size">45MB · PSD 원본</div>
+          </div>
+          <div class="fi-dl" onclick="event.stopPropagation();showToast('다운로드됩니다')">↓</div>
+        </div>
+        <div class="file-item" onclick="selectFile(2,this)">
+          <div class="fi-icon">📦</div>
+          <div class="fi-info">
+            <div class="fi-name">탄소중립_카드뉴스_SNS최적화.zip</div>
+            <div class="fi-size">8MB · 1:1, 4:5, 9:16</div>
+          </div>
+          <div class="fi-dl" onclick="event.stopPropagation();showToast('다운로드됩니다')">↓</div>
+        </div>
+      </div>
+
+      <!-- 검수 결과 요약 -->
+      <div class="check-summary">
+        <div class="cs-title">
+          <span>🤖 AI 검수 결과</span>
+          <span class="cs-score">94점</span>
+        </div>
+        <div class="cs-items">
+          <div class="cs-item"><div class="cs-dot cs-dot-pass"></div>공공언어 가이드라인 ✓</div>
+          <div class="cs-item"><div class="cs-dot cs-dot-pass"></div>정부 시각 디자인 ✓</div>
+          <div class="cs-item"><div class="cs-dot cs-dot-warn"></div>수치 오류 1건 (2024년 표기 확인 필요)</div>
+          <div class="cs-item"><div class="cs-dot cs-dot-warn"></div>색상 명도비 주의 1건</div>
+          <div class="cs-item"><div class="cs-dot cs-dot-pass"></div>저작권 이미지 ✓</div>
+        </div>
+        <div style="margin-top:8px;"><button class="btn btn-ghost btn-sm" onclick="nav('검수_결과.html')">상세 검수 결과 →</button></div>
+      </div>
+
+      <!-- 수정 횟수 -->
+      <div class="revision-info">
+        <span class="ri-label">남은 수정 기회</span>
+        <div class="ri-dots">
+          <div class="ri-dot rid-avail"></div>
+          <div class="ri-dot rid-avail"></div>
+        </div>
+        <span style="font-size:12px;color:var(--accent);font-weight:600;">2회</span>
+      </div>
+
+      <!-- 발주처 코멘트 -->
+      <div class="comment-box">
+        <div class="cb-label">검토 의견 (선택)</div>
+        <textarea id="comment" placeholder="납품물에 대한 의견을 남겨주세요. 수정 요청 시 제작사에게 전달됩니다."></textarea>
+      </div>
+
+      <!-- 평점 (승인 시) -->
+      <div class="rating-section" id="rating-section">
+        <div class="rs-label">제작사 평점 (승인 시 등록)</div>
+        <div class="stars-select" id="stars">
+          <button class="star-btn" onclick="setRating(1)">★</button>
+          <button class="star-btn" onclick="setRating(2)">★</button>
+          <button class="star-btn" onclick="setRating(3)">★</button>
+          <button class="star-btn" onclick="setRating(4)">★</button>
+          <button class="star-btn" onclick="setRating(5)">★</button>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="rating-label">별점을 선택하세요</div>
+      </div>
+    </div>
+
+    <div class="rp-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="openModal('approve')">
+        ✓ 최종 승인 — 에스크로 해제
+      </button>
+      <button class="btn btn-amber" style="width:100%;justify-content:center;" onclick="nav('수정_요청.html')">
+        ✏️ 수정 요청
+      </button>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="showToast('전체 파일이 다운로드됩니다')">
+        📥 전체 파일 다운로드
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="mc"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+function nav(p){window.location.href=p;}
+
+// 최종 승인 API 연동
+const _origDoApprove = typeof doApprove === 'function' ? doApprove : null;
+async function doApprove() {
+  const projectId = PCM.get('currentTask')?.projectId || null;
+  const comment   = document.getElementById('approve-comment')?.value || '최종 승인';
+
+  if (API.isLoggedIn() && projectId) {
+    const res = await API.deliveries.approve(projectId, comment);
+    if (res?.success || res === null) {
+      PCM.toast('최종 승인 완료! 정산이 진행됩니다.', 'success');
+      PCM.pushNotif({icon:'✅',title:'납품 승인',sub:'관리자가 정산을 진행합니다.',time:'방금'});
+      setTimeout(() => nav('정산_내역.html'), 1500);
+    }
+  } else {
+    if (_origDoApprove) _origDoApprove();
+    else {
+      PCM.toast('최종 승인이 완료되었습니다.', 'success');
+      setTimeout(() => nav('정산_내역.html'), 1500);
+    }
+  }
+}
+
+
+/* ── 다크모드 토글 ── */
+(function(){
+  var saved = localStorage.getItem('pcm_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+function toggleDarkMode(){
+  var cur = document.documentElement.getAttribute('data-theme')||'light';
+  var next = cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pcm_theme', next);
+  var btn = document.getElementById('dark-toggle');
+  if(btn) btn.textContent = next==='dark'?'☀️':'🌙';
+}
+/* ── END 다크모드 ── */
+
+
+let currentSlide=1;
+const totalSlides=10;
+const SLIDES=[
+  {main:'탄소중립,\n지금 시작하세요',sub:'2030년까지 온실가스 40% 감축'},
+  {main:'탄소중립\n실천 방법 1',sub:'대중교통 이용으로 연간 CO₂ 0.4톤 절감'},
+  {main:'재생에너지\n전환',sub:'태양광·풍력으로 전력 생산'},
+  {main:'탄소중립\n실천 방법 2',sub:'일회용품 사용 줄이기'},
+  {main:'2050\n탄소중립 목표',sub:'대한민국 탄소중립 선언'},
+  {main:'그린수소\n미래 에너지',sub:'수소 경제 전환 전략'},
+  {main:'녹색 건물\n에너지 효율',sub:'건물 에너지 소비 30% 절감'},
+  {main:'탄소흡수원\n확대',sub:'산림·습지 보전으로 탄소 흡수'},
+  {main:'스마트 팜\n탄소 농업',sub:'저탄소 농업 기술 도입'},
+  {main:'함께 만드는\n탄소중립',sub:'우리 모두의 실천이 시작입니다 🌱'},
+];
+
+function renderDots(){
+  const el=document.getElementById('sn-dots');
+  el.innerHTML=SLIDES.map((_,i)=>`<div class="sn-dot ${i===currentSlide-1?'active':''}" onclick="goSlide(${i+1})"></div>`).join('');
+}
+
+function updateSlide(){
+  const s=SLIDES[currentSlide-1];
+  const lines=s.main.split('\n');
+  document.getElementById('card-preview').querySelector('.cp-main').innerHTML=
+    lines.map((l,i)=>i===0?l:`<span style="color:#1dd9a0;">${l}</span>`).join('<br>');
+  document.getElementById('card-preview').querySelector('.cp-sub').textContent=s.sub;
+  document.getElementById('slide-indicator').textContent=`${currentSlide}/10`;
+  document.getElementById('slide-num').textContent=`${currentSlide} / 10`;
+  renderDots();
+}
+
+function changeSlide(d){
+  currentSlide=Math.max(1,Math.min(totalSlides,currentSlide+d));
+  updateSlide();
+}
+function goSlide(n){currentSlide=n;updateSlide();}
+
+let rating=0;
+function setRating(r){
+  rating=r;
+  document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('on',i<r));
+  const labels=['','별로예요','아쉬워요','보통이에요','좋아요','최고예요!'];
+  document.getElementById('rating-label').textContent=labels[r];
+}
+
+function selectFile(idx,el){
+  document.querySelectorAll('.file-item').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+  const names=['탄소중립_카드뉴스_JPG_300dpi.zip','탄소중립_카드뉴스_원본.psd','탄소중립_카드뉴스_SNS최적화.zip'];
+  document.getElementById('current-filename').textContent=names[idx];
+}
+
+function switchView(v){
+  document.querySelectorAll('.vt-tab').forEach((t,i)=>t.classList.toggle('active',(v==='preview'&&i===0)||(v==='info'&&i===1)));
+  if(v==='info'){
+    document.getElementById('viewer-area').innerHTML=`
+      <div style="background:var(--surface2);border-radius:12px;padding:24px;max-width:400px;width:100%;border:1px solid rgba(255,255,255,.08);">
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:16px;">파일 정보</div>
+        ${[['파일명','탄소중립_카드뉴스_JPG_300dpi.zip'],['크기','18.3 MB'],['형식','ZIP (JPEG × 10)'],['해상도','3000 × 3000px (300dpi)'],['색상모드','RGB'],['납품일','2025.05.05 14:22'],['버전','v1.0 최초 납품'],['체크섬','a3f9d2...b8e1']].map(([k,v])=>`
+          <div style="display:flex;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;">
+            <span style="color:rgba(255,255,255,.4);min-width:80px;">${k}</span>
+            <span style="color:rgba(255,255,255,.8);font-family:var(--mono);">${v}</span>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    document.getElementById('viewer-area').innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="card-preview" id="card-preview">
+          <div class="cp-watermark">미리보기</div>
+          <div class="cp-logo">환경부</div>
+          <div class="cp-main"></div>
+          <div class="cp-sub"></div>
+          <div class="cp-footer">환경부 공식 SNS @moenv_kr</div>
+          <div class="cp-num" id="slide-indicator">1/10</div>
+        </div>
+        <div class="slide-nav">
+          <button class="sn-btn" onclick="changeSlide(-1)">‹</button>
+          <div class="sn-dots" id="sn-dots"></div>
+          <button class="sn-btn" onclick="changeSlide(1)">›</button>
+        </div>
+      </div>`;
+    updateSlide();
+  }
+}
+
+function openModal(type){
+  const mc=document.getElementById('mc');
+  if(type==='approve'){
+    const comment=document.getElementById('comment')?.value||'';
+    mc.innerHTML=`
+      <div style="font-size:18px;font-family:var(--serif);font-weight:700;margin-bottom:8px;">최종 승인 확인</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+        납품물을 최종 승인하면 에스크로에 보관된 대금이 즉시 제작사에 지급됩니다.<br>
+        <strong>이 작업은 취소할 수 없습니다.</strong>
+      </div>
+      <div style="background:var(--accent-light);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--accent);">
+        지급 예정 사업비: <strong style="font-family:var(--mono);">14,727,000원</strong><br>
+        평점: <span style="color:#f5a623;">${rating>0?'★'.repeat(rating):'미입력'}</span> ${rating>0?'('+['','별로','아쉬움','보통','좋음','최고'][rating]+')':''}
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal()">취소</button>
+        <button class="btn btn-primary" onclick="doApprove()">✓ 최종 승인 확정</button>
+      </div>`;
+  }
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+function doApprove(){
+  closeModal();
+  showToast('최종 승인 완료! 에스크로 대금이 지급됩니다 ✓');
+  setTimeout(()=>nav('마이페이지_발주처.html'),2000);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+renderDots();
+updateSlide();
+</script>
+</body>
+</html>

@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭킹 — 공공콘텐츠마켓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b27;
+  --surface2: #1e2535;
+  --surface3: #242d42;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaf2;
+  --text2: #8b92b3;
+  --text3: #4a5270;
+  --accent: #1dd9a0;
+  --accent2: #0fb87f;
+  --accent-dim: rgba(29,217,160,0.12);
+  --gold: #f5c842;
+  --gold2: #c8a020;
+  --silver: #9eb0c8;
+  --bronze: #c87a3c;
+  --blue: #4f7cff;
+  --purple: #a07cfc;
+  --red: #ff4d6a;
+  --serif: 'Noto Serif KR', serif;
+  --sans: 'Noto Sans KR', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: rgba(13,17,23,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.logo-mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 700; font-size: 12px; color: #0d1117; }
+.logo-name { font-family: var(--serif); font-size: 14px; font-weight: 700; color: var(--text); }
+.nav-links { display: flex; gap: 4px; }
+.nav-btn { padding: 7px 14px; border-radius: 8px; font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.13s; border: none; background: transparent; font-family: var(--sans); }
+.nav-btn:hover { background: var(--surface2); color: var(--text); }
+.nav-btn.active { background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.live-badge { display: flex; align-items: center; gap: 5px; background: rgba(29,217,160,0.1); border: 1px solid rgba(29,217,160,0.25); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--accent); font-weight: 500; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+/* HERO */
+.hero {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 28px 0;
+  text-align: center;
+}
+.hero-label { font-size: 11px; font-weight: 500; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+.hero-title { font-family: var(--serif); font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px; }
+.hero-sub { font-size: 14px; color: var(--text2); font-weight: 300; margin-bottom: 28px; }
+
+/* TABS */
+.tab-bar { display: flex; justify-content: center; gap: 0; border-bottom: 1px solid var(--border); }
+.main-tab { padding: 12px 32px; font-size: 14px; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.18s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--sans); display: flex; align-items: center; gap: 8px; }
+.main-tab:hover { color: var(--text2); }
+.main-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* LAYOUT */
+.page { display: grid; grid-template-columns: 220px 1fr 300px; gap: 0; min-height: calc(100vh - 58px - 160px); }
+
+/* FILTER SIDE */
+.side-filter { border-right: 1px solid var(--border); padding: 20px 16px; position: sticky; top: 58px; height: calc(100vh - 58px); overflow-y: auto; }
+.sf-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.sf-section { margin-bottom: 20px; }
+
+.filter-chip { display: inline-block; border: 1px solid var(--border2); border-radius: 20px; padding: 4px 11px; font-size: 11px; color: var(--text2); cursor: pointer; margin: 0 4px 5px 0; transition: all 0.13s; background: transparent; user-select: none; }
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.filter-chip.on { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); font-weight: 500; }
+
+/* MAIN RANKING */
+.rank-main { padding: 20px 24px; }
+
+/* PODIUM */
+.podium { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 28px; align-items: end; }
+.podium-item { border-radius: 14px; padding: 20px 16px 16px; text-align: center; position: relative; transition: transform 0.2s; cursor: pointer; }
+.podium-item:hover { transform: translateY(-3px); }
+
+.podium-1 { background: linear-gradient(160deg, rgba(245,200,66,0.15) 0%, rgba(245,200,66,0.04) 100%); border: 1px solid rgba(245,200,66,0.3); order: 2; padding-top: 28px; }
+.podium-2 { background: linear-gradient(160deg, rgba(158,176,200,0.12) 0%, rgba(158,176,200,0.03) 100%); border: 1px solid rgba(158,176,200,0.25); order: 1; }
+.podium-3 { background: linear-gradient(160deg, rgba(200,122,60,0.12) 0%, rgba(200,122,60,0.03) 100%); border: 1px solid rgba(200,122,60,0.25); order: 3; }
+
+.crown { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); font-size: 22px; }
+.podium-rank { font-family: var(--mono); font-size: 11px; font-weight: 700; margin-bottom: 10px; }
+.podium-1 .podium-rank { color: var(--gold); }
+.podium-2 .podium-rank { color: var(--silver); }
+.podium-3 .podium-rank { color: var(--bronze); }
+
+.podium-emoji { font-size: 32px; margin-bottom: 8px; }
+.podium-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.podium-type { font-size: 10px; color: var(--text3); margin-bottom: 10px; }
+.podium-score { font-family: var(--mono); font-size: 22px; font-weight: 700; margin-bottom: 2px; }
+.podium-1 .podium-score { color: var(--gold); }
+.podium-2 .podium-score { color: var(--silver); }
+.podium-3 .podium-score { color: var(--bronze); }
+.podium-score-label { font-size: 10px; color: var(--text3); }
+.podium-badges { display: flex; justify-content: center; gap: 3px; margin-top: 8px; flex-wrap: wrap; }
+.p-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; }
+.pb-woman { background: rgba(180,80,180,0.15); color: #c87cd0; }
+.pb-g2b { background: rgba(79,124,255,0.15); color: var(--blue); }
+
+/* RANK LIST */
+.rank-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.rank-table { width: 100%; border-collapse: collapse; }
+.rank-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+.rank-row { border-bottom: 1px solid var(--border); transition: background 0.13s; cursor: pointer; }
+.rank-row:last-child { border-bottom: none; }
+.rank-row:hover { background: var(--surface2); }
+.rank-row td { padding: 13px 12px; vertical-align: middle; }
+
+.rank-num { font-family: var(--mono); font-size: 13px; font-weight: 700; min-width: 32px; }
+.rn-1 { color: var(--gold); }
+.rn-2 { color: var(--silver); }
+.rn-3 { color: var(--bronze); }
+.rn-other { color: var(--text3); }
+
+.rank-name-cell { display: flex; align-items: center; gap: 10px; }
+.rank-emoji { font-size: 20px; flex-shrink: 0; }
+.rank-name { font-size: 13px; font-weight: 700; color: var(--text); }
+.rank-sub { font-size: 11px; color: var(--text3); }
+.rank-badges { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; }
+.r-badge { font-size: 9px; padding: 1px 6px; border-radius: 5px; }
+
+.score-cell { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+.score-star { color: var(--gold); font-size: 13px; margin-right: 4px; }
+.score-count { font-size: 10px; color: var(--text3); display: block; margin-top: 1px; }
+
+.bar-cell { min-width: 120px; }
+.score-bar { height: 5px; border-radius: 3px; background: var(--surface3); overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.bar-1 { background: linear-gradient(90deg, var(--gold), #f0a020); }
+.bar-2 { background: linear-gradient(90deg, var(--silver), #7a9ab0); }
+.bar-3 { background: linear-gradient(90deg, var(--bronze), #a05020); }
+.bar-other { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+.change-cell { font-size: 11px; font-weight: 600; }
+.up { color: var(--accent); }
+.down { color: var(--red); }
+.same { color: var(--text3); }
+
+.rank-record { font-family: var(--mono); font-size: 12px; color: var(--text2); }
+
+/* RIGHT SIDE — STATS */
+.side-stats { border-left: 1px solid var(--border); padding: 20px 16px; position: sticky; top: 58px; height: calc(100vh - 58px); overflow-y: auto; }
+
+.stat-card { background: var(--surface2); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.stat-card-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+
+.top-performer { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.13s; border-radius: 6px; padding: 8px 6px; }
+.top-performer:hover { background: var(--surface3); }
+.top-performer:last-child { border-bottom: none; }
+.tp-rank { font-family: var(--mono); font-size: 11px; font-weight: 700; min-width: 18px; color: var(--text3); }
+.tp-emoji { font-size: 16px; }
+.tp-info { flex: 1; min-width: 0; }
+.tp-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tp-score { font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.tp-badge { font-size: 9px; padding: 1px 5px; border-radius: 5px; flex-shrink: 0; }
+
+.field-rank-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.field-rank-item:last-child { border-bottom: none; }
+.fri-field { font-size: 11px; color: var(--text2); flex: 1; }
+.fri-name { font-size: 11px; font-weight: 500; color: var(--text); }
+.fri-score { font-size: 11px; font-family: var(--mono); color: var(--gold); }
+
+.update-info { font-size: 10px; color: var(--text3); text-align: center; margin-top: 8px; }
+
+/* SCORE FORMULA */
+.formula-box { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.formula-title { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.formula-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; font-size: 11px; }
+.fi-label { color: var(--text2); }
+.fi-weight { font-family: var(--mono); font-weight: 700; font-size: 13px; }
+.fi-w-1 { color: var(--gold); }
+.fi-w-2 { color: var(--accent); }
+.fi-w-3 { color: var(--blue); }
+.fi-w-4 { color: var(--purple); }
+.formula-bar { height: 3px; border-radius: 2px; margin-top: 3px; }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border: 1px solid var(--border2); border-radius: 20px; width: 560px; max-width: 92vw; max-height: 85vh; overflow-y: auto; transform: scale(0.96); transition: transform 0.2s; }
+.modal-overlay.show .modal { transform: scale(1); }
+.modal-header { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+.modal-close { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.modal-body { padding: 16px 24px 24px; }
+.modal-name { font-family: var(--serif); font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+
+.score-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.sb-item { background: var(--surface2); border-radius: 8px; padding: 12px; }
+.sb-label { font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+.sb-val { font-family: var(--mono); font-size: 20px; font-weight: 700; }
+.sb-val.gold { color: var(--gold); }
+.sb-val.accent { color: var(--accent); }
+.sb-val.blue { color: var(--blue); }
+.sb-val.purple { color: var(--purple); }
+
+.review-list { list-style: none; }
+.review-item { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.review-item:last-child { border-bottom: none; }
+.review-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.review-org { font-size: 12px; font-weight: 500; color: var(--text); }
+.review-stars { color: var(--gold); font-size: 12px; }
+.review-date { font-size: 10px; color: var(--text3); margin-left: auto; }
+.review-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+
+@keyframes slideIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.rank-row { animation: slideIn 0.3s ease both; }
+
+button { cursor: pointer; }
+
+/* ── 모바일 반응형 ── */
+@media(max-width:768px){
+  .layout, .main-layout { grid-template-columns:1fr!important; }
+  .sidebar { position:static!important; height:auto!important; border-right:none!important; border-bottom:1px solid var(--border); }
+  .preview-panel,.right-panel { display:none; }
+  .main,.left-panel,.main-area { padding:16px!important; }
+  .stat-row { grid-template-columns:1fr 1fr!important; }
+  .header { padding:0 14px!important; }
+  .nav-links { display:none!important; }
+  .mob-menu-btn { display:flex!important; }
+  .form-grid, .spec-grid { grid-template-columns:1fr!important; }
+  .type-grid { grid-template-columns:repeat(2,1fr)!important; }
+  .score-grid { grid-template-columns:1fr!important; }
+  .compare-table { font-size:11px; }
+  .compare-table th, .compare-table td { padding:8px 8px!important; }
+  .eb-options { grid-template-columns:1fr!important; }
+  .sign-grid { grid-template-columns:1fr!important; gap:20px!important; }
+  .chat-layout { grid-template-columns:1fr!important; }
+  .file-preview-grid { grid-template-columns:1fr 1fr!important; }
+  .podium { grid-template-columns:1fr!important; }
+  .makers-grid { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr 1fr!important; }
+  .ql-grid { grid-template-columns:1fr!important; }
+  .filter-panel { display:none; }
+  .page { grid-template-columns:1fr!important; }
+}
+@media(max-width:480px){
+  .stat-row { grid-template-columns:1fr!important; }
+  .summary-grid { grid-template-columns:1fr!important; }
+  .hero-title { font-size:24px!important; }
+  .btn { padding:7px 12px!important; font-size:12px!important; }
+}
+/* ── END 모바일 ── */
+
+
+/* ── 다크모드 ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--surface2:#1c2333;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#e8eaf2;--text2:#8b92b3;--text3:#4a5270;
+}
+[data-theme="dark"] .logo-name,[data-theme="dark"] .page-title{color:var(--text);}
+[data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea{background:var(--surface2);color:var(--text);border-color:var(--border2);}
+[data-theme="dark"] .header{background:var(--surface);border-color:var(--border);}
+/* ── END 다크모드 ── */
+
+</style>
+
+<script>
+/* ================================================================
+   PCM.js — 공공콘텐츠마켓 공통 상태 관리 모듈 v3
+   모든 HTML에서 <\x3cscript src="pcm.js"><\/script>로 로드
+   ================================================================ */
+
+const PCM = (() => {
+  /* ── 기본 스토리지 ── */
+  const KEY = k => 'pcm_' + k;
+  const set  = (k, v)  => { try { sessionStorage.setItem(KEY(k), JSON.stringify(v)); } catch(e) {} };
+  const get  = (k, d=null) => { try { const v = sessionStorage.getItem(KEY(k)); return v != null ? JSON.parse(v) : d; } catch(e) { return d; } };
+  const del  = k => sessionStorage.removeItem(KEY(k));
+
+  /* ── 금액 계산 ── */
+  const breakdown = vatIncl => {
+    const supply = Math.round(vatIncl / 1.1);
+    return { vatIncl, supply, vat: vatIncl - supply, comm: Math.round(supply * 0.05), biz: Math.round(supply * 0.95) };
+  };
+  const fw  = v => Math.round(v).toLocaleString() + '원';
+  const fmw = v => (Math.round(v) / 10000).toLocaleString() + '만원';
+
+  /* ── 과업 / 견적 공유 ── */
+  const saveTask   = t => set('currentTask', t);
+  const getTask    = ()  => get('currentTask', null);
+  const saveQuote  = q => set('latestQuote', q);
+  const getQuote   = ()  => get('latestQuote', null);
+  const getConfirmedAmount = () => get('confirmedAmount', null);
+
+  /* ── 프로젝트 목록 ── */
+  const getProjects = () => get('projects', []);
+  const saveProject = p => {
+    const list = getProjects();
+    const idx = list.findIndex(x => x.id === p.id);
+    if (idx >= 0) list[idx] = p; else list.unshift(p);
+    set('projects', list.slice(0, 50));
+  };
+
+  /* ── 알림 시스템 ── */
+  const pushNotif = n => {
+    const list = get('notifs', []);
+    list.unshift({ id: 'n-' + Date.now(), unread: true, time: '방금', ...n });
+    set('notifs', list.slice(0, 50));
+    _updateBadge();
+  };
+  const getNotifs  = () => get('notifs', []);
+  const markRead   = () => { set('notifs', getNotifs().map(n => ({ ...n, unread: false }))); _updateBadge(); };
+  const unreadCount = () => getNotifs().filter(n => n.unread).length;
+  const _updateBadge = () => {
+    const cnt = unreadCount();
+    document.querySelectorAll('[data-notif-badge]').forEach(el => {
+      el.textContent = cnt || '';
+      el.style.display = cnt ? '' : 'none';
+    });
+  };
+
+  /* ── 로딩 버튼 ── */
+  const showLoading = (btn, text = '처리 중...') => {
+    if (!btn) return;
+    btn._origHTML = btn.innerHTML;
+    btn.disabled = true;
+    if (!document.getElementById('pcmSpinStyle')) {
+      const s = document.createElement('style');
+      s.id = 'pcmSpinStyle';
+      s.textContent = '@keyframes pcmSpin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    btn.innerHTML = `<span style="display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:pcmSpin .7s linear infinite;vertical-align:middle;margin-right:6px;"></span>${text}`;
+  };
+  const hideLoading = btn => {
+    if (btn && btn._origHTML != null) { btn.disabled = false; btn.innerHTML = btn._origHTML; }
+  };
+
+  /* ── 토스트 ── */
+  const toast = (msg, type = 'info') => {
+    const colors = { info: '#1a1f2e', success: '#1a6b4a', error: '#dc3545', warn: '#b45309' };
+    const icons  = { info: 'ℹ️', success: '✅', error: '❌', warn: '⚠️' };
+    let t = document.getElementById('pcmToast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'pcmToast';
+      t.style.cssText = 'position:fixed;bottom:24px;right:24px;border-radius:10px;padding:12px 18px;font-size:13px;font-family:sans-serif;z-index:9999;transition:all .3s;opacity:0;transform:translateY(60px);display:flex;align-items:center;gap:8px;max-width:340px;box-shadow:0 4px 24px rgba(0,0,0,.22);color:#fff;pointer-events:none;';
+      document.body.appendChild(t);
+    }
+    t.style.background = colors[type] || colors.info;
+    t.innerHTML = `<span style="flex-shrink:0;">${icons[type] || ''}</span><span>${msg}</span>`;
+    t.style.opacity = '1';
+    t.style.transform = 'translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(60px)'; }, 3400);
+  };
+
+  /* ── 폼 유효성 검사 ── */
+  const validate = rules => {
+    let ok = true;
+    rules.forEach(({ id, label, required, minLen, type: ftype }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const v = (el.value || '').trim();
+      let msg = '';
+      if (required && !v) msg = `${label}을(를) 입력해주세요.`;
+      else if (minLen && v.length < minLen) msg = `${label}은(는) ${minLen}자 이상이어야 합니다.`;
+      else if (ftype === 'email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) msg = '올바른 이메일 형식이 아닙니다.';
+      let errEl = document.getElementById(id + '-err');
+      if (!errEl) {
+        errEl = document.createElement('div');
+        errEl.id = id + '-err';
+        errEl.style.cssText = 'font-size:11px;color:#dc3545;margin-top:3px;';
+        if (el.parentNode) el.parentNode.appendChild(errEl);
+      }
+      if (msg) { ok = false; errEl.textContent = msg; el.style.setProperty('border-color', '#dc3545', 'important'); }
+      else { errEl.textContent = ''; el.style.removeProperty('border-color'); }
+    });
+    return ok;
+  };
+
+  /* ── 폼 자동 임시저장 ── */
+  const autoSave = (formId, storageKey) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const save = () => {
+      const data = {};
+      form.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) data[el.id] = el.value; });
+      set(storageKey, data);
+    };
+    form.addEventListener('input', save);
+    form.addEventListener('change', save);
+    // 새로고침 경고
+    window.addEventListener('beforeunload', e => {
+      const saved = get(storageKey, {});
+      if (Object.values(saved).some(v => v)) {
+        e.preventDefault();
+        e.returnValue = '작성 중인 내용이 있습니다. 페이지를 떠나시겠습니까?';
+      }
+    });
+    // 기존 임시저장 복원
+    const saved = get(storageKey, {});
+    if (saved) {
+      Object.entries(saved).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el && !el.value) el.value = v;
+      });
+    }
+  };
+
+  /* ── 로그아웃 (세션 완전 정리) ── */
+  const logout = () => {
+    // PCM 키 전부 삭제
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith('pcm_'));
+    keys.forEach(k => sessionStorage.removeItem(k));
+    // 기타 앱 키
+    ['userType', 'userEmail', 'onboarded', 'onboarding_from'].forEach(k => sessionStorage.removeItem(k));
+    window.location.href = '로그인.html';
+  };
+
+  /* ── 알림 렌더 헬퍼 (마이페이지 등에서 사용) ── */
+  const renderNotifList = (containerId) => {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const notifs = getNotifs();
+    markRead();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:32px;color:#8492a6;font-size:13px;">알림이 없습니다</div>';
+      return;
+    }
+    el.innerHTML = notifs.slice(0, 20).map(n => `
+      <div style="display:flex;gap:12px;padding:14px 0;border-bottom:1px solid rgba(0,0,0,0.08);cursor:pointer;">
+        <div style="font-size:20px;flex-shrink:0;">${n.icon || '🔔'}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px;">${n.title || ''}</div>
+          <div style="font-size:12px;color:#8492a6;">${n.sub || ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div style="font-size:11px;color:#8492a6;white-space:nowrap;">${n.time || ''}</div>
+          ${n.unread ? '<div style="width:8px;height:8px;border-radius:50%;background:#1a6b4a;flex-shrink:0;"></div>' : ''}
+        </div>
+      </div>`).join('');
+  };
+
+  /* ── 공개 API ── */
+  return {
+    set, get, del,
+    breakdown, fw, fmw,
+    saveTask, getTask, saveQuote, getQuote, getConfirmedAmount,
+    saveProject, getProjects,
+    pushNotif, getNotifs, markRead, unreadCount, renderNotifList,
+    showLoading, hideLoading,
+    toast, validate, autoSave, logout,
+    _updateBadge,
+  };
+})();
+
+/* 페이지 로드 시 뱃지 갱신 */
+document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
+
+</script>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:0;">
+    <div class="logo" onclick="nav('랜딩페이지.html')">
+      <div class="logo-mark">공</div>
+      <div class="logo-name">공공콘텐츠마켓</div>
+    </div>
+    <div class="nav-links" style="margin-left:16px;">
+      <button class="nav-btn" onclick="nav('발주처_대시보드.html')">대시보드</button>
+      <button class="nav-btn" onclick="nav('제작사_디렉토리.html')">콘텐츠사 찾기</button>
+      <button class="nav-btn active">랭킹</button>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div>실시간 업데이트</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Real-time Ranking</div>
+  <h1 class="hero-title">공공콘텐츠마켓 랭킹</h1>
+  <p class="hero-sub">발주처 평점을 기반으로 실시간 집계됩니다</p>
+  <div class="tab-bar">
+    <button class="main-tab active" id="tab-maker" onclick="switchMainTab('maker')">
+      🎬 콘텐츠사 랭킹
+    </button>
+    <button class="main-tab" id="tab-expert" onclick="switchMainTab('expert')">
+      👩‍💼 콘텐츠 전문가 랭킹
+    </button>
+  </div>
+</div>
+
+<div class="page" id="main-page">
+  <!-- 동적 렌더링 -->
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-body"></div>
+</div>
+
+<script>
+function nav(p) { window.location.href = p; }
+
+// ── 데이터 ────────────────────────────────────────────
+const MAKERS = [
+  { id:1, emoji:'🎬', name:'㈜ 그린스튜디오', type:'영상·SNS',
+    woman:true, g2b:true,
+    score:96.4, starAvg:4.9, reviewCount:42, recordCount:67, responseRate:98,
+    prevRank:1, fields:['홍보 영상','SNS 카드뉴스','모션그래픽'],
+    reviews:[
+      {org:'환경부 홍보기획과',stars:5,date:'2025.04',text:'납기 완벽, 수정 대응 빠름. 다음에도 반드시 재이용.'},
+      {org:'국토부 소통협력관',stars:5,date:'2025.03',text:'AI 검수 만점 근접. 완성도가 탁월합니다.'},
+      {org:'행안부 홍보담당관',stars:5,date:'2025.02',text:'3번 연속 발주. 신뢰할 수 있는 파트너.'},
+    ]},
+  { id:2, emoji:'📊', name:'비주얼팩토리', type:'인포그래픽·인쇄',
+    woman:true, g2b:false,
+    score:94.8, starAvg:4.9, reviewCount:38, recordCount:54, responseRate:95,
+    prevRank:3, fields:['인포그래픽','인쇄 홍보물','SNS 카드뉴스'],
+    reviews:[
+      {org:'국토부 주거복지기획과',stars:5,date:'2025.04',text:'복잡한 통계를 아름답게 시각화. 완성도 최상.'},
+      {org:'복지부 정책홍보담당관',stars:5,date:'2025.03',text:'디자인 감각이 뛰어납니다. 재의뢰 예정.'},
+    ]},
+  { id:3, emoji:'📣', name:'캠페인하우스', type:'캠페인·기획',
+    woman:true, g2b:true,
+    score:93.1, starAvg:4.8, reviewCount:29, recordCount:45, responseRate:97,
+    prevRank:2, fields:['캠페인 기획','SNS 채널운영','홍보 영상'],
+    reviews:[
+      {org:'환경부 기후변화홍보과',stars:5,date:'2025.04',text:'전략적 기획력이 압도적. 예산 대비 최고 효율.'},
+    ]},
+  { id:4, emoji:'🎨', name:'퍼블릭크리에이티브', type:'통합 크리에이티브',
+    woman:false, g2b:true,
+    score:91.7, starAvg:4.7, reviewCount:51, recordCount:89, responseRate:93,
+    prevRank:4, fields:['홍보 영상','캠페인 기획','인쇄 홍보물'],
+    reviews:[
+      {org:'문화체육관광부',stars:5,date:'2025.03',text:'10년 경험의 노하우가 느껴집니다.'},
+    ]},
+  { id:5, emoji:'📱', name:'소셜미디어웍스', type:'SNS 운영',
+    woman:true, g2b:true,
+    score:89.3, starAvg:4.6, reviewCount:21, recordCount:28, responseRate:99,
+    prevRank:6, fields:['SNS 채널운영','SNS 카드뉴스'],
+    reviews:[
+      {org:'서울시 디지털소통담당관',stars:4,date:'2025.04',text:'성실한 운영, 월간 보고서 상세.'},
+    ]},
+  { id:6, emoji:'✨', name:'모션랩', type:'모션·애니메이션',
+    woman:true, g2b:false,
+    score:87.5, starAvg:4.8, reviewCount:12, recordCount:18, responseRate:96,
+    prevRank:5, fields:['모션그래픽','홍보 영상'],
+    reviews:[
+      {org:'교육부 디지털교육기획관',stars:5,date:'2025.04',text:'감각적이고 창의적. 공공 콘텐츠의 새 기준.'},
+    ]},
+  { id:7, emoji:'📸', name:'포토웍스', type:'사진·영상',
+    woman:true, g2b:true,
+    score:85.9, starAvg:4.6, reviewCount:28, recordCount:41, responseRate:94,
+    prevRank:7, fields:['사진 촬영','홍보 영상'],
+    reviews:[]},
+  { id:8, emoji:'💻', name:'웹콘텐츠랩', type:'웹·디지털',
+    woman:true, g2b:false,
+    score:83.2, starAvg:4.7, reviewCount:9, recordCount:12, responseRate:91,
+    prevRank:9, fields:['SNS 카드뉴스','모션그래픽'],
+    reviews:[]},
+  { id:9, emoji:'🖨', name:'인쇄프로', type:'인쇄·출판',
+    woman:false, g2b:true,
+    score:81.6, starAvg:4.5, reviewCount:44, recordCount:70, responseRate:89,
+    prevRank:8, fields:['인쇄 홍보물','인포그래픽'],
+    reviews:[]},
+];
+
+const EXPERTS = [
+  { id:1, emoji:'👩', name:'김민정', title:'공공마케팅 전문가',
+    career:10, fields:['SNS·디지털마케팅','홍보기획','카피라이팅·공공언어'],
+    score:97.2, starAvg:5.0, reviewCount:34, checkCount:89, accuracyRate:98,
+    prevRank:1,
+    reviews:[
+      {org:'환경부 홍보기획과',stars:5,date:'2025.04',text:'검수 리포트가 매우 상세하고 정확합니다. 덕분에 납품물 품질이 크게 향상됐어요.'},
+      {org:'국토부 소통협력관',stars:5,date:'2025.03',text:'공공언어 기준에 맞는 꼼꼼한 검수. 신뢰할 수 있는 전문가입니다.'},
+    ]},
+  { id:2, emoji:'👨', name:'이준혁', title:'방송 PD·영상 전문가',
+    career:15, fields:['영상·영상편집','모션그래픽'],
+    score:95.8, starAvg:4.9, reviewCount:28, checkCount:74, accuracyRate:97,
+    prevRank:2,
+    reviews:[
+      {org:'서울시 디지털소통담당관',stars:5,date:'2025.04',text:'영상 검수 품질이 매우 높습니다. 기술적 기준까지 정확히 체크해주심.'},
+    ]},
+  { id:3, emoji:'👩', name:'박소연', title:'시각디자인 전문가',
+    career:8, fields:['시각디자인','인쇄·출판','데이터 시각화'],
+    score:94.1, starAvg:4.9, reviewCount:22, checkCount:61, accuracyRate:96,
+    prevRank:4,
+    reviews:[
+      {org:'국토부 주거복지기획과',stars:5,date:'2025.03',text:'디자인 검수 관점이 탁월합니다. 놓쳤던 부분을 정확히 짚어주셨어요.'},
+    ]},
+  { id:4, emoji:'👨', name:'최재훈', title:'카피라이터·공공언어',
+    career:12, fields:['카피라이팅·공공언어','홍보기획','SNS·디지털마케팅'],
+    score:92.6, starAvg:4.8, reviewCount:19, checkCount:55, accuracyRate:95,
+    prevRank:3,
+    reviews:[
+      {org:'문화체육관광부',stars:5,date:'2025.03',text:'공공언어 기준을 정확히 적용. 보고서도 읽기 좋게 작성됩니다.'},
+    ]},
+  { id:5, emoji:'👩', name:'한수진', title:'콘텐츠 전략가',
+    career:7, fields:['SNS·디지털마케팅','콘텐츠 전략','홍보기획'],
+    score:90.3, starAvg:4.7, reviewCount:15, checkCount:43, accuracyRate:93,
+    prevRank:5,
+    reviews:[]},
+  { id:6, emoji:'👨', name:'정민호', title:'사진·영상 전문가',
+    career:9, fields:['사진촬영','영상·영상편집'],
+    score:88.7, starAvg:4.7, reviewCount:13, checkCount:38, accuracyRate:94,
+    prevRank:6,
+    reviews:[]},
+  { id:7, emoji:'👩', name:'오지연', title:'인쇄·출판 전문가',
+    career:11, fields:['인쇄·출판','시각디자인'],
+    score:86.4, starAvg:4.6, reviewCount:18, checkCount:47, accuracyRate:91,
+    prevRank:8,
+    reviews:[]},
+];
+
+// ── 상태 ──────────────────────────────────────────────
+let currentTab = 'maker';
+let filterField = [];
+let filterWoman = false;
+let filterG2b = false;
+
+// ── 점수 계산 ─────────────────────────────────────────
+// 콘텐츠사: 발주처 평점 60% + 공공 실적 20% + 응답속도 10% + 검수 통과율 10%
+// 전문가:   발주처 평점 70% + 검수 정확도 20% + 처리 건수 10%
+
+function calcMakerScore(m) {
+  const s1 = (m.starAvg / 5) * 60;
+  const s2 = Math.min(m.recordCount / 100, 1) * 20;
+  const s3 = (m.responseRate / 100) * 10;
+  const s4 = 10; // 검수 통과율 고정 (샘플)
+  return Math.round((s1 + s2 + s3 + s4) * 10) / 10;
+}
+
+function calcExpertScore(e) {
+  const s1 = (e.starAvg / 5) * 70;
+  const s2 = (e.accuracyRate / 100) * 20;
+  const s3 = Math.min(e.checkCount / 100, 1) * 10;
+  return Math.round((s1 + s2 + s3) * 10) / 10;
+}
+
+// ── 렌더 ──────────────────────────────────────────────
+function render() {
+  const page = document.getElementById('main-page');
+  const isMaker = currentTab === 'maker';
+  const data = isMaker ? getSortedMakers() : getSortedExperts();
+
+  page.innerHTML = `
+    ${renderFilterSide(isMaker)}
+    ${renderRankMain(data, isMaker)}
+    ${renderStatsSide(data, isMaker)}`;
+}
+
+function getSortedMakers() {
+  return MAKERS
+    .filter(m => {
+      if (filterWoman && !m.woman) return false;
+      if (filterG2b && !m.g2b) return false;
+      if (filterField.length && !filterField.some(f => m.fields.includes(f))) return false;
+      return true;
+    })
+    .sort((a,b) => b.score - a.score);
+}
+
+function getSortedExperts() {
+  return EXPERTS
+    .filter(e => {
+      if (filterField.length && !filterField.some(f => e.fields.includes(f))) return false;
+      return true;
+    })
+    .sort((a,b) => b.score - a.score);
+}
+
+function renderFilterSide(isMaker) {
+  const MAKER_FIELDS = ['홍보 영상','SNS 카드뉴스','인포그래픽','인쇄 홍보물','SNS 채널운영','캠페인 기획','모션그래픽','사진 촬영'];
+  const EXPERT_FIELDS = ['영상·영상편집','SNS·디지털마케팅','카피라이팅·공공언어','시각디자인','홍보기획','사진촬영','모션그래픽','인쇄·출판','데이터 시각화'];
+  const fields = isMaker ? MAKER_FIELDS : EXPERT_FIELDS;
+
+  return `
+    <div class="side-filter">
+      <div class="sf-section">
+        <div class="sf-title">분야 필터</div>
+        <div>
+          ${fields.map(f => `<span class="filter-chip ${filterField.includes(f)?'on':''}" onclick="toggleField('${f}')">${f}</span>`).join('')}
+        </div>
+      </div>
+      ${isMaker ? `
+      <div class="sf-section">
+        <div class="sf-title">인증 조건</div>
+        <span class="filter-chip ${filterWoman?'on':''}" onclick="toggleWoman()">여성기업</span>
+        <span class="filter-chip ${filterG2b?'on':''}" onclick="toggleG2b()">나라장터 등록</span>
+      </div>` : ''}
+      <button style="width:100%;padding:7px;border:1px solid var(--border2);border-radius:8px;background:transparent;color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--sans);margin-top:8px;" onclick="resetFilter()">필터 초기화</button>
+    </div>`;
+}
+
+function renderRankMain(data, isMaker) {
+  if (data.length === 0) return `<div class="rank-main" style="display:flex;align-items:center;justify-content:center;"><div style="text-align:center;color:var(--text3);padding:60px;"><div style="font-size:36px;margin-bottom:12px;">🔍</div><div>조건에 맞는 결과가 없습니다</div></div></div>`;
+
+  const top3 = data.slice(0, 3);
+  const rest = data.slice(3);
+
+  return `
+    <div class="rank-main">
+      <div style="font-size:10px;color:var(--text3);text-align:right;margin-bottom:12px;font-family:var(--mono);">
+        마지막 업데이트: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+      </div>
+
+      <!-- PODIUM -->
+      <div class="podium" style="margin-bottom:28px;">
+        ${top3.map((item, i) => {
+          const rank = i + 1;
+          const cls = `podium-${rank}`;
+          const crowns = ['👑','🥈','🥉'];
+          return `
+            <div class="${cls} podium-item" onclick="openModal(${item.id}, '${currentTab}')" ondblclick="nav('제작사_디렉토리.html')">
+              <div class="crown">${crowns[i]}</div>
+              <div class="podium-rank">#${rank}</div>
+              <div class="podium-emoji">${item.emoji}</div>
+              <div class="podium-name">${item.name}</div>
+              <div class="podium-type">${isMaker ? item.type : item.title}</div>
+              <div class="podium-score">${item.score}</div>
+              <div class="podium-score-label">종합점수</div>
+              <div style="margin:8px 0 4px;font-size:12px;color:var(--gold);">★ ${item.starAvg.toFixed(1)}</div>
+              <div style="font-size:10px;color:var(--text3);">발주처 평점 (${item.reviewCount}건)</div>
+              ${isMaker ? `
+              <div class="podium-badges">
+                ${item.woman?'<span class="p-badge pb-woman">여성기업</span>':''}
+                ${item.g2b?'<span class="p-badge pb-g2b">나라장터</span>':''}
+              </div>` : `<div style="font-size:10px;color:var(--text3);margin-top:6px;">경력 ${item.career}년</div>`}
+            </div>`;
+        }).join('')}
+      </div>
+
+      <!-- REST TABLE -->
+      ${rest.length > 0 ? `
+      <div class="rank-section-title">
+        <span>4위 이하</span>
+        <span style="font-weight:400;color:var(--text3);">${data.length}개 ${isMaker?'콘텐츠사':'전문가'}</span>
+      </div>
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th style="width:40px;">순위</th>
+            <th>${isMaker?'콘텐츠사':'전문가'}</th>
+            <th>발주처 평점</th>
+            <th style="min-width:120px;">점수 분포</th>
+            <th>${isMaker?'실적':'검수 건수'}</th>
+            <th>변동</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rest.map((item, i) => {
+            const rank = i + 4;
+            const prev = item.prevRank;
+            const diff = prev - rank;
+            const changeHtml = diff > 0
+              ? `<span class="up">▲${diff}</span>`
+              : diff < 0
+                ? `<span class="down">▼${Math.abs(diff)}</span>`
+                : `<span class="same">−</span>`;
+            const barCls = rank <= 3 ? `bar-${rank}` : 'bar-other';
+            return `
+              <tr class="rank-row" onclick="openModal(${item.id}, '${currentTab}')" ondblclick="nav('제작사_디렉토리.html')" style="animation-delay:${i*0.04}s;">
+                <td><div class="rank-num rn-other">${rank}</div></td>
+                <td>
+                  <div class="rank-name-cell">
+                    <div class="rank-emoji">${item.emoji}</div>
+                    <div>
+                      <div class="rank-name">${item.name}</div>
+                      <div class="rank-sub">${isMaker ? item.type : item.title + ' · 경력 '+item.career+'년'}</div>
+                      ${isMaker ? `<div class="rank-badges">
+                        ${item.woman?'<span class="r-badge pb-woman">여성기업</span>':''}
+                        ${item.g2b?'<span class="r-badge pb-g2b">나라장터</span>':''}
+                      </div>`:''}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="score-cell">
+                    <span class="score-star">★</span>${item.starAvg.toFixed(1)}
+                  </div>
+                  <span class="score-count">${item.reviewCount}건 평가</span>
+                </td>
+                <td class="bar-cell">
+                  <div style="font-family:var(--mono);font-size:12px;font-weight:700;margin-bottom:4px;">${item.score}</div>
+                  <div class="score-bar">
+                    <div class="score-bar-fill ${barCls}" style="width:${item.score}%"></div>
+                  </div>
+                </td>
+                <td class="rank-record">${isMaker ? item.recordCount+'건' : item.checkCount+'건'}</td>
+                <td class="change-cell">${changeHtml}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>` : ''}
+    </div>`;
+}
+
+function renderStatsSide(data, isMaker) {
+  // 분야별 1위
+  const fieldMap = {};
+  data.forEach(item => {
+    item.fields.forEach(f => {
+      if (!fieldMap[f] || item.score > fieldMap[f].score) fieldMap[f] = item;
+    });
+  });
+  const fieldRanks = Object.entries(fieldMap).slice(0, 6);
+
+  const formula = isMaker ? [
+    { label: '발주처 평점', weight: '60%', cls: 'fi-w-1', bar: 'var(--gold)', w: 60 },
+    { label: '공공 실적 건수', weight: '20%', cls: 'fi-w-2', bar: 'var(--accent)', w: 20 },
+    { label: '응답 속도', weight: '10%', cls: 'fi-w-3', bar: 'var(--blue)', w: 10 },
+    { label: '검수 통과율', weight: '10%', cls: 'fi-w-4', bar: 'var(--purple)', w: 10 },
+  ] : [
+    { label: '발주처 평점', weight: '70%', cls: 'fi-w-1', bar: 'var(--gold)', w: 70 },
+    { label: '검수 정확도', weight: '20%', cls: 'fi-w-2', bar: 'var(--accent)', w: 20 },
+    { label: '처리 건수', weight: '10%', cls: 'fi-w-3', bar: 'var(--blue)', w: 10 },
+  ];
+
+  return `
+    <div class="side-stats">
+
+      <div class="formula-box">
+        <div class="formula-title">점수 산정 기준</div>
+        ${formula.map(f => `
+          <div class="formula-item">
+            <span class="fi-label">${f.label}</span>
+            <span class="fi-weight ${f.cls}">${f.weight}</span>
+          </div>
+          <div class="score-bar" style="margin-bottom:8px;">
+            <div class="score-bar-fill" style="width:${f.w}%;background:${f.bar};"></div>
+          </div>`).join('')}
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">분야별 1위</div>
+        ${fieldRanks.map(([field, item]) => `
+          <div class="field-rank-item">
+            <span class="fri-field">${field}</span>
+            <span class="fri-name">${item.name}</span>
+            <span class="fri-score">★${item.starAvg.toFixed(1)}</span>
+          </div>`).join('')}
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-title">이번 주 주목</div>
+        ${data.slice(0, 5).filter((_, i) => i < 5).map((item, i) => `
+          <div class="top-performer" onclick="openModal(${item.id}, '${currentTab}')" ondblclick="nav('제작사_디렉토리.html')">
+            <div class="tp-rank">${i+1}</div>
+            <div class="tp-emoji">${item.emoji}</div>
+            <div class="tp-info">
+              <div class="tp-name">${item.name}</div>
+              <div class="tp-score">★${item.starAvg.toFixed(1)} · ${item.reviewCount}건</div>
+            </div>
+            ${isMaker && item.woman ? '<span class="tp-badge pb-woman">여성</span>' : ''}
+          </div>`).join('')}
+      </div>
+
+      <div class="update-info">
+        점수는 새 리뷰 등록 즉시 갱신됩니다<br>
+        기준일: ${new Date().toLocaleDateString('ko-KR')}
+      </div>
+    </div>`;
+}
+
+// ── MODAL ─────────────────────────────────────────────
+function openModal(id, type) {
+  const isMaker = type === 'maker';
+  const item = isMaker ? MAKERS.find(m=>m.id===id) : EXPERTS.find(e=>e.id===id);
+  if (!item) return;
+
+  const body = document.getElementById('modal-body');
+  const formula = isMaker
+    ? [{label:'발주처 평점',val:(item.starAvg/5*60).toFixed(1),cls:'gold'},{label:'공공 실적',val:Math.min(item.recordCount/100,1)*20|0+'',cls:'accent'},{label:'응답속도',val:(item.responseRate/100*10).toFixed(1),cls:'blue'},{label:'검수 통과율',val:'10.0',cls:'purple'}]
+    : [{label:'발주처 평점',val:(item.starAvg/5*70).toFixed(1),cls:'gold'},{label:'검수 정확도',val:(item.accuracyRate/100*20).toFixed(1),cls:'accent'},{label:'처리 건수',val:Math.min(item.checkCount/100,1)*10|0+'',cls:'blue'}];
+
+  body.innerHTML = `
+    <div class="modal-header">
+      <div>
+        <div style="font-size:32px;margin-bottom:6px;">${item.emoji}</div>
+        <div class="modal-name">${item.name}</div>
+        <div class="modal-sub">${isMaker ? item.type : item.title + ' · 경력 '+item.career+'년'}</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div style="text-align:center;">
+          <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--gold);">${item.score}</div>
+          <div style="font-size:11px;color:var(--text3);">종합점수</div>
+        </div>
+        <div style="flex:1;">
+          <div class="score-bar" style="height:8px;margin-bottom:4px;">
+            <div class="score-bar-fill bar-other" style="width:${item.score}%;"></div>
+          </div>
+          <div style="font-size:11px;color:var(--text3);">상위 ${Math.round((1-item.score/100)*100)}% 수준</div>
+        </div>
+      </div>
+
+      <div class="score-breakdown">
+        ${formula.map(f=>`
+          <div class="sb-item">
+            <div class="sb-label">${f.label}</div>
+            <div class="sb-val ${f.cls}">${f.val}</div>
+          </div>`).join('')}
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">전문 분야</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          ${item.fields.map(f=>`<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:3px 9px;color:var(--text2);">${f}</span>`).join('')}
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;">발주처 리뷰 (${item.reviewCount}건)</div>
+        <ul class="review-list">
+          ${item.reviews.length ? item.reviews.map(r=>`
+            <li class="review-item">
+              <div class="review-top">
+                <span class="review-org">${r.org}</span>
+                <span class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</span>
+                <span class="review-date">${r.date}</span>
+              </div>
+              <div class="review-text">${r.text}</div>
+            </li>`).join('') : `<li style="padding:12px 0;font-size:12px;color:var(--text3);">등록된 리뷰가 없습니다.</li>`}
+        </ul>
+      </div>
+    </div>`;
+
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ── 액션 ──────────────────────────────────────────────
+function switchMainTab(tab) {
+  currentTab = tab;
+  filterField = []; filterWoman = false; filterG2b = false;
+  document.getElementById('tab-maker').classList.toggle('active', tab==='maker');
+  document.getElementById('tab-expert').classList.toggle('active', tab==='expert');
+  render();
+}
+
+function toggleField(f) {
+  const i = filterField.indexOf(f);
+  i >= 0 ? filterField.splice(i,1) : filterField.push(f);
+  render();
+}
+function toggleWoman() { filterWoman = !filterWoman; render(); }
+function toggleG2b()   { filterG2b = !filterG2b; render(); }
+function resetFilter() { filterField=[]; filterWoman=false; filterG2b=false; render(); }
+
+// 실시간 시계 (시간만 업데이트, 데이터 재렌더 없이)
+setInterval(() => {
+  const el = document.querySelector('.rank-main > div:first-child');
+  if (el) el.textContent = `마지막 업데이트: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+}, 1000);
+
+render();
+</script>
+
+<div id="price-login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;">
+  <div style="background:#161b27;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;max-width:380px;width:90%;text-align:center;">
+    <div style="font-size:36px;margin-bottom:14px;">🔒</div>
+    <div style="font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:8px;">로그인이 필요합니다</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px;">표준단가 정보는 회원만 열람 가능합니다.<br>로그인 후 이용해주세요.</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="document.getElementById('price-login-modal').style.display='none'" style="padding:10px 20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#e8eaf2;border-radius:8px;cursor:pointer;font-family:var(--sans);">닫기</button>
+      <button onclick="nav('로그인.html')" style="padding:10px 20px;background:#1dd9a0;color:#0d1117;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--sans);">로그인하기</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="price-login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#161b27;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;max-width:360px;width:90%;text-align:center;color:#e8eaf2;">
+    <div style="font-size:36px;margin-bottom:14px;">🔒</div>
+    <div style="font-family:var(--serif,serif);font-size:18px;font-weight:700;margin-bottom:8px;">로그인이 필요합니다</div>
+    <div style="font-size:13px;color:#8b92b3;line-height:1.7;margin-bottom:20px;">표준단가 정보는 회원만 열람 가능합니다.</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="document.getElementById('price-login-modal').style.display='none'" style="padding:10px 20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#e8eaf2;border-radius:8px;cursor:pointer;font-family:sans-serif;">닫기</button>
+      <button onclick="window.location.href='로그인.html'" style="padding:10px 20px;background:#1dd9a0;color:#0d1117;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:sans-serif;">로그인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="price-login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;"><div style="background:#161b27;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;max-width:360px;width:90%;text-align:center;color:#e8eaf2;"><div style="font-size:36px;margin-bottom:14px;">🔒</div><div style="font-size:18px;font-weight:700;margin-bottom:8px;">로그인이 필요합니다</div><div style="font-size:13px;color:#8b92b3;margin-bottom:20px;">표준단가는 회원만 열람 가능합니다.</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="document.getElementById('price-login-modal').style.display='none'" style="padding:10px 20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#e8eaf2;border-radius:8px;cursor:pointer;">닫기</button><button onclick="window.location.href='로그인.html'" style="padding:10px 20px;background:#1dd9a0;color:#0d1117;border:none;border-radius:8px;font-weight:700;cursor:pointer;">로그인</button></div></div></div>
+
+<script>
+
+function guardedSwitchTab(tab) {
+  if (tab === 'price' && !sessionStorage.getItem('userType')) {
+    var m = document.getElementById('price-login-modal');
+    if(m) { m.style.display='flex'; return; }
+    if(confirm('표준단가는 로그인 후 이용 가능합니다. 로그인하시겠습니까?'))
+      window.location.href='로그인.html';
+    return;
+  }
+  if (typeof switchMainTab === 'function') switchMainTab(tab);
+  else if (typeof switchTab === 'function') switchTab(tab);
+}
+
+</script>
+<div id="price-login-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;"><div style="background:#161b27;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;max-width:360px;width:90%;text-align:center;color:#e8eaf2;"><div style="font-size:36px;margin-bottom:14px;">🔒</div><div style="font-size:18px;font-weight:700;margin-bottom:8px;">로그인이 필요합니다</div><div style="font-size:13px;color:#8b92b3;margin-bottom:20px;">표준단가는 회원만 열람 가능합니다.</div><div style="display:flex;gap:10px;justify-content:center;"><button onclick="document.getElementById('price-login-modal').style.display='none'" style="padding:10px 20px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#e8eaf2;border-radius:8px;cursor:pointer;">닫기</button><button onclick="window.location.href='로그인.html'" style="padding:10px 20px;background:#1dd9a0;color:#0d1117;border:none;border-radius:8px;font-weight:700;cursor:pointer;">로그인</button></div></div></div>
+</body>
+</html>
