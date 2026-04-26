@@ -417,9 +417,9 @@ function setTab(type) {
 }
 
 
-async function doLogin() {
+async async function doLogin() {
   const email    = document.getElementById('email')?.value?.trim();
-  const password = document.getElementById('password')?.value;
+  const password = document.getElementById('pw')?.value || document.getElementById('password')?.value;
   const role     = document.getElementById('role')?.value || sessionStorage.getItem('loginRole') || 'public';
 
   if (!email || !password) {
