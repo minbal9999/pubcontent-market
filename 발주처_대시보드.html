@@ -932,7 +932,7 @@ function renderDashboard() {
             <div class="proj-name">${p.title}</div>
             <div class="proj-maker">${p.maker}</div>
           </div>
-          <div class="budget-val">${p.budgetVAT.slice(0,-4)}<span style="font-size:11px;color:var(--text3);">만원</span></div>
+          <div class="budget-val">${Math.round(p.budgetVAT/10000).toLocaleString()}<span style="font-size:11px;color:var(--text3);">만원</span></div>
           <div class="deadline-val">${p.deadline}</div>
           <span class="status-pill ${statusClass(p.status)}">${p.statusLabel}</span>
           <div style="font-size:13px;font-family:var(--mono);color:${scoreColor(p.aiScore)};">${p.aiScore ? p.aiScore + '/100' : '—'}</div>
@@ -966,7 +966,7 @@ function renderProjects() {
             <div class="proj-name">${p.title}</div>
             <div class="proj-maker">${p.maker}</div>
           </div>
-          <div class="budget-val">${p.budgetVAT.slice(0,-4)}<span style="font-size:11px;color:var(--text3);">만원</span></div>
+          <div class="budget-val">${Math.round(p.budgetVAT/10000).toLocaleString()}<span style="font-size:11px;color:var(--text3);">만원</span></div>
           <div class="deadline-val">${p.deadline}</div>
           <span class="status-pill ${statusClass(p.status)}">${p.statusLabel}</span>
           <div style="font-size:13px;font-family:var(--mono);color:${scoreColor(p.aiScore)};">${p.aiScore ? p.aiScore + '/100' : '—'}</div>
@@ -1126,13 +1126,13 @@ function showDetail(id) {
         <div class="action-panel">
           <div class="action-title">프로젝트 정보</div>
           <div class="action-info-row"><span class="air-label">제작사</span><span class="air-val">${p.maker}</span></div>
-          <div class="action-info-row"><span class="air-label">계약 예산</span><span class="air-val">${p.budgetVAT.slice(0,-4)}만원</span></div>
+          <div class="action-info-row"><span class="air-label">계약 예산</span><span class="air-val">${Math.round(p.budgetVAT/10000).toLocaleString()}만원</span></div>
           <div class="action-info-row"><span class="air-label">납기일</span><span class="air-val">${p.deadline}</span></div>
           <div class="action-info-row"><span class="air-label">수정 가능 횟수</span><span class="air-val" style="color:var(--accent);">2회 남음</span></div>
 
           <div class="escrow-box">
             <div class="escrow-label">에스크로 보관 대금</div>
-            <div class="escrow-val">${p.budgetVAT.slice(0,-4)}<span style="font-size:14px;color:var(--text3);">만원</span></div>
+            <div class="escrow-val">${Math.round(p.budgetVAT/10000).toLocaleString()}<span style="font-size:14px;color:var(--text3);">만원</span></div>
             <div class="escrow-note">최종 승인 후 자동 지급</div>
           </div>
 
