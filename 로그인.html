@@ -417,39 +417,58 @@ function setTab(type) {
 }
 
 
-async async function doLogin() {
-  const email    = document.getElementById('email')?.value?.trim();
-  const password = document.getElementById('pw')?.value || document.getElementById('password')?.value;
-  const role     = document.getElementById('role')?.value || sessionStorage.getItem('loginRole') || 'public';
+function doLogin() {
+  var email    = document.getElementById('email') ? document.getElementById('email').value.trim() : '';
+  var password = document.getElementById('pw') ? document.getElementById('pw').value : '';
+  var role     = sessionStorage.getItem('loginRole') || 'public';
 
   if (!email || !password) {
     PCM.toast('이메일과 비밀번호를 입력하세요.', 'error'); return;
   }
 
-  // 로딩 상태
-  const btn = document.getElementById('login-btn');
+  var btn = document.getElementById('btn-login');
   if (btn) { btn.disabled = true; btn.textContent = '로그인 중...'; }
 
-  try {
-    // API 호출 시도
-    const res = await API.auth.login(email, password);
-
-    if (res && res.success) {
-      // 역할별 리다이렉트
-      const role = res.data.user.role;
-      if (role === 'BUYER')  window.location.href = '발주처_대시보드.html';
-      else if (role === 'MAKER')  window.location.href = '마이페이지_콘텐츠사.html';
-      else if (role === 'EXPERT') window.location.href = '마이페이지_전문가.html';
-      else if (role === 'ADMIN')  window.location.href = '관리자_백오피스.html';
-    } else if (res === null) {
-      // 서버 연결 실패 → 더미 로그인
-      dummyLogin(email, role);
-    }
-  } catch(e) {
-    dummyLogin(email, role);
-  } finally {
+  fetch('https://pubcontent.kr/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: password })
+  })
+  .then(function(res){ return res.json(); })
+  .then(function(data){
     if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
-  }
+    if (data && data.success) {
+      try {
+        sessionStorage.setItem('pcm_token', data.data.token);
+        sessionStorage.setItem('pcm_user', JSON.stringify(data.data.user));
+        sessionStorage.setItem('userType', role);
+        sessionStorage.setItem('userName', data.data.user.name);
+        if (data.data.user.makerProfile) {
+          sessionStorage.setItem('pcm_membership', (data.data.user.makerProfile.membership || 'none').toLowerCase());
+        }
+      } catch(e) {}
+      var r = data.data.user.role;
+      if (r === 'BUYER')  window.location.href = '발주처_대시보드.html';
+      else if (r === 'MAKER')  window.location.href = '마이페이지_콘텐츠사.html';
+      else if (r === 'EXPERT') window.location.href = '마이페이지_전문가.html';
+      else if (r === 'ADMIN')  window.location.href = '관리자_백오피스.html';
+      else window.location.href = '발주처_대시보드.html';
+    } else {
+      PCM.toast((data && data.message) || '로그인 실패', 'error');
+    }
+  })
+  .catch(function(){
+    if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
+    // 더미 모드
+    sessionStorage.setItem('userType', role);
+    sessionStorage.setItem('userName', email.split('@')[0]);
+    PCM.toast('더미 모드로 로그인합니다.', 'info');
+    setTimeout(function(){
+      if (role === 'maker') window.location.href = '마이페이지_콘텐츠사.html';
+      else if (role === 'expert') window.location.href = '마이페이지_전문가.html';
+      else window.location.href = '발주처_대시보드.html';
+    }, 800);
+  });
 }
 
 function dummyLogin(email, role) {
