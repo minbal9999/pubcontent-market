@@ -809,396 +809,205 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 
 <script>
 
+// ── 발주처 대시보드 ──
+var currentPage = 'dashboard';
 
-
-
-/* ── 발주처 대시보드 앱 코드 ── */
-
-// ── 전역 상태 ──
-function fmtW(n){ return n ? Math.round(n/10000).toLocaleString()+'만원' : '0원'; }
-
-let currentPage = 'dashboard';  // ← 초기값 명시
-
-// ── 샘플 프로젝트 데이터 ──
-const PROJECTS = [
+var PROJECTS = [
   { id:1, icon:'🌿', title:'탄소중립 SNS 카드뉴스 제작', org:'환경부 홍보기획과',
     maker:'㈜ 그린스튜디오', status:'review', statusLabel:'검수 중',
-    budgetVAT:18000000, deadline:'2025.05.10', revisions:2, progress:75, aiScore:94,
-    escrow:'18,000,000', checkStep:2 },
+    budgetVAT:19800000, deadline:'2025.05.10', progress:75, aiScore:94 },
   { id:2, icon:'📊', title:'환경정책 인포그래픽 5종', org:'환경부 정책기획과',
     maker:'비주얼팩토리', status:'done', statusLabel:'정산 완료',
-    budgetVAT:8800000, deadline:'2025.04.28', revisions:1, progress:100, aiScore:98,
-    escrow:'8,800,000', checkStep:3 },
+    budgetVAT:9680000, deadline:'2025.04.28', progress:100, aiScore:98 },
   { id:3, icon:'📣', title:'청년 주거복지 캠페인 기획', org:'국토부 주거복지기획과',
     maker:'캠페인하우스', status:'making', statusLabel:'제작 중',
-    budgetVAT:25000000, deadline:'2025.07.01', revisions:0, progress:30, aiScore:null,
-    escrow:'25,000,000', checkStep:0 },
+    budgetVAT:27500000, deadline:'2025.07.01', progress:30, aiScore:null },
 ];
 
-// 세션 프로젝트와 병합
-function mergeSessionProjects() {
-  try {
-    const sp = PCM.getProjects();
-    sp.forEach(p => { if (!PROJECTS.find(x => x.id === p.id)) PROJECTS.unshift(p); });
-  } catch(e) {}
+function fmtW(n) {
+  if (!n && n !== 0) return '0';
+  return Math.round(n / 10000).toLocaleString();
 }
 
-// ── 페이지 전환 ──
+function statusBadge(status, label) {
+  var colors = {
+    review: 'background:#e8f0fe;color:#1a56db;',
+    done:   'background:#e8f5ef;color:#1a6b4a;',
+    making: 'background:#fef3c7;color:#b45309;',
+    wait:   'background:#f9f8f5;color:#8492a6;'
+  };
+  var style = colors[status] || colors.wait;
+  return '<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;' + style + '">' + label + '</span>';
+}
+
 function showPage(page) {
   currentPage = page;
-  document.querySelectorAll('.nav-item').forEach((el, i) => {
-    el.classList.toggle('active',
-      ['dashboard','projects','new','makers','contracts'][i] === page);
+  document.querySelectorAll('.nav-item').forEach(function(el) {
+    el.classList.remove('active');
   });
+  var target = document.querySelector('.nav-item[data-page="' + page + '"]');
+  if (target) target.classList.add('active');
   render();
 }
 
-// ── 메인 렌더 ──
 function render() {
-  const area = document.getElementById('main-area');
-  if (!area) return;
-  if (currentPage === 'dashboard')  area.innerHTML = renderDashboard();
-  else if (currentPage === 'projects') area.innerHTML = renderProjects();
-  else if (currentPage === 'new')   area.innerHTML = renderNew();
-  else if (currentPage === 'makers') area.innerHTML = `
-    <div class="page-header"><div><div class="page-title">제작사 찾기</div>
-    <div class="page-sub">랭킹 기반 추천 제작사</div></div>
-    <button class="btn btn-primary" onclick="nav('제작사_디렉토리.html')">전체 디렉토리 →</button></div>
-    <div style="text-align:center;padding:48px;color:var(--text3);">
-      <div style="font-size:44px;margin-bottom:12px;">🎬</div>
-      <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px;">제작사 디렉토리</div>
-      <button class="btn btn-primary" onclick="nav('제작사_디렉토리.html')">제작사 찾기 →</button>
-    </div>`;
-  else if (currentPage === 'contracts') area.innerHTML = `
-    <div class="page-header"><div><div class="page-title">계약서 관리</div></div></div>
-    <div style="text-align:center;padding:48px;color:var(--text3);">
-      <div style="font-size:44px;margin-bottom:12px;">📄</div>
-      <div style="font-size:16px;font-weight:600;color:var(--text2);margin-bottom:8px;">계약서 목록</div>
-      <button class="btn btn-ghost" onclick="nav('계약서.html')">최근 계약서 보기</button>
-    </div>`;
+  var area = document.getElementById('main-area');
+  if (!area) { console.error('main-area 없음'); return; }
+  try {
+    if (currentPage === 'dashboard') {
+      area.innerHTML = renderDashboard();
+    } else if (currentPage === 'projects') {
+      area.innerHTML = renderProjects();
+    } else if (currentPage === 'new') {
+      area.innerHTML = '<div style="padding:32px;text-align:center;"><div style="font-size:44px;margin-bottom:14px;">📋</div><p style="margin-bottom:20px;">과업지시서 생성기로 이동합니다.</p><button class="btn btn-primary" onclick="nav(\'과업지시서_생성기_v3.html\')">과업지시서 작성 →</button></div>';
+    } else {
+      area.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text3);">준비 중입니다.</div>';
+    }
+  } catch(err) {
+    console.error('render 오류:', err);
+    area.innerHTML = '<div style="padding:32px;color:red;">오류: ' + err.message + '</div>';
+  }
 }
 
 function renderDashboard() {
-  const projects = PROJECTS;
-  return `
-    <div class="page-header">
-      <div>
-        <div class="page-title">대시보드</div>
-        <div class="page-sub">환경부 홍보기획과 · 2025년 2분기</div>
-      </div>
-      <button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button>
-    </div>
+  var html = '';
+  html += '<div class="page-header">';
+  html += '<div><div class="page-title">대시보드</div>';
+  html += '<div class="page-sub">환경부 홍보기획과 · 2025년 2분기</div></div>';
+  html += '<button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button>';
+  html += '</div>';
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">진행 중 프로젝트</div>
-        <div class="stat-val">3<span>건</span></div>
-        <div class="stat-change sc-up">▲ 이번 분기</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">집행 예산</div>
-        <div class="stat-val">59.5<span>백만원</span></div>
-        <div class="stat-change" style="color:var(--text3);">예산 한도 내</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">납품 완료</div>
-        <div class="stat-val">1<span>건</span></div>
-        <div class="stat-change sc-up">전문가 검수 통과</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">에스크로 보관 중</div>
-        <div class="stat-val">75<span>백만원</span></div>
-        <div class="stat-change" style="color:var(--accent);">안전 보관 중</div>
-      </div>
-    </div>
+  // 통계
+  html += '<div class="stats-grid">';
+  html += '<div class="stat-card"><div class="stat-label">진행 중</div><div class="stat-val">3<span>건</span></div></div>';
+  html += '<div class="stat-card"><div class="stat-label">집행 예산</div><div class="stat-val">570<span>만원</span></div></div>';
+  html += '<div class="stat-card"><div class="stat-label">완료</div><div class="stat-val">1<span>건</span></div></div>';
+  html += '<div class="stat-card"><div class="stat-label">AI 평균 점수</div><div class="stat-val">96<span>점</span></div></div>';
+  html += '</div>';
 
-    <div class="section-header">
-      <div class="section-title-sm">진행 중인 프로젝트</div>
-      <button class="btn btn-ghost btn-sm" onclick="showPage('projects')" data-page="projects">전체 보기</button>
-    </div>
+  // 프로젝트 목록
+  html += '<div class="card">';
+  html += '<div class="card-header"><div class="card-title">진행 중 의뢰</div>';
+  html += '<button class="btn btn-ghost btn-sm" onclick="showPage('projects')">전체 보기</button></div>';
+  html += '<div class="table-wrap">';
 
-    <div class="card">
-      <div class="table-header">
-        <span>프로젝트</span>
-        <span>예산</span>
-        <span>납기</span>
-        <span>검수 상태</span>
-        <span>AI 점수</span>
-        <span></span>
-      </div>
-      ${projects.map(p => `
-        <div class="table-row" onclick="showDetail(${p.id})">
-          <div>
-            <div class="proj-name">${p.title}</div>
-            <div class="proj-maker">${p.maker}</div>
-          </div>
-          <div class="budget-val">${Math.round(p.budgetVAT/10000).toLocaleString()}<span style="font-size:11px;color:var(--text3);">만원</span></div>
-          <div class="deadline-val">${p.deadline}</div>
-          <span class="status-pill ${statusClass(p.status)}">${p.statusLabel}</span>
-          <div style="font-size:13px;font-family:var(--mono);color:${scoreColor(p.aiScore)};">${p.aiScore ? p.aiScore + '/100' : '—'}</div>
-          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showDetail(${p.id})">상세 보기</button>
-        </div>`).join('')}
-    </div>`;
+  for (var i = 0; i < PROJECTS.length; i++) {
+    var p = PROJECTS[i];
+    html += '<div class="table-row" onclick="showDetail(' + p.id + ')" style="cursor:pointer;">';
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+    html += '<span>' + p.icon + '</span>';
+    html += '<span class="proj-name">' + p.title + '</span>';
+    html += statusBadge(p.status, p.statusLabel);
+    html += '</div>';
+    html += '<div class="proj-meta">' + p.maker + ' · 납기 ' + p.deadline + '</div>';
+    html += '</div>';
+    html += '<div style="text-align:right;flex-shrink:0;">';
+    html += '<div style="font-family:var(--mono,monospace);font-size:13px;font-weight:700;">' + fmtW(p.budgetVAT) + '만원</div>';
+    html += '<div style="font-size:11px;color:var(--text3);margin-top:3px;">' + (p.aiScore ? 'AI ' + p.aiScore + '점' : '검수 전') + '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+
+  // 빠른 액션
+  html += '<div class="card"><div class="card-header"><div class="card-title">빠른 액션</div></div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px;">';
+  var actions = [
+    {icon:'📋', label:'새 의뢰 등록', href:'과업지시서_생성기_v3.html'},
+    {icon:'💰', label:'단가 계산기', href:'표준단가_계산기.html'},
+    {icon:'🏢', label:'제작사 찾기', href:'제작사_디렉토리.html'},
+    {icon:'📊', label:'견적 비교', href:'견적_요청비교.html'},
+    {icon:'💬', label:'메시지', href:'메시지.html'},
+    {icon:'📄', label:'정산 내역', href:'정산_내역.html'},
+  ];
+  for (var j = 0; j < actions.length; j++) {
+    var a = actions[j];
+    html += '<div onclick="nav('' + a.href + '')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">';
+    html += '<div style="font-size:22px;margin-bottom:6px;">' + a.icon + '</div>';
+    html += '<div style="font-size:12px;font-weight:500;">' + a.label + '</div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+
+  return html;
 }
 
 function renderProjects() {
-  const projects = PROJECTS;
-  return `
-    <div class="page-header">
-      <div>
-        <div class="page-title">프로젝트 목록</div>
-        <div class="page-sub">전체 ${projects.length}건</div>
-      </div>
-      <button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button>
-    </div>
-    <div class="card">
-      <div class="table-header">
-        <span>프로젝트</span>
-        <span>예산</span>
-        <span>납기</span>
-        <span>검수 상태</span>
-        <span>AI 점수</span>
-        <span></span>
-      </div>
-      ${projects.map(p => `
-        <div class="table-row" onclick="showDetail(${p.id})">
-          <div>
-            <div class="proj-name">${p.title}</div>
-            <div class="proj-maker">${p.maker}</div>
-          </div>
-          <div class="budget-val">${Math.round(p.budgetVAT/10000).toLocaleString()}<span style="font-size:11px;color:var(--text3);">만원</span></div>
-          <div class="deadline-val">${p.deadline}</div>
-          <span class="status-pill ${statusClass(p.status)}">${p.statusLabel}</span>
-          <div style="font-size:13px;font-family:var(--mono);color:${scoreColor(p.aiScore)};">${p.aiScore ? p.aiScore + '/100' : '—'}</div>
-          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showDetail(${p.id})">상세 보기</button>
-        </div>`).join('')}
-    </div>`;
-}
-
-function renderNew() {
-  return `
-    <div class="page-header">
-      <div>
-        <div class="page-title">새 의뢰 등록</div>
-        <div class="page-sub">조건을 입력하면 적합한 제작사를 자동으로 추천합니다</div>
-      </div>
-    </div>
-    <div class="card" style="padding:28px;max-width:680px;">
-      <div class="new-request-form">
-        <div class="form-group">
-          <label>프로젝트명 *</label>
-          <input type="text" placeholder="예: 환경부 탄소중립 SNS 카드뉴스 제작">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>콘텐츠 종류 *</label>
-            <select>
-              <option value="">선택하세요</option>
-              <option>SNS 카드뉴스</option>
-              <option>홍보 영상</option>
-              <option>인포그래픽</option>
-              <option>브로슈어·인쇄물</option>
-              <option>웹 배너</option>
-              <option>SNS 채널 운영</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>수량</label>
-            <input type="text" placeholder="예: 10장, 3분 영상 1편">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>예산 (원) *</label>
-            <input type="text" placeholder="예: 18,000,000">
-          </div>
-          <div class="form-group">
-            <label>납기일 *</label>
-            <input type="text" placeholder="2025.05.10">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>제작사 조건</label>
-          <select>
-            <option>여성기업 인증 제작사 우선</option>
-            <option>여성기업 인증 필수</option>
-            <option>조건 없음</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>상세 요청 사항</label>
-          <textarea placeholder="제작 방향, 참고 자료, 특이 사항 등을 자유롭게 입력해주세요."></textarea>
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px;">
-          <button class="btn btn-ghost" onclick="showPage('dashboard')" data-page="dashboard">취소</button>
-          <button class="btn btn-primary" onclick="submitNew()">의뢰 등록 →</button>
-        </div>
-      </div>
-    </div>`;
+  var html = '<div class="page-header"><div><div class="page-title">프로젝트 목록</div>';
+  html += '<div class="page-sub">전체 ' + PROJECTS.length + '건</div></div>';
+  html += '<button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button></div>';
+  html += '<div class="card"><div class="table-wrap">';
+  for (var i = 0; i < PROJECTS.length; i++) {
+    var p = PROJECTS[i];
+    html += '<div class="table-row" onclick="showDetail(' + p.id + ')" style="cursor:pointer;">';
+    html += '<div style="flex:1;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+    html += '<span>' + p.icon + '</span><span class="proj-name">' + p.title + '</span>';
+    html += statusBadge(p.status, p.statusLabel) + '</div>';
+    html += '<div class="proj-meta">' + p.org + ' · ' + p.maker + '</div>';
+    html += '</div>';
+    html += '<div style="text-align:right;font-weight:700;">' + fmtW(p.budgetVAT) + '만원</div>';
+    html += '</div>';
+  }
+  html += '</div></div>';
+  return html;
 }
 
 function showDetail(id) {
-  currentPage = 'detail_' + id;
-  const p = projects[id];
-  const area = document.getElementById('main-area');
-
-  area.innerHTML = `
-    <div class="page-header">
-      <div>
-        <button class="btn btn-ghost btn-sm" onclick="showPage('projects')" data-page="projects" style="margin-bottom:8px;">← 목록으로</button>
-        <div class="page-title">${p.title}</div>
-        <div class="page-sub">${p.maker} · 납기 ${p.deadline}</div>
-      </div>
-      <span class="status-pill ${statusClass(p.status)}" style="font-size:13px;padding:6px 14px;">${p.statusLabel}</span>
-    </div>
-
-    <div class="detail-layout">
-      <div>
-        <div class="detail-card" style="margin-bottom:16px;">
-          <div class="review-track">
-            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;font-weight:500;">검수 진행 현황</div>
-            <div class="review-steps">
-              <div class="rstep">
-                <div class="rstep-circle done">↑</div>
-                <div class="rstep-label done">납품</div>
-              </div>
-              <div class="rstep-line done"></div>
-              <div class="rstep">
-                <div class="rstep-circle done">AI</div>
-                <div class="rstep-label done">AI 검수</div>
-              </div>
-              <div class="rstep-line ${p.status === 'review' || p.status === 'done' ? 'done' : ''}"></div>
-              <div class="rstep">
-                <div class="rstep-circle ${p.status === 'review' ? 'active' : p.status === 'done' ? 'done' : ''}">전</div>
-                <div class="rstep-label ${p.status === 'review' ? 'active' : p.status === 'done' ? 'done' : ''}">전문가</div>
-              </div>
-              <div class="rstep-line ${p.status === 'done' ? 'done' : ''}"></div>
-              <div class="rstep">
-                <div class="rstep-circle ${p.status === 'done' ? 'done' : ''}">발</div>
-                <div class="rstep-label ${p.status === 'done' ? 'done' : ''}">발주처</div>
-              </div>
-              <div class="rstep-line ${p.status === 'done' ? 'done' : ''}"></div>
-              <div class="rstep">
-                <div class="rstep-circle ${p.status === 'done' ? 'done' : ''}">✓</div>
-                <div class="rstep-label ${p.status === 'done' ? 'done' : ''}">완료</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        ${p.aiScore ? `
-        <div class="ai-report">
-          <div class="ai-report-head">
-            <div class="ai-report-title">🤖 AI 1차 검수 결과</div>
-            <div class="ai-score-badge ${p.aiScore >= 85 ? 'asb-good' : 'asb-warn'}">${p.aiScore}/100 — ${p.aiScore >= 85 ? '통과' : '보완 권고'}</div>
-          </div>
-          <div class="ai-report-body">
-            <div class="ai-check-item"><div class="aci-icon aci-pass">✓</div>파일 포맷 및 해상도 — 적합</div>
-            <div class="ai-check-item"><div class="aci-icon aci-pass">✓</div>공공언어 가이드라인 — 준수</div>
-            <div class="ai-check-item"><div class="aci-icon aci-warn">!</div>"넷제로" 표현 → "탄소중립" 교체 권고</div>
-            <div class="ai-check-item"><div class="aci-icon aci-warn">!</div>3번 카드 글자 크기 기준 미달 의심</div>
-            <div class="ai-check-item"><div class="aci-icon aci-pass">✓</div>저작권 위반 의심 문구 — 없음</div>
-          </div>
-        </div>` : ''}
-
-        ${p.status === 'review' || p.status === 'done' ? `
-        <div class="expert-report">
-          <div class="expert-report-head">
-            <div class="expert-report-title">👩‍💼 전문가 2차 검수 의견</div>
-            <span style="font-size:11px;color:var(--amber);">2025.04.23 완료</span>
-          </div>
-          <div class="expert-report-body">
-            <div class="expert-comment-text">전반적으로 메시지 전달력은 좋습니다. 다만 6번 카드의 통계 수치(2024년 기준)가 발주처 요청 기준(2023년)과 상이합니다. AI가 지적한 "넷제로" 표현도 수정이 필요합니다. 나머지 항목은 납품 가능 수준으로 판단합니다.</div>
-            <div class="expert-reviewer">
-              <div class="er-avatar">김</div>
-              <span>김민정 · 공공마케팅 전문가 10년 경력</span>
-            </div>
-          </div>
-        </div>` : `
-        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;color:var(--text3);">
-          <div style="font-size:20px;margin-bottom:8px;">⏳</div>
-          <div style="font-size:13px;">전문가 검수 진행 중</div>
-          <div style="font-size:11px;margin-top:4px;">48시간 내 완료 예정</div>
-        </div>`}
-      </div>
-
-      <div>
-        <div class="action-panel">
-          <div class="action-title">프로젝트 정보</div>
-          <div class="action-info-row"><span class="air-label">제작사</span><span class="air-val">${p.maker}</span></div>
-          <div class="action-info-row"><span class="air-label">계약 예산</span><span class="air-val">${Math.round(p.budgetVAT/10000).toLocaleString()}만원</span></div>
-          <div class="action-info-row"><span class="air-label">납기일</span><span class="air-val">${p.deadline}</span></div>
-          <div class="action-info-row"><span class="air-label">수정 가능 횟수</span><span class="air-val" style="color:var(--accent);">2회 남음</span></div>
-
-          <div class="escrow-box">
-            <div class="escrow-label">에스크로 보관 대금</div>
-            <div class="escrow-val">${Math.round(p.budgetVAT/10000).toLocaleString()}<span style="font-size:14px;color:var(--text3);">만원</span></div>
-            <div class="escrow-note">최종 승인 후 자동 지급</div>
-          </div>
-
-          ${p.status === 'review' || p.status === 'done' ? `
-          <div class="action-btns">
-            <button class="btn btn-approve" onclick="openModal('approveModal')">✓ 최종 승인 및 대금 지급</button>
-            <button class="btn btn-request" onclick="openModal('requestModal')">수정 요청 보내기</button>
-          </div>` : `
-          <div style="text-align:center;font-size:12px;color:var(--text3);padding:12px;">검수 완료 후 승인 버튼이 활성화됩니다</div>`}
-        </div>
-      </div>
-    </div>`;
+  var p = null;
+  for (var i = 0; i < PROJECTS.length; i++) {
+    if (PROJECTS[i].id === id) { p = PROJECTS[i]; break; }
+  }
+  if (!p) return;
+  var modal = document.getElementById('modal-overlay');
+  var body  = document.getElementById('modal-body');
+  if (!modal || !body) {
+    alert(p.title + '\n' + p.maker + '\n' + fmtW(p.budgetVAT) + '만원');
+    return;
+  }
+  body.innerHTML = '<div style="font-size:16px;font-weight:700;margin-bottom:8px;">' + p.icon + ' ' + p.title + '</div>'
+    + '<div style="font-size:12px;color:var(--text3);margin-bottom:14px;">' + p.org + '</div>'
+    + statusBadge(p.status, p.statusLabel)
+    + '<div style="margin-top:14px;font-size:12px;">'
+    + '<div>제작사: ' + p.maker + '</div>'
+    + '<div>예산: ' + fmtW(p.budgetVAT) + '만원</div>'
+    + '<div>납기: ' + p.deadline + '</div>'
+    + '</div>'
+    + '<div style="margin-top:16px;display:flex;gap:8px;">'
+    + '<button class="btn btn-ghost" onclick="closeModal()">닫기</button>'
+    + '</div>';
+  modal.style.display = 'flex';
 }
 
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-function confirmApprove() {
-  closeModal('approveModal');
-  showToast('최종 승인 완료! 에스크로 대금이 제작사에 지급됩니다.', '✓');
-  const p = projects.find(x => currentPage.includes(x.id));
-  if (p) p.status = 'done';
+function closeModal() {
+  var m = document.getElementById('modal-overlay');
+  if (m) m.style.display = 'none';
 }
 
-function confirmRequest() {
-  closeModal('requestModal');
-  showToast('수정 요청이 제작사에 전달되었습니다.', '📩');
+function showToast(msg) {
+  try { PCM.toast(msg, 'info'); } catch(e) {}
 }
 
-function submitNew() {
-  showToast('의뢰가 등록되었습니다. 제작사 매칭을 시작합니다.', '✓');
-  setTimeout(() => showPage('projects'), 1000);
-}
-
-function openModal(id) { document.getElementById(id).classList.add('show'); }
-
-function scoreColor(score) {
-  if (!score) return 'var(--text3)';
-  if (score >= 85) return 'var(--accent)';
-  if (score >= 70) return 'var(--amber)';
-  return 'var(--red)';
-}
-
-function statusClass(s) {
-  return { review: 'sp-review', ai: 'sp-ai', done: 'sp-done', wait: 'sp-wait', revision: 'sp-revision' }[s] || 'sp-wait';
-}
-
-function showToast(msg, icon) {
-  const toast = document.getElementById('toast');
-  if (!toast) { PCM.toast(msg, 'info'); return; }
-  document.getElementById('toast-msg').textContent = msg;
-  document.getElementById('toast-icon').textContent = icon || 'ℹ️';
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3500);
-}
-
-// ── 초기화 ──
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function(){ mergeSessionProjects(); render(); });
-} else {
+// 초기화
+document.addEventListener('DOMContentLoaded', function() {
   mergeSessionProjects();
   render();
+});
+
+function mergeSessionProjects() {
+  try {
+    var sp = PCM.getProjects ? PCM.getProjects() : [];
+    for (var i = 0; i < sp.length; i++) {
+      var found = false;
+      for (var j = 0; j < PROJECTS.length; j++) {
+        if (PROJECTS[j].id === sp[i].id) { found = true; break; }
+      }
+      if (!found) PROJECTS.unshift(sp[i]);
+    }
+  } catch(e) {}
 }
-/* ── END 발주처 대시보드 ── */
-
-
-
 
 </script>
 
@@ -1265,5 +1074,6 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 </script>
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;"><div style="background:#fff;border-radius:16px;padding:28px;max-width:440px;width:90%;" id="modal-body"></div></div>
 </body>
 </html>
