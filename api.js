@@ -6,7 +6,7 @@
 const API = (() => {
 
   // ── 설정 ──
-  const BASE_URL = window.API_BASE_URL || 'https://pubcontent.kr/api';
+  const BASE_URL = window.API_BASE_URL || 'https://api.pubcontent.kr/api';
 
   // ── 토큰 관리 ──
   function getToken()         { try { return sessionStorage.getItem('pcm_token'); } catch(e) { return null; } }

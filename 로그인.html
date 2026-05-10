@@ -429,7 +429,7 @@ function doLogin() {
   var btn = document.getElementById('btn-login');
   if (btn) { btn.disabled = true; btn.textContent = '로그인 중...'; }
 
-  fetch('https://pubcontent.kr/api/auth/login', {
+  fetch('https://api.pubcontent.kr/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: email, password: password })
