@@ -732,6 +732,22 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 </script>
 </head>
 <body>
+<!-- 베타 안내 배너 -->
+<style>
+.beta-banner{position:sticky;top:0;z-index:9999;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;padding:8px 16px;text-align:center;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.beta-banner-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;margin-left:8px;}
+.beta-banner-close:hover{background:rgba(255,255,255,.35);}
+.beta-banner-link{color:#fff;text-decoration:underline;cursor:pointer;font-weight:700;}
+@media (max-width:600px){.beta-banner{font-size:11px;padding:6px 10px;}}
+</style>
+<div class="beta-banner" id="beta-banner">
+  <span>🎉 <strong>베타 버전</strong> · 본 서비스는 시범 운영 중이며 데이터가 초기화될 수 있습니다 · <a class="beta-banner-link" href="https://open.kakao.com" target="_blank">피드백 보내기</a></span>
+  <button class="beta-banner-close" onclick="document.getElementById('beta-banner').style.display='none';sessionStorage.setItem('beta_banner_closed','1');" aria-label="닫기">✕</button>
+</div>
+<script>if(sessionStorage.getItem('beta_banner_closed')==='1'){var b=document.getElementById('beta-banner');if(b)b.style.display='none';}</script>
+<!-- 베타 안내 배너 끝 -->
+
+
 
 <div class="header">
   <div class="logo" onclick="nav('랜딩페이지.html')" style="cursor:pointer;">

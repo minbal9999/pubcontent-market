@@ -356,6 +356,22 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 </script>
 </head>
 <body>
+<!-- 베타 안내 배너 -->
+<style>
+.beta-banner{position:sticky;top:0;z-index:9999;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;padding:8px 16px;text-align:center;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.beta-banner-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;margin-left:8px;}
+.beta-banner-close:hover{background:rgba(255,255,255,.35);}
+.beta-banner-link{color:#fff;text-decoration:underline;cursor:pointer;font-weight:700;}
+@media (max-width:600px){.beta-banner{font-size:11px;padding:6px 10px;}}
+</style>
+<div class="beta-banner" id="beta-banner">
+  <span>🎉 <strong>베타 버전</strong> · 본 서비스는 시범 운영 중이며 데이터가 초기화될 수 있습니다 · <a class="beta-banner-link" href="https://open.kakao.com" target="_blank">피드백 보내기</a></span>
+  <button class="beta-banner-close" onclick="document.getElementById('beta-banner').style.display='none';sessionStorage.setItem('beta_banner_closed','1');" aria-label="닫기">✕</button>
+</div>
+<script>if(sessionStorage.getItem('beta_banner_closed')==='1'){var b=document.getElementById('beta-banner');if(b)b.style.display='none';}</script>
+<!-- 베타 안내 배너 끝 -->
+
+
 <div class="header">
   <div style="display:flex;align-items:center;">
     <div class="logo" onclick="nav(\'검수_모니터링_대시보드.html\')">
@@ -701,6 +717,66 @@ document.addEventListener('DOMContentLoaded', function(){
   if(menuBadge) menuBadge.innerHTML = '<span style="background:'+m.bg+';color:'+m.color+';border-radius:5px;padding:1px 6px;border:1px solid '+m.color+'33;">'+m.icon+' '+m.name+'</span>';
 });
 
+
+
+// ⭐ 백엔드 API에서 매칭된 프로젝트 가져오기 (제작사용)
+function loadOrdersFromAPI(){
+  var token = sessionStorage.getItem('pcm_token');
+  if(!token) return;
+  
+  fetch('https://api.pubcontent.kr/api/projects', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(!d.success || !d.data) return;
+    
+    // 자신과 매칭된 프로젝트만 필터링 (makerId가 자신과 일치)
+    var user = JSON.parse(sessionStorage.getItem('pcm_user') || '{}');
+    var myProjects = d.data.filter(function(p){
+      return p.makerId === user.id;
+    });
+    
+    if(myProjects.length === 0) return;
+    
+    // ORDERS 형식으로 변환
+    var statusMap = {
+      'IN_PROGRESS': '제작 중',
+      'IN_REVIEW': '검수 중',
+      'COMPLETED': '완료',
+      'PENDING': '견적 대기'
+    };
+    
+    var apiOrders = myProjects.map(function(p){
+      return {
+        id: p.id,
+        title: p.title,
+        client: p.buyerName || '발주처',
+        budget: Math.floor((p.budget || 0) / 10000),
+        status: statusMap[p.status] || p.status,
+        deadline: (p.deadline || '').substring(0,10).replace(/-/g,'.'),
+        progress: p.status === 'COMPLETED' ? 100 : p.status === 'IN_REVIEW' ? 65 : 30,
+        isFromAPI: true
+      };
+    });
+    
+    // ORDERS 배열에 추가 (전역 변수일 가능성)
+    if (typeof ORDERS !== 'undefined' && Array.isArray(ORDERS)) {
+      apiOrders.forEach(function(o){
+        var idx = ORDERS.findIndex(function(x){ return x.id === o.id; });
+        if (idx >= 0) ORDERS[idx] = o;
+        else ORDERS.unshift(o);
+      });
+      
+      if (typeof renderMain === 'function') renderMain();
+    }
+  })
+  .catch(function(e){ console.warn('주문 로드 실패:', e); });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(loadOrdersFromAPI, 200);
+});
 </script>
 </body>
 </html>

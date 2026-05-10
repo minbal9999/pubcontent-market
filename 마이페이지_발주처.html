@@ -370,6 +370,22 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 </script>
 </head>
 <body>
+<!-- 베타 안내 배너 -->
+<style>
+.beta-banner{position:sticky;top:0;z-index:9999;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;padding:8px 16px;text-align:center;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.beta-banner-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;margin-left:8px;}
+.beta-banner-close:hover{background:rgba(255,255,255,.35);}
+.beta-banner-link{color:#fff;text-decoration:underline;cursor:pointer;font-weight:700;}
+@media (max-width:600px){.beta-banner{font-size:11px;padding:6px 10px;}}
+</style>
+<div class="beta-banner" id="beta-banner">
+  <span>🎉 <strong>베타 버전</strong> · 본 서비스는 시범 운영 중이며 데이터가 초기화될 수 있습니다 · <a class="beta-banner-link" href="https://open.kakao.com" target="_blank">피드백 보내기</a></span>
+  <button class="beta-banner-close" onclick="document.getElementById('beta-banner').style.display='none';sessionStorage.setItem('beta_banner_closed','1');" aria-label="닫기">✕</button>
+</div>
+<script>if(sessionStorage.getItem('beta_banner_closed')==='1'){var b=document.getElementById('beta-banner');if(b)b.style.display='none';}</script>
+<!-- 베타 안내 배너 끝 -->
+
+
 <div class="header">
   <div style="display:flex;align-items:center;">
     <div class="logo" onclick="nav('견적서_수락.html')">
@@ -487,6 +503,61 @@ function mergeSessionProjects(){
     sp.forEach(function(p){if(!PROJECTS.find(function(x){return x.id===p.id;}))PROJECTS.unshift(p);});
   }catch(e){}
 }
+
+// ⭐ 백엔드 API에서 진짜 프로젝트 데이터 가져오기
+function loadProjectsFromAPI(){
+  var token = sessionStorage.getItem('pcm_token');
+  if(!token) return;  // 로그인 안 된 상태면 더미만 표시
+  
+  fetch('https://api.pubcontent.kr/api/projects', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(!d.success || !d.data) return;
+    
+    // DB 데이터를 마이페이지 형식으로 변환
+    var apiProjects = d.data.map(function(p){
+      var iconMap = {'카드뉴스':'📊','홍보영상':'🎬','인포그래픽':'📈','SNS콘텐츠':'📱','인쇄홍보물':'📄'};
+      var statusMap = {
+        'IN_PROGRESS':{status:'progress',label:'제작 중',progress:30},
+        'IN_REVIEW':{status:'review',label:'검수 중',progress:65},
+        'COMPLETED':{status:'done',label:'완료',progress:100},
+        'PENDING':{status:'pending',label:'견적 대기',progress:10}
+      };
+      var s = statusMap[p.status] || {status:'progress',label:p.status,progress:30};
+      return {
+        id: p.id,
+        icon: iconMap[p.contentType] || '📋',
+        title: p.title,
+        maker: p.makerName || '제작사 매칭 중',
+        status: s.status,
+        statusLabel: s.label,
+        budget: Math.floor((p.budget || 0) / 10000),  // 원 → 만원
+        deadline: (p.deadline || '').substring(0,10).replace(/-/g,'.'),
+        progress: s.progress,
+        checkStep: 0,
+        isFromAPI: true  // API에서 온 데이터 표시
+      };
+    });
+    
+    // 기존 PROJECTS와 합치기 (중복 제거)
+    apiProjects.forEach(function(ap){
+      var idx = PROJECTS.findIndex(function(x){ return x.id === ap.id; });
+      if (idx >= 0) PROJECTS[idx] = ap;
+      else PROJECTS.unshift(ap);
+    });
+    
+    // 화면 다시 그리기
+    if (typeof renderMain === 'function') renderMain();
+  })
+  .catch(function(e){ console.warn('프로젝트 로드 실패:', e); });
+}
+
+// 페이지 로드 시 API 호출
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(loadProjectsFromAPI, 100);
+});
 
 function renderMain(){
   const el=document.getElementById('main-area');
