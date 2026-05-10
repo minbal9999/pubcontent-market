@@ -456,6 +456,22 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 </script>
 </head>
 <body>
+<!-- 베타 안내 배너 -->
+<style>
+.beta-banner{position:sticky;top:0;z-index:9999;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;padding:8px 16px;text-align:center;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.beta-banner-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;margin-left:8px;}
+.beta-banner-close:hover{background:rgba(255,255,255,.35);}
+.beta-banner-link{color:#fff;text-decoration:underline;cursor:pointer;font-weight:700;}
+@media (max-width:600px){.beta-banner{font-size:11px;padding:6px 10px;}}
+</style>
+<div class="beta-banner" id="beta-banner">
+  <span>🎉 <strong>베타 버전</strong> · 본 서비스는 시범 운영 중이며 데이터가 초기화될 수 있습니다 · <a class="beta-banner-link" href="https://open.kakao.com" target="_blank">피드백 보내기</a></span>
+  <button class="beta-banner-close" onclick="document.getElementById('beta-banner').style.display='none';sessionStorage.setItem('beta_banner_closed','1');" aria-label="닫기">✕</button>
+</div>
+<script>if(sessionStorage.getItem('beta_banner_closed')==='1'){var b=document.getElementById('beta-banner');if(b)b.style.display='none';}</script>
+<!-- 베타 안내 배너 끝 -->
+
+
 
 <div class="header">
   <a class="logo" onclick="nav('랜딩페이지.html')" style="cursor:pointer;">
@@ -1143,40 +1159,6 @@ let S = {
   verifyMethod: null,       // 인증 방법
   verifyStatus: null        // 인증 상태
 };
-
-const TYPES = {
-  public: {
-    icon: '🏛',
-    name: '공공기관 담당자',
-    sub: '부처·공기업·지자체\n홍보·마케팅 담당',
-    color: 'blue',
-    benefits: ['콘텐츠 외주 의뢰 등록 무료', '여성기업 인증 제작사 우선 매칭', 'AI+전문가 이중 검수 보장', '에스크로 대금 보호', '수의계약 서류 자동 생성'],
-    steps: ['유형 선택', '기관 정보', '담당자 정보', '약관 동의'],
-    submitLabel: '공공기관 회원 가입'
-  },
-  expert: {
-    icon: '👩‍💼',
-    name: '검수 전문가',
-    sub: '마케터·PD·카피라이터\n콘텐츠 품질 검수 패널',
-    color: 'expert',
-    benefits: ['건당 1~3만원 검수 수수료', '공공 콘텐츠 전문성 인증', '재택 가능·자유로운 시간', '경력 증빙 자료로 활용', '전문가 네트워크 참여'],
-    steps: ['유형 선택', '기본 정보', '전문 분야', '약관 동의'],
-    submitLabel: '전문가 패널 신청'
-  },
-  maker: {
-    icon: '🎬',
-    name: '콘텐츠 제작사',
-    sub: '영상·SNS·인쇄·디자인\n공공기관 수주 희망 업체',
-    color: 'maker',
-    benefits: ['공공기관 발주 알림 수신', '여성기업 인증 시 우선 노출', '안정적인 공공 수주 채널', '나라장터 연동 지원', '포트폴리오 프로필 노출'],
-    steps: ['유형 선택', '회사 정보', '전문 분야', '약관 동의'],
-    submitLabel: '제작사 입점 신청'
-  }
-};
-
-const EXPERT_FIELDS = ['영상·영상편집','SNS·디지털마케팅','카피라이팅','시각디자인','공공언어','홍보기획','사진촬영','모션그래픽','인쇄·출판'];
-const MAKER_SERVICES = ['SNS 카드뉴스','홍보 영상','인포그래픽','인쇄 홍보물','SNS 채널운영','웹 콘텐츠','캠페인 기획','사진 촬영','모션그래픽'];
-const ORG_TYPES = ['중앙부처','공기업','지방자치단체','지방공기업','공공기관(기타)'];
 
 /* ── 다크모드 토글 ── */
 (function(){

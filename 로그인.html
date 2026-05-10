@@ -445,7 +445,7 @@ function doLogin() {
   var btn = document.getElementById('btn-login');
   if (btn) { btn.disabled = true; btn.textContent = '로그인 중...'; }
 
-  fetch('https://pubcontent.kr/api/auth/login', {
+  fetch('https://api.pubcontent.kr/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: email, password: password })
@@ -480,17 +480,11 @@ function doLogin() {
       PCM.toast((data && data.message) || '로그인 실패', 'error');
     }
   })
-  .catch(function(){
+  .catch(function(err){
     if (btn) { btn.disabled = false; btn.textContent = '로그인'; }
-    // 더미 모드
-    sessionStorage.setItem('userType', role);
-    sessionStorage.setItem('userName', email.split('@')[0]);
-    PCM.toast('더미 모드로 로그인합니다.', 'info');
-    setTimeout(function(){
-      if (role === 'maker') window.location.href = '마이페이지_콘텐츠사.html';
-      else if (role === 'expert') window.location.href = '마이페이지_전문가.html';
-      else window.location.href = '발주처_대시보드.html';
-    }, 800);
+    // ⭐ 더미 모드 제거: 백엔드 실패 시 에러만 표시 (토큰 없이 리다이렉트 방지)
+    PCM.toast('서버 연결 실패. 잠시 후 다시 시도해주세요.', 'error');
+    console.warn('Login error:', err);
   });
 }
 

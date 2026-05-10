@@ -828,17 +828,7 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 // ── 발주처 대시보드 ──
 var currentPage = 'dashboard';
 
-var PROJECTS = [
-  { id:1, icon:'🌿', title:'탄소중립 SNS 카드뉴스 제작', org:'환경부 홍보기획과',
-    maker:'㈜ 그린스튜디오', status:'review', statusLabel:'검수 중',
-    budgetVAT:19800000, deadline:'2025.05.10', progress:75, aiScore:94 },
-  { id:2, icon:'📊', title:'환경정책 인포그래픽 5종', org:'환경부 정책기획과',
-    maker:'비주얼팩토리', status:'done', statusLabel:'정산 완료',
-    budgetVAT:9680000, deadline:'2025.04.28', progress:100, aiScore:98 },
-  { id:3, icon:'📣', title:'청년 주거복지 캠페인 기획', org:'국토부 주거복지기획과',
-    maker:'캠페인하우스', status:'making', statusLabel:'제작 중',
-    budgetVAT:27500000, deadline:'2025.07.01', progress:30, aiScore:null },
-];
+var PROJECTS = [];
 
 function fmtW(n) {
   if (!n && n !== 0) return '0';
@@ -1089,6 +1079,60 @@ document.addEventListener('DOMContentLoaded', function(){
   try { PCM._updateBadge(); } catch(e){}
 });
 
+
+
+// ⭐ 백엔드 API에서 진짜 프로젝트 데이터 가져오기 (대시보드)
+function loadProjectsFromAPI(){
+  var token = sessionStorage.getItem('pcm_token');
+  if(!token) return;
+  
+  fetch('https://api.pubcontent.kr/api/projects', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if(!d.success || !d.data || d.data.length === 0) return;
+    
+    var iconMap = {'카드뉴스':'📊','홍보영상':'🎬','인포그래픽':'📈','SNS콘텐츠':'📱','인쇄홍보물':'📄'};
+    var statusMap = {
+      'IN_PROGRESS':{status:'progress',label:'제작 중',progress:30},
+      'IN_REVIEW':{status:'review',label:'검수 중',progress:65},
+      'COMPLETED':{status:'done',label:'완료',progress:100},
+      'PENDING':{status:'pending',label:'견적 대기',progress:10}
+    };
+    
+    if (typeof PROJECTS !== 'undefined' && Array.isArray(PROJECTS)) {
+      d.data.forEach(function(p){
+        var s = statusMap[p.status] || {status:'progress',label:p.status,progress:30};
+        var item = {
+          id: p.id,
+          icon: iconMap[p.contentType] || '📋',
+          title: p.title,
+          org: '',
+          maker: p.makerName || '제작사 매칭 중',
+          status: s.status,
+          statusLabel: s.label,
+          budget: Math.floor((p.budget || 0) / 10000),
+          deadline: (p.deadline || '').substring(0,10).replace(/-/g,'.'),
+          progress: s.progress,
+          checkStep: 0
+        };
+        var idx = PROJECTS.findIndex(function(x){ return x.id === p.id; });
+        if (idx >= 0) PROJECTS[idx] = item;
+        else PROJECTS.unshift(item);
+      });
+      
+      // 화면 다시 그리기 시도
+      if (typeof render === 'function') render();
+      else if (typeof renderProjects === 'function') renderProjects();
+    }
+  })
+  .catch(function(e){ console.warn('Projects load failed:', e); });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(loadProjectsFromAPI, 100);
+});
 </script>
 <div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;"><div style="background:#fff;border-radius:16px;padding:28px;max-width:440px;width:90%;" id="modal-body"></div></div>
 </body>

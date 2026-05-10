@@ -471,11 +471,7 @@ function toggleDarkMode(){
 
 let currentSection='orders';
 
-const ORDERS=[
-  {id:1,icon:'📊',title:'탄소중립 SNS 카드뉴스',org:'환경부 홍보기획과',status:'review',statusLabel:'검수 중',budgetVAT:1800,checkStep:2,deadline:'2025.05.10',revisions:1},
-  {id:2,icon:'📱',title:'서울시 SNS 채널 운영',org:'서울시 디지털소통담당관',status:'making',statusLabel:'제작 중',budgetVAT:2100,checkStep:0,deadline:'2025.06.01',revisions:2},
-  {id:3,icon:'🎬',title:'국토부 주거복지 홍보영상',org:'국토부 주거복지기획과',status:'new',statusLabel:'견적 수락 대기',budgetVAT:5500,checkStep:0,deadline:'2025.07.15',revisions:2},
-];
+const ORDERS=[];
 
 function bd(vatIncl){
   const supply=Math.round(vatIncl/1.1);

@@ -388,6 +388,22 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 </script>
 </head>
 <body>
+<!-- 베타 안내 배너 -->
+<style>
+.beta-banner{position:sticky;top:0;z-index:9999;background:linear-gradient(90deg,#f59e0b,#f97316);color:#fff;padding:8px 16px;text-align:center;font-size:13px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,'Pretendard','Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.beta-banner-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;margin-left:8px;}
+.beta-banner-close:hover{background:rgba(255,255,255,.35);}
+.beta-banner-link{color:#fff;text-decoration:underline;cursor:pointer;font-weight:700;}
+@media (max-width:600px){.beta-banner{font-size:11px;padding:6px 10px;}}
+</style>
+<div class="beta-banner" id="beta-banner">
+  <span>🎉 <strong>베타 버전</strong> · 본 서비스는 시범 운영 중이며 데이터가 초기화될 수 있습니다 · <a class="beta-banner-link" href="https://open.kakao.com" target="_blank">피드백 보내기</a></span>
+  <button class="beta-banner-close" onclick="document.getElementById('beta-banner').style.display='none';sessionStorage.setItem('beta_banner_closed','1');" aria-label="닫기">✕</button>
+</div>
+<script>if(sessionStorage.getItem('beta_banner_closed')==='1'){var b=document.getElementById('beta-banner');if(b)b.style.display='none';}</script>
+<!-- 베타 안내 배너 끝 -->
+
+
 
 <div class="header">
   <div style="display:flex;align-items:center;">
@@ -428,17 +444,6 @@ const DELIVERY_FILES = [
 const HISTORY = [
   {round:1, date:'2025.05.05 14:22', items:['최초 납품'], used:false},
 ];
-// 수정 요청 페이지 상태 변수
-const REVISIONS_TOTAL = 3;     // 총 수정 가능 횟수
-const REVISIONS_USED = 1;      // 이미 사용한 수정 횟수
-const REVISIONS_LEFT = REVISIONS_TOTAL - REVISIONS_USED;  // 남은 수정 횟수
-
-// 프로젝트 정보 (실제로는 백엔드 API에서 가져와야 함)
-const PROJECT_INFO = {
-  title: '탄소중립 SNS 카드뉴스',
-  maker: '㈜ 그린스튜디오'
-};
-
 
 function render() {
   const el = document.getElementById('main');
