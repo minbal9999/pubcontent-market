@@ -874,7 +874,7 @@ function renderDashboard() {
   html += '<div class="page-header">';
   html += '<div><div class="page-title">대시보드</div>';
   html += '<div class="page-sub">환경부 홍보기획과 · 2025년 2분기</div></div>';
-  html += '<button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button>';
+  html += '<button class="btn btn-primary" onclick="nav(\'과업지시서_생성기_v3.html\')">+ 새 의뢰 등록</button>';
   html += '</div>';
 
   // 통계
@@ -888,7 +888,7 @@ function renderDashboard() {
   // 프로젝트 목록
   html += '<div class="card">';
   html += '<div class="card-header"><div class="card-title">진행 중 의뢰</div>';
-  html += '<button class="btn btn-ghost btn-sm" onclick="showPage('projects')">전체 보기</button></div>';
+  html += '<button class="btn btn-ghost btn-sm" onclick="showPage(\'projects\')">전체 보기</button></div>';
   html += '<div class="table-wrap">';
 
   for (var i = 0; i < PROJECTS.length; i++) {
@@ -924,7 +924,7 @@ function renderDashboard() {
   ];
   for (var j = 0; j < actions.length; j++) {
     var a = actions[j];
-    html += '<div onclick="nav('' + a.href + '')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">';
+    html += '<div onclick="nav(\'' + a.href + '\')" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;">';
     html += '<div style="font-size:22px;margin-bottom:6px;">' + a.icon + '</div>';
     html += '<div style="font-size:12px;font-weight:500;">' + a.label + '</div>';
     html += '</div>';
@@ -937,7 +937,7 @@ function renderDashboard() {
 function renderProjects() {
   var html = '<div class="page-header"><div><div class="page-title">프로젝트 목록</div>';
   html += '<div class="page-sub">전체 ' + PROJECTS.length + '건</div></div>';
-  html += '<button class="btn btn-primary" onclick="nav('과업지시서_생성기_v3.html')">+ 새 의뢰 등록</button></div>';
+  html += '<button class="btn btn-primary" onclick="nav(\'과업지시서_생성기_v3.html\')">+ 새 의뢰 등록</button></div>';
   html += '<div class="card"><div class="table-wrap">';
   for (var i = 0; i < PROJECTS.length; i++) {
     var p = PROJECTS[i];
@@ -1040,7 +1040,7 @@ function toggleDarkMode(){
         const containers = document.querySelectorAll('.project-list, .project-cards, [class*="projects"]');
         containers.forEach(function(el){
           if(el && el.children.length === 0) {
-            el.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--text3);"><div style="font-size:44px;margin-bottom:14px;">📋</div><div style="font-size:17px;font-weight:700;color:var(--text2);margin-bottom:8px;">아직 진행 중인 의뢰가 없어요</div><div style="font-size:13px;line-height:1.7;margin-bottom:22px;">첫 의뢰를 등록하고 콘텐츠 제작을 시작해보세요.<br>AI+전문가 검수와 에스크로 대금 보호가 제공됩니다.</div><button onclick="nav('과업지시서_생성기_v3.html')" style="padding:12px 28px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);">+ 첫 의뢰 등록하기</button></div>';
+            el.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--text3);"><div style="font-size:44px;margin-bottom:14px;">📋</div><div style="font-size:17px;font-weight:700;color:var(--text2);margin-bottom:8px;">아직 진행 중인 의뢰가 없어요</div><div style="font-size:13px;line-height:1.7;margin-bottom:22px;">첫 의뢰를 등록하고 콘텐츠 제작을 시작해보세요.<br>AI+전문가 검수와 에스크로 대금 보호가 제공됩니다.</div><button onclick="nav(\'과업지시서_생성기_v3.html\')" style="padding:12px 28px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);">+ 첫 의뢰 등록하기</button></div>';
           }
         });
       }, 100);
