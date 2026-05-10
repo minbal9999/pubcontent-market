@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
 <body>
 <div class="header">
   <div style="display:flex;align-items:center;">
-    <div class="logo" onclick="nav('발주처_대시보드.html')">
+    <div class="logo" onclick="nav(\'발주처_대시보드.html\')">
       <div class="logo-mark">공</div>
       <div class="logo-name">공공콘텐츠마켓</div>
       <span class="logo-role">발주처</span>
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => PCM._updateBadge());
   </div>
   <div style="display:flex;gap:8px;">
     <button class="btn btn-ghost mob-back" id="mob-back" onclick="showRoomList()">← 목록</button>
-    <button class="btn btn-ghost" onclick="nav('마이페이지_발주처.html')">← 마이페이지</button>
+    <button class="btn btn-ghost" onclick="nav(\'마이페이지_발주처.html\')">← 마이페이지</button>
   </div>
 </div>
 
@@ -453,8 +453,8 @@ function checkDMPermission(){
       +'<div style="font-size:18px;font-weight:700;margin-bottom:8px;">프로 플랜 전용 기능</div>'
       +'<div style="font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:20px;">발주처 선제안 DM은<br><strong>월 5만원 프로 플랜</strong>에서 사용 가능합니다.<br>월 10건 한도로 발주처에게 직접 제안하세요.</div>'
       +'<div style="display:flex;flex-direction:column;gap:8px;">'
-      +'<button onclick="window.location.href='멤버십.html'" style="padding:11px;background:#6b46c1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;">👑 프로로 업그레이드</button>'
-      +'<button onclick="this.closest('div[style*=fixed]').remove()" style="padding:10px;background:transparent;border:1px solid rgba(0,0,0,.14);border-radius:8px;font-size:13px;cursor:pointer;font-family:sans-serif;">닫기</button>'
+      +'<button onclick="window.location.href=\'멤버십.html\'" style="padding:11px;background:#6b46c1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:sans-serif;">👑 프로로 업그레이드</button>'
+      +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="padding:10px;background:transparent;border:1px solid rgba(0,0,0,.14);border-radius:8px;font-size:13px;cursor:pointer;font-family:sans-serif;">닫기</button>'
       +'</div></div>';
     document.body.appendChild(modal);
     return false;
@@ -581,8 +581,8 @@ function openRoom(id){
         <div class="cw-sub"><span class="online-dot"></span>${room.sub} · 온라인</div>
       </div>
       <div class="cw-actions">
-        <button class="btn btn-ghost" onclick="nav('검수_결과.html')" title="검수 결과">📋</button>
-        <button class="btn btn-ghost" onclick="nav('납품물_열람.html')" title="납품물">📁</button>
+        <button class="btn btn-ghost" onclick="nav(\'검수_결과.html\')" title="검수 결과">📋</button>
+        <button class="btn btn-ghost" onclick="nav(\'납품물_열람.html\')" title="납품물">📁</button>
       </div>
     </div>
     <div class="msg-area" id="msg-area"></div>
@@ -590,8 +590,8 @@ function openRoom(id){
       <div class="input-toolbar">
         <button class="tool-btn" title="파일 첨부" onclick="attachFile()">📎</button>
         <button class="tool-btn" title="이모지">😊</button>
-        <button class="tool-btn" title="수정 요청" onclick="nav('수정_요청.html')">✏️</button>
-        <button class="tool-btn" title="납품물 보기" onclick="nav('납품물_열람.html')">📁</button>
+        <button class="tool-btn" title="수정 요청" onclick="nav(\'수정_요청.html\')">✏️</button>
+        <button class="tool-btn" title="납품물 보기" onclick="nav(\'납품물_열람.html\')">📁</button>
       </div>
       <div class="input-row">
         <textarea class="msg-input" id="msg-input" placeholder="메시지를 입력하세요..." rows="1"
@@ -638,7 +638,7 @@ function renderMessages(msgs){
     if(m.quickAction){
       qa=`<div class="quick-action">
         <div class="qa-title">${m.quickAction.title}</div>
-        ${m.quickAction.btns.map(b=>`<button class="qa-btn" onclick="nav('${b.url}')">${b.label}</button>`).join('')}
+        ${m.quickAction.btns.map(b=>`<button class="qa-btn" onclick="nav(\'${b.url}\')">${b.label}</button>`).join('')}
       </div>`;
     }
 

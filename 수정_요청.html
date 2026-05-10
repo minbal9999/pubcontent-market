@@ -704,7 +704,6 @@ function doSend() {
     sessionStorage.setItem('pcm_msgs_r1', JSON.stringify(msgs));
   } catch(e){}
   PCM.pushNotif({icon:'✏️',title:'수정 요청 발송',sub:'제작사에게 수정 요청이 전달되었습니다.',time:'방금'}); PCM.toast('수정 요청이 발송되었습니다 ✓','success');
-  else PCM.pushNotif({icon:'✏️',title:'수정 요청 발송',sub:'제작사에게 수정 요청이 전달되었습니다.',time:'방금'}); showToast('수정 요청이 발송되었습니다 ✓');
   setTimeout(() => nav('마이페이지_발주처.html'), 1500);
 }
 function doExtra() {
