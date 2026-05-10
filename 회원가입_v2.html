@@ -1132,6 +1132,18 @@ render();
 <script>
 function nav(p){window.location.href=p;}
 
+// State 객체 - 회원가입 v2 흐름 전체 상태 관리
+let S = {
+  step: 0,                  // 0: 유형선택, 1-3: 입력단계, 4: 완료
+  type: null,               // 'public' | 'maker' | 'expert'
+  chips: {},                // 칩 선택 상태 (field/key/service별 배열)
+  bizCodes: [],             // 업종 코드 배열
+  careers: [],              // 경력 배열
+  attachedFiles: {},        // 첨부파일 (method/key별)
+  verifyMethod: null,       // 인증 방법
+  verifyStatus: null        // 인증 상태
+};
+
 /* ── 다크모드 토글 ── */
 (function(){
   var saved = localStorage.getItem('pcm_theme') || 'light';
